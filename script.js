@@ -53,10 +53,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const visibilityDisplay = document.getElementById("visibility");
   const visibilityStatus = document.getElementById("visibility-status");
 
-  // API Key & Storage Constants
-  const API_KEY = "5deead9ad15ea47dc8fff790537c8568";
+  // Storage Constants
   const HISTORY_STORAGE_KEY = "atmosphere_recent_searches";
   const MAX_HISTORY_ITEMS = 6;
+
+  // WMO Weather Codes & Condition Mappings
+  const WMO_WEATHER_MAP = {
+    0: { main: "Clear", desc: "Clear Sky", iconDay: "01d", iconNight: "01n" },
+    1: { main: "Clear", desc: "Mainly Clear", iconDay: "01d", iconNight: "01n" },
+    2: { main: "Clouds", desc: "Partly Cloudy", iconDay: "02d", iconNight: "02n" },
+    3: { main: "Clouds", desc: "Overcast", iconDay: "04d", iconNight: "04n" },
+    45: { main: "Mist", desc: "Foggy", iconDay: "50d", iconNight: "50n" },
+    48: { main: "Mist", desc: "Depositing Rime Fog", iconDay: "50d", iconNight: "50n" },
+    51: { main: "Rain", desc: "Light Drizzle", iconDay: "09d", iconNight: "09n" },
+    53: { main: "Rain", desc: "Moderate Drizzle", iconDay: "09d", iconNight: "09n" },
+    55: { main: "Rain", desc: "Dense Drizzle", iconDay: "09d", iconNight: "09n" },
+    56: { main: "Rain", desc: "Freezing Drizzle", iconDay: "09d", iconNight: "09n" },
+    57: { main: "Rain", desc: "Dense Freezing Drizzle", iconDay: "09d", iconNight: "09n" },
+    61: { main: "Rain", desc: "Slight Rain", iconDay: "10d", iconNight: "10n" },
+    63: { main: "Rain", desc: "Moderate Rain", iconDay: "10d", iconNight: "10n" },
+    65: { main: "Rain", desc: "Heavy Rain", iconDay: "10d", iconNight: "10n" },
+    66: { main: "Rain", desc: "Freezing Rain", iconDay: "13d", iconNight: "13n" },
+    67: { main: "Rain", desc: "Heavy Freezing Rain", iconDay: "13d", iconNight: "13n" },
+    71: { main: "Snow", desc: "Slight Snow Fall", iconDay: "13d", iconNight: "13n" },
+    73: { main: "Snow", desc: "Moderate Snow Fall", iconDay: "13d", iconNight: "13n" },
+    75: { main: "Snow", desc: "Heavy Snow Fall", iconDay: "13d", iconNight: "13n" },
+    77: { main: "Snow", desc: "Snow Grains", iconDay: "13d", iconNight: "13n" },
+    80: { main: "Rain", desc: "Slight Rain Showers", iconDay: "09d", iconNight: "09n" },
+    81: { main: "Rain", desc: "Moderate Rain Showers", iconDay: "09d", iconNight: "09n" },
+    82: { main: "Rain", desc: "Violent Rain Showers", iconDay: "09d", iconNight: "09n" },
+    85: { main: "Snow", desc: "Slight Snow Showers", iconDay: "13d", iconNight: "13n" },
+    86: { main: "Snow", desc: "Heavy Snow Showers", iconDay: "13d", iconNight: "13n" },
+    95: { main: "Thunderstorm", desc: "Thunderstorm", iconDay: "11d", iconNight: "11n" },
+    96: { main: "Thunderstorm", desc: "Thunderstorm with Hail", iconDay: "11d", iconNight: "11n" },
+    99: { main: "Thunderstorm", desc: "Heavy Thunderstorm with Hail", iconDay: "11d", iconNight: "11n" },
+  };
 
   // State
   let debounceTimeout = null;
@@ -65,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSuggestions = [];
 
   // --- Initial Launch State ---
-  // Create beautiful ambient sky background for the welcome screen
   initAmbientSky();
 
   // --- Event Listeners ---
@@ -177,10 +207,10 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Debounce live suggestions by 300ms
+    // Debounce live suggestions by 250ms
     debounceTimeout = setTimeout(() => {
       fetchCitySuggestions(query);
-    }, 300);
+    }, 250);
   }
 
   function onInputFocus() {
@@ -235,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     activeDropdownIndex = -1;
   }
 
-  // --- Live Suggestions API ---
+  // --- High-Precision Global City Geocoding API ---
   async function fetchCitySuggestions(query) {
     if (currentAbortController) {
       currentAbortController.abort();
@@ -243,14 +273,14 @@ document.addEventListener("DOMContentLoaded", () => {
     currentAbortController = new AbortController();
 
     try {
-      const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`;
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`;
       const response = await fetch(url, { signal: currentAbortController.signal });
 
       if (!response.ok) return;
 
       const data = await response.json();
-      currentSuggestions = data;
-      renderSuggestionsDropdown(data, query);
+      currentSuggestions = data.results || [];
+      renderSuggestionsDropdown(currentSuggestions, query);
     } catch (err) {
       if (err.name !== "AbortError") {
         console.error("Suggestion error:", err);
@@ -279,13 +309,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
             <circle cx="12" cy="10" r="3"/>
           </svg>
-          Suggestions
+          Matching Locations
         </span>
       </div>
     `;
 
     suggestions.forEach((item, index) => {
-      const locationSub = item.state ? `${item.state}, ${item.country}` : item.country;
+      const region = item.admin1 ? `${item.admin1}, ` : "";
+      const locationSub = `${region}${item.country || ""}`;
       const highlightedName = highlightMatch(item.name, query);
 
       html += `
@@ -315,7 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
           cityInput.value = selected.name;
           clearInputBtn.classList.remove("hidden");
           closeDropdown();
-          executeSearchWithCoords(selected.lat, selected.lon, selected);
+          executeSearchWithCoords(selected.latitude, selected.longitude, selected);
         }
       });
     });
@@ -339,10 +370,11 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       history.unshift({
         name: locationObj.name,
-        state: locationObj.state || "",
+        admin1: locationObj.admin1 || "",
         country: locationObj.country || "",
-        lat: locationObj.lat,
-        lon: locationObj.lon,
+        latitude: locationObj.latitude,
+        longitude: locationObj.longitude,
+        timezone: locationObj.timezone || "auto",
       });
       if (history.length > MAX_HISTORY_ITEMS) {
         history = history.slice(0, MAX_HISTORY_ITEMS);
@@ -388,7 +420,9 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     history.forEach((item, index) => {
-      const locationSub = item.state ? `${item.state}, ${item.country}` : item.country;
+      const region = item.admin1 ? `${item.admin1}, ` : "";
+      const locationSub = `${region}${item.country || ""}`;
+
       html += `
         <div class="dropdown-item" data-history-index="${index}">
           <div class="dropdown-item-left">
@@ -431,8 +465,8 @@ document.addEventListener("DOMContentLoaded", () => {
           cityInput.value = item.name;
           clearInputBtn.classList.remove("hidden");
           closeDropdown();
-          if (item.lat && item.lon) {
-            executeSearchWithCoords(item.lat, item.lon, item);
+          if (item.latitude && item.longitude) {
+            executeSearchWithCoords(item.latitude, item.longitude, item);
           } else {
             handleSearch(item.name);
           }
@@ -462,7 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const locationData = await fetchCoordinates(cityName);
-      await executeSearchWithCoords(locationData.lat, locationData.lon, locationData);
+      await executeSearchWithCoords(locationData.latitude, locationData.longitude, locationData);
     } catch (error) {
       console.error(error);
       showError(error.message);
@@ -475,13 +509,9 @@ document.addEventListener("DOMContentLoaded", () => {
     showLoading();
 
     try {
-      const [currentWeather, forecastData] = await Promise.all([
-        fetchWeatherByCoords(lat, lon),
-        fetchForecastByCoords(lat, lon),
-      ]);
-
+      const weatherData = await fetchGlobalWeatherData(lat, lon, locationData.timezone);
       activateDashboardView();
-      renderAtmosphereDashboard(currentWeather, forecastData, locationData);
+      renderAtmosphereDashboard(weatherData, locationData);
       saveSearchToHistory(locationData);
     } catch (error) {
       console.error(error);
@@ -493,86 +523,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- API Fetch Functions ---
   async function fetchCoordinates(city) {
-    const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`;
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=5&language=en&format=json`;
     const response = await fetch(url);
 
     if (!response.ok) throw new Error("Failed to fetch location data.");
 
     const data = await response.json();
-    if (!data || data.length === 0) {
+    if (!data.results || data.results.length === 0) {
       throw new Error(`No city found for "${city}". Please check the spelling.`);
     }
 
     const searchLower = city.toLowerCase();
-    const exactMatch = data.find((item) => item.name.toLowerCase() === searchLower);
+    const exactMatch = data.results.find((item) => item.name.toLowerCase() === searchLower);
     if (exactMatch) return exactMatch;
 
-    const startsWithMatch = data.find((item) => item.name.toLowerCase().startsWith(searchLower));
-    if (startsWithMatch) return startsWithMatch;
-
-    return data[0];
+    return data.results[0];
   }
 
-  async function fetchWeatherByCoords(lat, lon) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch current weather details.");
-    return await response.json();
-  }
+  async function fetchGlobalWeatherData(lat, lon, timezone) {
+    const tzParam = timezone && timezone !== "auto" ? encodeURIComponent(timezone) : "auto";
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&timezone=${tzParam}&forecast_days=2`;
 
-  async function fetchForecastByCoords(lat, lon) {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch hourly forecast data.");
+    if (!response.ok) throw new Error("Failed to fetch forecast details from global models.");
     return await response.json();
   }
 
   // --- Render Master Dashboard ---
-  function renderAtmosphereDashboard(current, forecast, location) {
-    const { main, weather, wind, sys, visibility, timezone } = current;
-    const { name } = location;
+  function renderAtmosphereDashboard(data, location) {
+    const { current, hourly, daily, utc_offset_seconds, timezone } = data;
+    const { name, country } = location;
+
+    const wmoInfo = WMO_WEATHER_MAP[current.weather_code] || {
+      main: "Clear",
+      desc: "Clear Sky",
+      iconDay: "01d",
+      iconNight: "01n",
+    };
 
     // 1. Header & Location Meta
     cityNameDisplay.textContent = name;
-    localTimeDisplay.textContent = formatLocalTime(timezone);
+    localTimeDisplay.textContent = formatCurrentLocalTime(utc_offset_seconds, timezone);
 
     // 2. Hero Weather Readings
-    temperatureDisplay.textContent = Math.round(main.temp);
-    descriptionDisplay.textContent = weather[0].description;
-    tempMaxDisplay.textContent = `${Math.round(main.temp_max)}°`;
-    tempMinDisplay.textContent = `${Math.round(main.temp_min)}°`;
-    feelsLikeDisplay.textContent = `${Math.round(main.feels_like)}°`;
+    temperatureDisplay.textContent = Math.round(current.temperature_2m);
+    descriptionDisplay.textContent = wmoInfo.desc;
+    tempMaxDisplay.textContent = `${Math.round(daily.temperature_2m_max[0])}°`;
+    tempMinDisplay.textContent = `${Math.round(daily.temperature_2m_min[0])}°`;
+    feelsLikeDisplay.textContent = `${Math.round(current.apparent_temperature)}°`;
 
-    // 3. Dynamic Animated Sky & Scenery Theme
-    updateSceneryAndTheme(current);
+    // 3. Dynamic Animated 3D Sky & Scenery Theme
+    updateSceneryAndTheme(current.is_day, wmoInfo.main);
 
     // 4. Summary Banner
-    generateSummaryNarrative(current, forecast);
+    generateSummaryNarrative(current, daily, wmoInfo);
 
-    // 5. Hourly Forecast Spline Curve Chart
-    renderHourlySplineChart(forecast, timezone, sys);
+    // 5. High-Resolution Hourly Forecast Spline Curve Chart
+    renderHourlySplineChart(hourly, current.time, utc_offset_seconds, timezone);
 
     // 6. Sun Cycle Arc Widget
-    renderSunCycleArc(sys, timezone);
+    renderSunCycleArc(daily, current.time, current.is_day, utc_offset_seconds);
 
     // 7. Insight Card
-    renderInsightWidget(current, forecast);
+    renderInsightWidget(daily);
 
     // 8. Metrics Grid
-    renderMetricCards(current);
+    renderMetricCards(current, hourly);
 
     errorMessage.classList.add("hidden");
   }
 
-  // --- Animated Scenery & Theme Engine ---
-  function updateSceneryAndTheme(weatherData) {
-    const { weather, sys, dt } = weatherData;
-    const condition = weather[0].main;
-    const isNight = isNightTime(dt, sys.sunrise, sys.sunset);
+  // --- Animated 3D Scenery & Theme Engine ---
+  function updateSceneryAndTheme(isDay, conditionMain) {
+    const isNight = isDay === 0;
 
     // Switch body theme class
     document.body.className = "";
-    if (condition === "Rain" || condition === "Drizzle" || condition === "Thunderstorm") {
+    if (conditionMain === "Rain" || conditionMain === "Drizzle" || conditionMain === "Thunderstorm") {
       document.body.classList.add("theme-rain");
     } else if (isNight) {
       document.body.classList.add("theme-night");
@@ -621,18 +648,33 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="sun-core"></div>
       `;
       skyElements.appendChild(sun3d);
+
+      // Soft ambient background clouds in daytime
+      if (ambientSkyCanvas) {
+        for (let i = 0; i < 3; i++) {
+          const bgCloud = document.createElement("div");
+          bgCloud.className = "cloud-layer";
+          bgCloud.style.top = `${6 + i * 20}%`;
+          bgCloud.style.left = `${-180 + i * 360}px`;
+          bgCloud.style.width = `${380 + i * 140}px`;
+          bgCloud.style.height = `${130 + i * 40}px`;
+          bgCloud.style.opacity = "0.4";
+          bgCloud.style.animationDuration = `${55 + i * 18}s`;
+          ambientSkyCanvas.appendChild(bgCloud);
+        }
+      }
     }
 
     // 3D Volumetric Fluffy Clouds
-    if (condition === "Clouds" || condition === "Rain" || condition === "Mist" || condition === "Clear") {
+    if (conditionMain === "Clouds" || conditionMain === "Rain" || conditionMain === "Mist" || conditionMain === "Clear") {
       const cloudConfigs = [
         { top: "14%", left: "-60px", scale: 1.15, dur: "42s", delay: "0s" },
-        { top: "28%", left: "160px", scale: 0.85, dur: "52s", delay: "-12s" },
+        { top: "26%", left: "160px", scale: 0.85, dur: "52s", delay: "-12s" },
         { top: "8%", left: "380px", scale: 0.95, dur: "48s", delay: "-24s" },
-        { top: "22%", left: "620px", scale: 0.75, dur: "58s", delay: "-6s" },
+        { top: "20%", left: "620px", scale: 0.75, dur: "58s", delay: "-6s" },
       ];
 
-      const count = condition === "Clear" ? 2 : cloudConfigs.length;
+      const count = conditionMain === "Clear" ? 2 : cloudConfigs.length;
       for (let i = 0; i < count; i++) {
         const cfg = cloudConfigs[i];
         const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
@@ -641,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Rain Streaks in rainy conditions
-    if (condition === "Rain" || condition === "Drizzle" || condition === "Thunderstorm") {
+    if (conditionMain === "Rain" || conditionMain === "Drizzle" || conditionMain === "Thunderstorm") {
       for (let i = 0; i < 40; i++) {
         const rain = document.createElement("div");
         rain.className = "rain-streak";
@@ -687,67 +729,81 @@ document.addEventListener("DOMContentLoaded", () => {
     return cloud;
   }
 
-  function isNightTime(currentTimestamp, sunriseTimestamp, sunsetTimestamp) {
-    if (!sunriseTimestamp || !sunsetTimestamp) return false;
-    return currentTimestamp < sunriseTimestamp || currentTimestamp > sunsetTimestamp;
-  }
-
   // --- Summary Narrative Generator ---
-  function generateSummaryNarrative(current, forecast) {
-    const condition = current.weather[0].description;
-    const highs = Math.round(current.main.temp_max);
-    const lows = Math.round(current.main.temp_min);
+  function generateSummaryNarrative(current, daily, wmoInfo) {
+    const desc = wmoInfo.desc.toLowerCase();
+    const highs = Math.round(daily.temperature_2m_max[0]);
+    const lows = Math.round(daily.temperature_2m_min[0]);
+    const rainMax = daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
 
-    let narrative = `Generally ${condition}. Highs of ${highs}°C and lows near ${lows}°C.`;
+    let narrative = `Generally ${desc}. Expected highs of ${highs}°C and lows near ${lows}°C.`;
 
-    if (current.weather[0].main === "Rain") {
-      narrative = `Rainy conditions throughout the area. Keep an umbrella handy with highs around ${highs}°C.`;
-    } else if (current.weather[0].main === "Clear") {
+    if (rainMax > 40) {
+      narrative = `Chance of rain up to ${rainMax}%. Keep an umbrella handy with highs around ${highs}°C.`;
+    } else if (wmoInfo.main === "Clear") {
       narrative = `Clear skies with great visibility. Expected high of ${highs}°C and low of ${lows}°C.`;
     }
 
     summaryText.textContent = narrative;
   }
 
-  // --- Hourly Forecast Spline Curve Chart ---
-  function renderHourlySplineChart(forecastData, timezoneOffset, sys) {
-    const list = forecastData.list.slice(0, 9); // next 24-27 hours
-    if (!list || list.length === 0) return;
+  // --- Hourly Forecast Spline Curve Chart (True 1-Hour Resolution) ---
+  function renderHourlySplineChart(hourly, currentTimeIso, utcOffsetSec, timezone) {
+    if (!hourly || !hourly.time || hourly.time.length === 0) return;
 
-    const temps = list.map((item) => Math.round(item.main.temp));
+    // Find starting hour index in hourly.time
+    let startIndex = 0;
+    const currentPrefix = currentTimeIso ? currentTimeIso.slice(0, 13) : "";
+    const foundIdx = hourly.time.findIndex((t) => t.startsWith(currentPrefix));
+    if (foundIdx >= 0) {
+      startIndex = foundIdx;
+    }
+
+    // Extract next 10 consecutive hours (1-hour resolution)
+    const hoursCount = 10;
+    const sliceIndices = [];
+    for (let i = 0; i < hoursCount && startIndex + i < hourly.time.length; i++) {
+      sliceIndices.push(startIndex + i);
+    }
+
+    const temps = sliceIndices.map((i) => Math.round(hourly.temperature_2m[i]));
     const minTemp = Math.min(...temps);
     const maxTemp = Math.max(...temps);
     const tempRange = Math.max(maxTemp - minTemp, 4);
 
-    const colWidth = 76;
-    const totalWidth = list.length * colWidth;
+    const colWidth = 78;
+    const totalWidth = sliceIndices.length * colWidth;
     const graphHeight = 85;
     const graphTopPadding = 25;
 
-    const points = list.map((item, index) => {
-      const x = index * colWidth + colWidth / 2;
-      const normalized = (item.main.temp - minTemp) / tempRange;
+    // Calculate curve points
+    const points = sliceIndices.map((itemIdx, seqIdx) => {
+      const x = seqIdx * colWidth + colWidth / 2;
+      const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
       const y = graphTopPadding + (1 - normalized) * (graphHeight - 35);
-      return { x, y, temp: Math.round(item.main.temp) };
+      return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
     });
 
     const svgPath = createSmoothSplinePath(points);
 
-    let html = `
-      <div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">
-    `;
+    let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
 
-    list.forEach((item, index) => {
-      const hourStr = index === 0 ? "Now" : formatHourOnly(item.dt, timezoneOffset);
-      const iconCode = item.weather[0].icon;
-      const popPercent = Math.round((item.pop || 0) * 100);
+    sliceIndices.forEach((itemIdx, seqIdx) => {
+      const timeIso = hourly.time[itemIdx];
+      const hourStr = seqIdx === 0 ? "Now" : formatIsoHour(timeIso);
+      const code = hourly.weather_code[itemIdx];
+      const wmo = WMO_WEATHER_MAP[code] || { iconDay: "01d", iconNight: "01n", desc: "Clear" };
+      const hourVal = parseInt(timeIso.split("T")[1].split(":")[0], 10);
+      const isDayHour = hourVal >= 6 && hourVal < 20;
+      const iconCode = isDayHour ? wmo.iconDay : wmo.iconNight;
+      const popPercent = Math.round(hourly.precipitation_probability[itemIdx] || 0);
       const popDisplay = popPercent > 0 ? `☂ ${popPercent}%` : "";
 
       html += `
         <div class="hourly-col" style="width: ${colWidth}px;">
           <span class="hourly-time">${hourStr}</span>
           <div class="hourly-icon-box">
-            <img src="https://openweathermap.org/img/wn/${iconCode}.png" alt="${item.weather[0].description}"/>
+            <img src="https://openweathermap.org/img/wn/${iconCode}.png" alt="${wmo.desc}"/>
           </div>
           <span class="hourly-pop">${popDisplay}</span>
         </div>
@@ -793,20 +849,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Sun Cycle Arc Renderer ---
-  function renderSunCycleArc(sys, timezoneOffset) {
-    if (!sys || !sys.sunrise || !sys.sunset) return;
+  function renderSunCycleArc(daily, currentTimeIso, isDay, utcOffsetSec) {
+    if (!daily || !daily.sunrise || !daily.sunset) return;
 
-    const sunriseStr = formatTimestampWithOffset(sys.sunrise, timezoneOffset);
-    const sunsetStr = formatTimestampWithOffset(sys.sunset, timezoneOffset);
+    const sunriseIso = daily.sunrise[0];
+    const sunsetIso = daily.sunset[0];
+
+    const sunriseStr = formatIsoTime(sunriseIso);
+    const sunsetStr = formatIsoTime(sunsetIso);
 
     arcSunriseText.textContent = sunriseStr;
     arcSunsetText.textContent = sunsetStr;
 
-    const nowSec = Math.floor(Date.now() / 1000);
-    const totalDay = sys.sunset - sys.sunrise;
-    const elapsed = nowSec - sys.sunrise;
+    const sunriseMs = new Date(sunriseIso).getTime();
+    const sunsetMs = new Date(sunsetIso).getTime();
+    const nowMs = new Date(currentTimeIso).getTime();
 
-    let progress = elapsed / totalDay;
+    let progress = (nowMs - sunriseMs) / (sunsetMs - sunriseMs);
     progress = Math.max(0, Math.min(1, progress));
 
     const cx = 120 - 95 * Math.cos(progress * Math.PI);
@@ -815,13 +874,14 @@ document.addEventListener("DOMContentLoaded", () => {
     sunGlowCircle.setAttribute("cx", cx);
     sunGlowCircle.setAttribute("cy", cy);
 
-    if (nowSec < sys.sunrise) {
-      sunStatusTitle.textContent = "Night Sky";
-      sunFooterText.textContent = `Sunrise will be at ${sunriseStr}`;
-      sunGlowCircle.setAttribute("fill", "#e0e7ff");
-    } else if (nowSec > sys.sunset) {
-      sunStatusTitle.textContent = "Evening Starlight";
-      sunFooterText.textContent = `Sunset was at ${sunsetStr}`;
+    if (isDay === 0) {
+      if (nowMs < sunriseMs) {
+        sunStatusTitle.textContent = "Night Sky";
+        sunFooterText.textContent = `Sunrise will be at ${sunriseStr}`;
+      } else {
+        sunStatusTitle.textContent = "Evening Starlight";
+        sunFooterText.textContent = `Sunset was at ${sunsetStr}`;
+      }
       sunGlowCircle.setAttribute("fill", "#e0e7ff");
     } else {
       sunStatusTitle.textContent = "Rise and Shine";
@@ -831,54 +891,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Insight Widget ---
-  function renderInsightWidget(current, forecast) {
-    const currentTemp = Math.round(current.main.temp);
-    const tomorrowTemp = forecast.list[8] ? Math.round(forecast.list[8].main.temp) : currentTemp;
-    const diff = tomorrowTemp - currentTemp;
+  function renderInsightWidget(daily) {
+    const todayMax = Math.round(daily.temperature_2m_max[0]);
+    const tomorrowMax = Math.round(daily.temperature_2m_max[1]);
+    const diff = tomorrowMax - todayMax;
 
     insightTitle.textContent = "Tomorrow's Temperature";
 
     if (diff > 0) {
-      insightDesc.textContent = `Temperatures will be around ${Math.abs(diff)}° higher than today.`;
+      insightDesc.textContent = `Temperatures will be around ${Math.abs(diff)}° higher than today (${tomorrowMax}°↑).`;
     } else if (diff < 0) {
-      insightDesc.textContent = `Temperatures a little lower than today (${Math.abs(diff)}°↓).`;
+      insightDesc.textContent = `Temperatures a little lower than today (${Math.abs(diff)}°↓, high ${tomorrowMax}°).`;
     } else {
-      insightDesc.textContent = `Expect similar pleasant temperatures to today.`;
+      insightDesc.textContent = `Expect similar temperatures to today (high near ${tomorrowMax}°).`;
     }
   }
 
   // --- Detailed Metrics Grid ---
-  function renderMetricCards(current) {
-    const { main, wind, visibility } = current;
-
-    humidityDisplay.textContent = `${main.humidity}%`;
-    humidityBar.style.width = `${main.humidity}%`;
-    if (main.humidity < 40) humidityStatus.textContent = "Dry air";
-    else if (main.humidity <= 70) humidityStatus.textContent = "Comfortable level";
+  function renderMetricCards(current, hourly) {
+    // Humidity
+    humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+    humidityBar.style.width = `${current.relative_humidity_2m}%`;
+    if (current.relative_humidity_2m < 40) humidityStatus.textContent = "Dry air";
+    else if (current.relative_humidity_2m <= 70) humidityStatus.textContent = "Comfortable level";
     else humidityStatus.textContent = "High humidity";
 
-    windSpeedDisplay.textContent = `${wind.speed} m/s`;
-    windDirection.textContent = getWindDirectionText(wind.deg);
-    if (wind.speed < 3) windCaption.textContent = "Light air";
-    else if (wind.speed < 8) windCaption.textContent = "Gentle breeze";
+    // Wind
+    windSpeedDisplay.textContent = `${(current.wind_speed_10m / 3.6).toFixed(1)} m/s`;
+    windDirection.textContent = getWindDirectionText(current.wind_direction_10m);
+    const speedMs = current.wind_speed_10m / 3.6;
+    if (speedMs < 3) windCaption.textContent = "Light air";
+    else if (speedMs < 8) windCaption.textContent = "Gentle breeze";
     else windCaption.textContent = "Strong breeze";
 
-    pressureDisplay.textContent = `${main.pressure} hPa`;
+    // Pressure
+    pressureDisplay.textContent = `${Math.round(current.surface_pressure)} hPa`;
 
-    const visKm = visibility ? (visibility / 1000).toFixed(1) : "--";
+    // Visibility
+    const visMeters = hourly && hourly.visibility ? hourly.visibility[0] : 10000;
+    const visKm = (visMeters / 1000).toFixed(1);
     visibilityDisplay.textContent = `${visKm} km`;
-    if (visibility >= 9000) visibilityStatus.textContent = "Clear visibility";
-    else if (visibility >= 4000) visibilityStatus.textContent = "Moderate haze";
+    if (visMeters >= 9000) visibilityStatus.textContent = "Clear visibility";
+    else if (visMeters >= 4000) visibilityStatus.textContent = "Moderate haze";
     else visibilityStatus.textContent = "Low visibility";
   }
 
   function getWindDirectionText(deg) {
-    if (deg === undefined) return "Calm";
+    if (deg === undefined || deg === null) return "Calm";
     const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
     return `${dirs[Math.round(deg / 45) % 8]} direction`;
   }
 
-  // --- Utilities & UI ---
+  // --- Utilities & Date Formats ---
   function showError(message) {
     errorText.textContent = message;
     errorMessage.classList.remove("hidden");
@@ -912,9 +976,20 @@ document.addEventListener("DOMContentLoaded", () => {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  function formatLocalTime(timezoneOffsetSeconds) {
+  function formatCurrentLocalTime(utcOffsetSec, timezone) {
+    try {
+      if (timezone && timezone !== "auto") {
+        return new Date().toLocaleDateString("en-US", {
+          timeZone: timezone,
+          weekday: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    } catch {}
+
     const nowUtc = Date.now() + new Date().getTimezoneOffset() * 60000;
-    const cityTime = new Date(nowUtc + timezoneOffsetSeconds * 1000);
+    const cityTime = new Date(nowUtc + (utcOffsetSec || 0) * 1000);
     return cityTime.toLocaleDateString([], {
       weekday: "short",
       hour: "2-digit",
@@ -922,18 +997,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function formatHourOnly(timestamp, timezoneOffsetSeconds) {
-    const dateUtc = timestamp * 1000;
-    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
-    const cityDate = new Date(dateUtc + offsetMs);
-    return cityDate.toLocaleTimeString([], { hour: "numeric" }).toLowerCase();
+  function formatIsoHour(isoString) {
+    if (!isoString) return "--";
+    const parts = isoString.split("T");
+    if (parts.length < 2) return isoString;
+    const hour = parseInt(parts[1].split(":")[0], 10);
+    const ampm = hour >= 12 ? "pm" : "am";
+    const hour12 = hour % 12 || 12;
+    return `${hour12} ${ampm}`;
   }
 
-  function formatTimestampWithOffset(timestamp, timezoneOffsetSeconds) {
-    const dateUtc = timestamp * 1000;
-    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
-    const cityDate = new Date(dateUtc + offsetMs);
-    return cityDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  function formatIsoTime(isoString) {
+    if (!isoString) return "--";
+    const parts = isoString.split("T");
+    if (parts.length < 2) return isoString;
+    const timeParts = parts[1].split(":");
+    const hour = parseInt(timeParts[0], 10);
+    const min = timeParts[1];
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12;
+    const paddedHour = hour12 < 10 ? `0${hour12}` : hour12;
+    return `${paddedHour}:${min} ${ampm}`;
   }
 });
 
