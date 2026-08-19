@@ -4,31 +4,47 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearInputBtn = document.getElementById("clear-input-btn");
   const getWeatherBtn = document.getElementById("get-weather-btn");
   const searchDropdown = document.getElementById("search-dropdown");
-  const weatherInfo = document.getElementById("weather-info");
+  const weatherContent = document.getElementById("weather-content");
   const errorMessage = document.getElementById("error-message");
   const errorText = document.getElementById("error-text");
   const loadingSpinner = document.getElementById("loading-spinner");
-  const bgContainer = document.getElementById("bg-container");
 
-  // Weather Data Displays
+  // Hero Displays
   const cityNameDisplay = document.getElementById("city-name");
-  const localTimeDisplay = document.getElementById("local-time");
-  const temperatureDisplay = document.getElementById("temperature");
-  const descriptionDisplay = document.getElementById("description");
-  const tempMaxDisplay = document.getElementById("temp-max");
-  const tempMinDisplay = document.getElementById("temp-min");
-  const weatherIcon = document.getElementById("weather-icon");
-  const feelsLikeDisplay = document.getElementById("feels-like");
-  const humidityDisplay = document.getElementById("humidity");
-  const windSpeedDisplay = document.getElementById("wind-speed");
-  const pressureDisplay = document.getElementById("pressure");
-  const visibilityDisplay = document.getElementById("visibility");
-  const sunriseTimeDisplay = document.getElementById("sunrise-time");
-  const sunsetTimeDisplay = document.getElementById("sunset-time");
+  const heroTempDisplay = document.getElementById("hero-temp");
+  const heroConditionDisplay = document.getElementById("hero-condition");
+  const heroTempMaxDisplay = document.getElementById("hero-temp-max");
+  const heroTempMinDisplay = document.getElementById("hero-temp-min");
+  const heroFeelsLikeDisplay = document.getElementById("hero-feels-like");
+  const heroTimeDisplay = document.getElementById("hero-time");
+  const weatherSummaryText = document.getElementById("weather-summary-text");
+
+  // Forecast & Widgets
+  const hourlyTrack = document.getElementById("hourly-track");
+  const tempCurveSvg = document.getElementById("temp-curve-svg");
+  const dailyForecastList = document.getElementById("daily-forecast-list");
+  const particlesLayer = document.getElementById("particles-layer");
+
+  // Sun Arc Widget
+  const sunStatusText = document.getElementById("sun-status-text");
+  const arcSunriseTime = document.getElementById("arc-sunrise-time");
+  const arcSunsetTime = document.getElementById("arc-sunset-time");
+  const sunProgressPath = document.getElementById("sun-progress-path");
+  const sunIndicator = document.getElementById("sun-indicator");
+  const sunIndicatorGlow = document.getElementById("sun-indicator-glow");
+
+  // Metric Details
+  const metricWind = document.getElementById("metric-wind");
+  const metricWindDir = document.getElementById("metric-wind-dir");
+  const metricHumidity = document.getElementById("metric-humidity");
+  const metricDewPoint = document.getElementById("metric-dew-point");
+  const metricPressure = document.getElementById("metric-pressure");
+  const metricVisibility = document.getElementById("metric-visibility");
+  const metricVisQuality = document.getElementById("metric-vis-quality");
 
   // API Key & Storage Constants
   const API_KEY = "5deead9ad15ea47dc8fff790537c8568";
-  const HISTORY_STORAGE_KEY = "atmosphere_recent_searches";
+  const HISTORY_STORAGE_KEY = "oneui_recent_searches";
   const MAX_HISTORY_ITEMS = 6;
 
   // State
@@ -36,10 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAbortController = null;
   let activeDropdownIndex = -1;
   let currentSuggestions = [];
-  let dropdownMode = "none"; // 'history' | 'suggestions' | 'none'
 
-  // Initialize
-  updateBackground("Default");
+  // Default initial city
+  handleSearch("London");
 
   // --- Event Listeners ---
   getWeatherBtn.addEventListener("click", () => {
@@ -58,9 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHistoryDropdown();
   });
 
-  // Close dropdown when clicking outside
+  // Close dropdown on click outside
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".search-box-wrapper")) {
+    if (!e.target.closest(".search-container")) {
       closeDropdown();
     }
   });
@@ -87,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Debounce live suggestions by 300ms
     debounceTimeout = setTimeout(() => {
       fetchCitySuggestions(query);
     }, 300);
@@ -143,54 +157,41 @@ document.addEventListener("DOMContentLoaded", () => {
     searchDropdown.classList.add("hidden");
     searchDropdown.innerHTML = "";
     activeDropdownIndex = -1;
-    dropdownMode = "none";
   }
 
-  // --- Live Suggestions API ---
+  // --- Suggestions API ---
   async function fetchCitySuggestions(query) {
-    if (currentAbortController) {
-      currentAbortController.abort();
-    }
+    if (currentAbortController) currentAbortController.abort();
     currentAbortController = new AbortController();
 
     try {
       const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`;
       const response = await fetch(url, { signal: currentAbortController.signal });
-
       if (!response.ok) return;
 
       const data = await response.json();
       currentSuggestions = data;
       renderSuggestionsDropdown(data, query);
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Suggestion error:", err);
-      }
+      if (err.name !== "AbortError") console.error("Autocomplete error:", err);
     }
   }
 
   function renderSuggestionsDropdown(suggestions, query) {
     if (!suggestions || suggestions.length === 0) {
       searchDropdown.innerHTML = `
-        <div class="dropdown-empty-state">
-          No matching cities found for "<strong>${escapeHtml(query)}</strong>"
-        </div>
+        <div class="dropdown-empty-state">No matching cities found for "<strong>${escapeHtml(query)}</strong>"</div>
       `;
       searchDropdown.classList.remove("hidden");
-      dropdownMode = "suggestions";
-      activeDropdownIndex = -1;
       return;
     }
 
-    dropdownMode = "suggestions";
     activeDropdownIndex = -1;
-
     let html = `
       <div class="dropdown-header">
         <span class="dropdown-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
           </svg>
           Suggestions
         </span>
@@ -205,8 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="dropdown-item" data-index="${index}">
           <div class="dropdown-item-left">
             <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
             </svg>
             <div class="dropdown-text-group">
               <span class="dropdown-primary-text">${highlightedName}</span>
@@ -220,15 +220,11 @@ document.addEventListener("DOMContentLoaded", () => {
     searchDropdown.innerHTML = html;
     searchDropdown.classList.remove("hidden");
 
-    // Attach click events
     searchDropdown.querySelectorAll(".dropdown-item").forEach((el) => {
       el.addEventListener("click", () => {
         const index = parseInt(el.getAttribute("data-index"), 10);
         const selected = currentSuggestions[index];
         if (selected) {
-          const displayStr = selected.state
-            ? `${selected.name}, ${selected.state}, ${selected.country}`
-            : `${selected.name}, ${selected.country}`;
           cityInput.value = selected.name;
           clearInputBtn.classList.remove("hidden");
           closeDropdown();
@@ -238,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Recent Searches (History) ---
+  // --- Search History ---
   function getSearchHistory() {
     try {
       const stored = localStorage.getItem(HISTORY_STORAGE_KEY);
@@ -251,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function saveSearchToHistory(locationObj) {
     try {
       let history = getSearchHistory();
-      // Remove duplicate if already in history
       history = history.filter(
         (h) => h.name.toLowerCase() !== locationObj.name.toLowerCase() || h.country !== locationObj.country
       );
@@ -262,25 +257,11 @@ document.addEventListener("DOMContentLoaded", () => {
         lat: locationObj.lat,
         lon: locationObj.lon,
       });
-      if (history.length > MAX_HISTORY_ITEMS) {
-        history = history.slice(0, MAX_HISTORY_ITEMS);
-      }
+      if (history.length > MAX_HISTORY_ITEMS) history = history.slice(0, MAX_HISTORY_ITEMS);
       localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
     } catch (e) {
-      console.error("Error saving search history:", e);
+      console.error("Storage error:", e);
     }
-  }
-
-  function removeHistoryItem(index) {
-    let history = getSearchHistory();
-    history.splice(index, 1);
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
-    renderHistoryDropdown();
-  }
-
-  function clearAllHistory() {
-    localStorage.removeItem(HISTORY_STORAGE_KEY);
-    closeDropdown();
   }
 
   function renderHistoryDropdown() {
@@ -290,15 +271,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    dropdownMode = "history";
     activeDropdownIndex = -1;
-
     let html = `
       <div class="dropdown-header">
         <span class="dropdown-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
           </svg>
           Recent Searches
         </span>
@@ -312,18 +290,16 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="dropdown-item" data-history-index="${index}">
           <div class="dropdown-item-left">
             <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
             <div class="dropdown-text-group">
               <span class="dropdown-primary-text">${escapeHtml(item.name)}</span>
               <span class="dropdown-secondary-text">${escapeHtml(locationSub)}</span>
             </div>
           </div>
-          <button class="delete-item-btn" title="Remove from history" data-delete-index="${index}">
+          <button class="delete-item-btn" title="Remove" data-delete-index="${index}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
         </div>
@@ -333,16 +309,15 @@ document.addEventListener("DOMContentLoaded", () => {
     searchDropdown.innerHTML = html;
     searchDropdown.classList.remove("hidden");
 
-    // Clear all click
     const clearAllBtn = document.getElementById("clear-all-history-btn");
     if (clearAllBtn) {
       clearAllBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        clearAllHistory();
+        localStorage.removeItem(HISTORY_STORAGE_KEY);
+        closeDropdown();
       });
     }
 
-    // Individual item click
     searchDropdown.querySelectorAll(".dropdown-item").forEach((el) => {
       el.addEventListener("click", (e) => {
         if (e.target.closest(".delete-item-btn")) return;
@@ -361,12 +336,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Delete single item click
     searchDropdown.querySelectorAll(".delete-item-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const deleteIndex = parseInt(btn.getAttribute("data-delete-index"), 10);
-        removeHistoryItem(deleteIndex);
+        let h = getSearchHistory();
+        h.splice(deleteIndex, 1);
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(h));
+        renderHistoryDropdown();
       });
     });
   }
@@ -374,8 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Main Search Logic ---
   async function handleSearch(cityName) {
     if (!cityName) return;
-
-    resetUI();
 
     if (cityName.length < 2) {
       showError("Please enter at least 2 characters for city search.");
@@ -396,12 +371,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function executeSearchWithCoords(lat, lon, locationData) {
-    resetUI();
     showLoading();
+    hideError();
 
     try {
-      const weatherData = await fetchWeatherByCoords(lat, lon);
-      displayWeatherData(weatherData, locationData);
+      // Fetch both current weather and 5-day forecast simultaneously
+      const [currentWeather, forecastData] = await Promise.all([
+        fetchCurrentWeather(lat, lon),
+        fetchForecastData(lat, lon)
+      ]);
+
+      renderOneUIWeather(currentWeather, forecastData, locationData);
       saveSearchToHistory(locationData);
     } catch (error) {
       console.error(error);
@@ -411,16 +391,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- API Fetch Helpers ---
+  // --- API Fetches ---
   async function fetchCoordinates(city) {
     const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`;
     const response = await fetch(url);
-
-    if (!response.ok) throw new Error("Failed to fetch location data.");
+    if (!response.ok) throw new Error("Location lookup failed.");
 
     const data = await response.json();
     if (!data || data.length === 0) {
-      throw new Error(`No weather data found for "${city}". Please check the spelling.`);
+      throw new Error(`No weather location found for "${city}".`);
     }
 
     const searchLower = city.toLowerCase();
@@ -433,140 +412,368 @@ document.addEventListener("DOMContentLoaded", () => {
     return data[0];
   }
 
-  async function fetchWeatherByCoords(lat, lon) {
+  async function fetchCurrentWeather(lat, lon) {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch current weather details.");
+    if (!response.ok) throw new Error("Failed to fetch current weather.");
     return await response.json();
   }
 
-  // --- UI Update & Display ---
-  function resetUI() {
-    weatherInfo.classList.add("hidden");
-    errorMessage.classList.add("hidden");
-    errorText.textContent = "";
-
-    cityNameDisplay.textContent = "--";
-    localTimeDisplay.textContent = "--";
-    temperatureDisplay.textContent = "--";
-    descriptionDisplay.textContent = "--";
-    tempMaxDisplay.textContent = "--°";
-    tempMinDisplay.textContent = "--°";
-    feelsLikeDisplay.textContent = "--°C";
-    humidityDisplay.textContent = "--%";
-    windSpeedDisplay.textContent = "-- m/s";
-    pressureDisplay.textContent = "-- hPa";
-    visibilityDisplay.textContent = "-- km";
-    sunriseTimeDisplay.textContent = "🌅 --";
-    sunsetTimeDisplay.textContent = "🌇 --";
-    weatherIcon.src = "";
+  async function fetchForecastData(lat, lon) {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch forecast details.");
+    return await response.json();
   }
 
-  function displayWeatherData(weatherData, locationData) {
-    const { main, weather, wind, sys, visibility, timezone } = weatherData;
-    const { name, state, country } = locationData;
+  // --- Render Samsung One UI 9 Weather ---
+  function renderOneUIWeather(current, forecast, location) {
+    const { main, weather, wind, sys, visibility, timezone, dt } = current;
+    const condition = weather[0].main;
+    const conditionDesc = weather[0].description;
+    const isNight = isNightTime(dt, sys.sunrise, sys.sunset);
 
-    // Location formatted string
-    const locationString = state ? `${name}, ${state}, ${country}` : `${name}, ${country}`;
-    cityNameDisplay.textContent = locationString;
+    // 1. Set Theme & Atmosphere Animation
+    updateThemeAtmosphere(condition, isNight);
 
-    // Format local time & sun cycle using city's timezone offset
-    const localTimeString = formatLocalTime(timezone);
-    localTimeDisplay.textContent = localTimeString;
+    // 2. Hero Weather Header
+    const locationName = location.state ? `${location.name}, ${location.state}` : `${location.name}, ${location.country}`;
+    cityNameDisplay.textContent = location.name;
+    heroTempDisplay.textContent = Math.round(main.temp);
+    heroConditionDisplay.textContent = formatConditionTitle(conditionDesc);
 
-    if (sys && sys.sunrise && sys.sunset) {
-      sunriseTimeDisplay.textContent = `🌅 ${formatTimestampWithOffset(sys.sunrise, timezone)}`;
-      sunsetTimeDisplay.textContent = `🌇 ${formatTimestampWithOffset(sys.sunset, timezone)}`;
+    const maxTemp = Math.round(main.temp_max);
+    const minTemp = Math.round(main.temp_min);
+    heroTempMaxDisplay.textContent = `${maxTemp}°`;
+    heroTempMinDisplay.textContent = `${minTemp}°`;
+    heroFeelsLikeDisplay.textContent = `${Math.round(main.feels_like)}°`;
+    heroTimeDisplay.textContent = formatHeroDate(timezone);
+
+    // Summary Text Pill
+    weatherSummaryText.textContent = `Generally ${conditionDesc.toLowerCase()}. Highs ${maxTemp - 1} to ${maxTemp + 1}°C and lows ${minTemp - 1} to ${minTemp + 1}°C.`;
+
+    // 3. Hourly Forecast with SVG Temperature Trendline Curve
+    renderHourlyForecast(forecast, timezone, main.temp, weather[0].icon);
+
+    // 4. Rise & Shine (Sun Arc Widget)
+    renderSunArcWidget(dt, sys.sunrise, sys.sunset, timezone);
+
+    // 5. 5-Day Daily Forecast List
+    renderDailyForecast(forecast, timezone);
+
+    // 6. Metric Cards
+    metricWind.textContent = `${wind.speed} m/s`;
+    metricWindDir.textContent = getWindDescription(wind.speed);
+
+    metricHumidity.textContent = `${main.humidity}%`;
+    const dewPoint = Math.round(main.temp - (100 - main.humidity) / 5);
+    metricDewPoint.textContent = `Dew point: ${dewPoint}°`;
+
+    metricPressure.textContent = `${main.pressure} hPa`;
+    metricVisibility.textContent = visibility ? `${(visibility / 1000).toFixed(1)} km` : "--";
+    metricVisQuality.textContent = visibility >= 10000 ? "Clear View" : "Hazy View";
+  }
+
+  // --- Atmospheric Theme & Scene Controller ---
+  function updateThemeAtmosphere(condition, isNight) {
+    document.body.className = "";
+    particlesLayer.innerHTML = "";
+
+    if (condition === "Rain" || condition === "Drizzle" || condition === "Thunderstorm") {
+      document.body.classList.add("theme-rain");
+      createRainParticles();
+    } else if (condition === "Snow") {
+      document.body.classList.add("theme-night");
+      createSnowParticles();
+    } else if (isNight) {
+      document.body.classList.add("theme-night");
+    } else {
+      document.body.classList.add("theme-day");
+    }
+  }
+
+  function createRainParticles() {
+    const count = 24;
+    for (let i = 0; i < count; i++) {
+      const drop = document.createElement("div");
+      drop.className = "rain-drop";
+      drop.style.left = `${Math.random() * 100}%`;
+      drop.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
+      drop.style.animationDelay = `${Math.random() * 0.8}s`;
+      particlesLayer.appendChild(drop);
+    }
+  }
+
+  function createSnowParticles() {
+    const count = 20;
+    for (let i = 0; i < count; i++) {
+      const flake = document.createElement("div");
+      flake.className = "snow-flake";
+      flake.style.left = `${Math.random() * 100}%`;
+      flake.style.animationDuration = `${2 + Math.random() * 2}s`;
+      flake.style.animationDelay = `${Math.random() * 2}s`;
+      particlesLayer.appendChild(flake);
+    }
+  }
+
+  // --- Hourly Forecast & SVG Continuous Curve Graph ---
+  function renderHourlyForecast(forecast, timezoneOffset, currentTemp, currentIcon) {
+    hourlyTrack.innerHTML = "";
+    tempCurveSvg.innerHTML = "";
+
+    const list = forecast.list.slice(0, 8);
+    const hourlyData = [
+      {
+        time: "Now",
+        temp: Math.round(currentTemp),
+        icon: currentIcon,
+        pop: 0,
+      },
+      ...list.map((item) => ({
+        time: formatHourlyTime(item.dt, timezoneOffset),
+        temp: Math.round(item.main.temp),
+        icon: item.weather[0].icon,
+        pop: item.pop || 0,
+      })),
+    ];
+
+    const itemWidth = 70;
+    const totalWidth = hourlyData.length * itemWidth;
+    hourlyTrack.style.minWidth = `${totalWidth}px`;
+    tempCurveSvg.setAttribute("width", totalWidth);
+    tempCurveSvg.setAttribute("viewBox", `0 0 ${totalWidth} 60`);
+
+    // Min and Max temperatures for normalizing curve
+    const temps = hourlyData.map((d) => d.temp);
+    const minT = Math.min(...temps);
+    const maxT = Math.max(...temps);
+    const rangeT = maxT - minT || 1;
+
+    const points = [];
+
+    // Render column elements
+    hourlyData.forEach((item, index) => {
+      const col = document.createElement("div");
+      col.className = "hourly-item";
+
+      const popText = item.pop > 0.05 ? `☔ ${Math.round(item.pop * 100)}%` : "";
+
+      col.innerHTML = `
+        <span class="hourly-time">${item.time}</span>
+        <div class="hourly-icon-wrapper">
+          <img src="https://openweathermap.org/img/wn/${item.icon}@2x.png" alt="icon" />
+        </div>
+        <span class="hourly-rain-pop">${popText}</span>
+        <span class="hourly-temp-val">${item.temp}°</span>
+      `;
+      hourlyTrack.appendChild(col);
+
+      // Coordinate calculation for SVG curve
+      const x = index * itemWidth + itemWidth / 2;
+      const normalizedY = 48 - ((item.temp - minT) / rangeT) * 36;
+      points.push({ x, y: normalizedY, temp: item.temp });
+    });
+
+    // Draw Smooth Spline / Cubic Bézier Path
+    let pathD = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      const cp1y = p0.y;
+      const cp2x = p0.x + (p1.x - p0.x) / 2;
+      const cp2y = p1.y;
+      pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`;
     }
 
-    // Temperature & Conditions
-    temperatureDisplay.textContent = Math.round(main.temp);
-    descriptionDisplay.textContent = weather[0].description;
-    tempMaxDisplay.textContent = `${Math.round(main.temp_max)}°`;
-    tempMinDisplay.textContent = `${Math.round(main.temp_min)}°`;
+    // Path Line
+    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    pathEl.setAttribute("d", pathD);
+    pathEl.setAttribute("fill", "none");
+    pathEl.setAttribute("stroke", "rgba(255, 255, 255, 0.7)");
+    pathEl.setAttribute("stroke-width", "2");
+    pathEl.setAttribute("stroke-linecap", "round");
+    tempCurveSvg.appendChild(pathEl);
 
-    // Metrics
-    feelsLikeDisplay.textContent = `${Math.round(main.feels_like)}°C`;
-    humidityDisplay.textContent = `${main.humidity}%`;
-    windSpeedDisplay.textContent = `${wind.speed} m/s`;
-    pressureDisplay.textContent = `${main.pressure} hPa`;
+    // Glowing Markers at each data point
+    points.forEach((p) => {
+      const outerGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      outerGlow.setAttribute("cx", p.x);
+      outerGlow.setAttribute("cy", p.y);
+      outerGlow.setAttribute("r", "6");
+      outerGlow.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
+      tempCurveSvg.appendChild(outerGlow);
 
-    const visKm = visibility ? (visibility / 1000).toFixed(1) : "--";
-    visibilityDisplay.textContent = `${visKm} km`;
-
-    // High quality weather icon
-    const iconCode = weather[0].icon;
-    weatherIcon.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-    weatherIcon.alt = weather[0].description;
-
-    // Dynamic background transition
-    updateBackground(weather[0].main);
-
-    // Reveal weather card
-    weatherInfo.classList.remove("hidden");
+      const circleEl = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circleEl.setAttribute("cx", p.x);
+      circleEl.setAttribute("cy", p.y);
+      circleEl.setAttribute("r", "3.5");
+      circleEl.setAttribute("fill", "#ffffff");
+      circleEl.setAttribute("stroke", "#38bdf8");
+      circleEl.setAttribute("stroke-width", "1.5");
+      tempCurveSvg.appendChild(circleEl);
+    });
   }
 
-  function updateBackground(condition) {
-    let imageUrl = "https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=2000&auto=format&fit=crop";
+  // --- Sun Cycle Arc Widget ("Rise and Shine") ---
+  function renderSunArcWidget(currentDt, sunriseDt, sunsetDt, timezoneOffset) {
+    const sunriseStr = formatTimestampOnly(sunriseDt, timezoneOffset);
+    const sunsetStr = formatTimestampOnly(sunsetDt, timezoneOffset);
 
-    switch (condition) {
-      case "Clear":
-        imageUrl = "https://images.unsplash.com/photo-1601297183305-6df142704ea2?q=80&w=2000&auto=format&fit=crop";
-        break;
-      case "Clouds":
-        imageUrl = "https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=2000&auto=format&fit=crop";
-        break;
-      case "Rain":
-      case "Drizzle":
-        imageUrl = "https://images.unsplash.com/photo-1519692933481-e162a57d6721?q=80&w=2000&auto=format&fit=crop";
-        break;
-      case "Thunderstorm":
-        imageUrl = "https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?q=80&w=2000&auto=format&fit=crop";
-        break;
-      case "Snow":
-        imageUrl = "https://images.unsplash.com/photo-1477601263568-180e2c6d046e?q=80&w=2000&auto=format&fit=crop";
-        break;
-      case "Mist":
-      case "Fog":
-      case "Haze":
-      case "Smoke":
-        imageUrl = "https://images.unsplash.com/photo-1485236715568-ddc5ee6ca227?q=80&w=2000&auto=format&fit=crop";
-        break;
+    arcSunriseTime.textContent = sunriseStr;
+    arcSunsetTime.textContent = sunsetStr;
+
+    const totalDaylight = sunsetDt - sunriseDt;
+    let progress = 0;
+
+    if (currentDt < sunriseDt) {
+      progress = 0;
+      sunStatusText.textContent = `Sunrise will be at ${sunriseStr}`;
+    } else if (currentDt >= sunsetDt) {
+      progress = 1;
+      sunStatusText.textContent = `Sunset was at ${sunsetStr}`;
+    } else {
+      progress = (currentDt - sunriseDt) / totalDaylight;
+      sunStatusText.textContent = `Sunset will be at ${sunsetStr}`;
     }
 
-    const newLayer = document.createElement("div");
-    newLayer.classList.add("bg-layer");
-    newLayer.style.backgroundImage = `url('${imageUrl}')`;
+    progress = Math.max(0, Math.min(1, progress));
 
-    const img = new Image();
-    img.src = imageUrl;
+    // Calculate position along semicircular arc (rx = 120, ry = 100, center = 150, 120)
+    const angle = Math.PI * (1 - progress);
+    const cx = 150 - 120 * Math.cos(angle);
+    const cy = 120 - 100 * Math.sin(angle);
 
-    img.onload = () => {
-      bgContainer.appendChild(newLayer);
-      void newLayer.offsetWidth;
-      newLayer.classList.add("active");
-      setTimeout(() => {
-        const oldLayers = document.querySelectorAll(".bg-layer:not(:last-child)");
-        oldLayers.forEach((layer) => layer.remove());
-      }, 1200);
-    };
+    sunIndicator.setAttribute("cx", cx);
+    sunIndicator.setAttribute("cy", cy);
+    sunIndicatorGlow.setAttribute("cx", cx);
+    sunIndicatorGlow.setAttribute("cy", cy);
+
+    // Progress path
+    if (progress <= 0.01) {
+      sunProgressPath.setAttribute("d", `M 30 120 A 120 100 0 0 1 31 119`);
+    } else {
+      sunProgressPath.setAttribute("d", `M 30 120 A 120 100 0 0 1 ${cx} ${cy}`);
+    }
   }
 
-  function showError(message) {
-    weatherInfo.classList.add("hidden");
-    errorText.textContent = message;
-    errorMessage.classList.remove("hidden");
+  // --- 5-Day Daily Forecast List ---
+  function renderDailyForecast(forecast, timezoneOffset) {
+    dailyForecastList.innerHTML = "";
+
+    // Group list by date
+    const dailyMap = {};
+    forecast.list.forEach((item) => {
+      const dateKey = getDayDateKey(item.dt, timezoneOffset);
+      if (!dailyMap[dateKey]) {
+        dailyMap[dateKey] = {
+          temps: [],
+          icons: [],
+          descriptions: [],
+          dt: item.dt,
+        };
+      }
+      dailyMap[dateKey].temps.push(item.main.temp);
+      dailyMap[dateKey].icons.push(item.weather[0].icon);
+      dailyMap[dateKey].descriptions.push(item.weather[0].main);
+    });
+
+    const days = Object.values(dailyMap).slice(0, 5);
+
+    // Find global min and max across the 5 days for the relative bar
+    let allTemps = [];
+    days.forEach((d) => (allTemps = allTemps.concat(d.temps)));
+    const globalMin = Math.min(...allTemps);
+    const globalMax = Math.max(...allTemps);
+    const totalRange = globalMax - globalMin || 1;
+
+    days.forEach((day, idx) => {
+      const min = Math.round(Math.min(...day.temps));
+      const max = Math.round(Math.max(...day.temps));
+      const dominantIcon = day.icons[Math.floor(day.icons.length / 2)] || day.icons[0];
+      const dayName = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : formatDayOfWeek(day.dt, timezoneOffset);
+
+      // Relative bar fill percentages
+      const leftPercent = Math.max(0, ((min - globalMin) / totalRange) * 100);
+      const widthPercent = Math.max(15, ((max - min) / totalRange) * 100);
+
+      const row = document.createElement("div");
+      row.className = "daily-row";
+      row.innerHTML = `
+        <span class="daily-day-col">${dayName}</span>
+        <div class="daily-icon-col">
+          <img src="https://openweathermap.org/img/wn/${dominantIcon}.png" alt="daily-icon" />
+        </div>
+        <div class="daily-bar-container">
+          <span class="daily-temp-min">${min}°</span>
+          <div class="daily-bar-bg">
+            <div class="daily-bar-fill" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
+          </div>
+          <span class="daily-temp-max">${max}°</span>
+        </div>
+      `;
+      dailyForecastList.appendChild(row);
+    });
   }
 
-  function showLoading() {
-    loadingSpinner.classList.remove("hidden");
+  // --- Date & String Formatters ---
+  function isNightTime(dt, sunrise, sunset) {
+    return dt < sunrise || dt > sunset;
   }
 
-  function hideLoading() {
-    loadingSpinner.classList.add("hidden");
+  function formatConditionTitle(str) {
+    if (!str) return "";
+    return str.replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
-  // --- Utilities ---
+  function formatHeroDate(timezoneOffsetSeconds) {
+    const nowUtc = Date.now() + new Date().getTimezoneOffset() * 60000;
+    const cityDate = new Date(nowUtc + timezoneOffsetSeconds * 1000);
+    return cityDate.toLocaleDateString("en-US", {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
+  function formatHourlyTime(timestamp, timezoneOffsetSeconds) {
+    const dateUtc = timestamp * 1000;
+    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
+    const cityDate = new Date(dateUtc + offsetMs);
+    return cityDate.toLocaleTimeString("en-US", { hour: "numeric", hour12: true });
+  }
+
+  function formatTimestampOnly(timestamp, timezoneOffsetSeconds) {
+    const dateUtc = timestamp * 1000;
+    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
+    const cityDate = new Date(dateUtc + offsetMs);
+    return cityDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+  }
+
+  function getDayDateKey(timestamp, timezoneOffsetSeconds) {
+    const dateUtc = timestamp * 1000;
+    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
+    const cityDate = new Date(dateUtc + offsetMs);
+    return `${cityDate.getFullYear()}-${cityDate.getMonth()}-${cityDate.getDate()}`;
+  }
+
+  function formatDayOfWeek(timestamp, timezoneOffsetSeconds) {
+    const dateUtc = timestamp * 1000;
+    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
+    const cityDate = new Date(dateUtc + offsetMs);
+    return cityDate.toLocaleDateString("en-US", { weekday: "short" });
+  }
+
+  function getWindDescription(speed) {
+    if (speed < 1.5) return "Calm";
+    if (speed < 3.3) return "Light Air";
+    if (speed < 5.5) return "Light Breeze";
+    if (speed < 8.0) return "Gentle Breeze";
+    if (speed < 10.8) return "Moderate Breeze";
+    return "Fresh Breeze";
+  }
+
   function highlightMatch(text, query) {
     if (!query) return escapeHtml(text);
     const regex = new RegExp(`(${escapeRegex(query)})`, "gi");
@@ -587,22 +794,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  function formatLocalTime(timezoneOffsetSeconds) {
-    const nowUtc = Date.now() + new Date().getTimezoneOffset() * 60000;
-    const cityTime = new Date(nowUtc + timezoneOffsetSeconds * 1000);
-    return cityTime.toLocaleTimeString([], {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  function showError(msg) {
+    errorText.textContent = msg;
+    errorMessage.classList.remove("hidden");
   }
 
-  function formatTimestampWithOffset(timestamp, timezoneOffsetSeconds) {
-    const dateUtc = timestamp * 1000;
-    const offsetMs = (new Date().getTimezoneOffset() * 60 + timezoneOffsetSeconds) * 1000;
-    const cityDate = new Date(dateUtc + offsetMs);
-    return cityDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  function hideError() {
+    errorMessage.classList.add("hidden");
   }
-});
+
+  function showLoading() {
+    loadingSpinner.classList.remove("hidden");
+  }
+
+  function hideLoading() {
+    loadingSpinner.classList.add("hidden");
+  }
+});
+
