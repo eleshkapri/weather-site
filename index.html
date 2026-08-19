@@ -125,12 +125,22 @@
               
               <!-- Character Silhouette standing on the hill -->
               <div class="character-silhouette" id="character-figure">
-                <svg viewBox="0 0 60 110" fill="currentColor">
-                  <!-- Person looking at the horizon -->
-                  <circle cx="30" cy="14" r="8"/>
-                  <path d="M22,24 C18,24 16,32 16,42 L22,46 L20,78 L26,78 L28,52 L32,52 L34,78 L40,78 L38,46 L44,42 C44,32 42,24 38,24 Z"/>
-                  <!-- Telescope / binoculars / hat accent -->
-                  <path d="M20,10 Q30,4 40,10 L38,13 Q30,8 22,13 Z"/>
+                <svg viewBox="0 0 70 120" class="person-svg">
+                  <!-- Cap/Head -->
+                  <path class="figure-cap" d="M30,16 C30,11 40,11 40,16 L44,18 L30,18 Z" fill="#2d3748"/>
+                  <circle class="figure-skin" cx="35" cy="22" r="7" fill="#fcd34d"/>
+                  <!-- Yellow Shirt (Daytime) -->
+                  <path class="figure-shirt" d="M26,30 C26,29 44,29 44,30 L47,56 L23,56 Z" fill="#f59e0b"/>
+                  <!-- Arm holding binoculars/phone -->
+                  <path class="figure-arm figure-skin" d="M44,34 L52,44 L48,46 L42,38 Z" fill="#fcd34d"/>
+                  <!-- Shorts -->
+                  <path class="figure-shorts" d="M23,56 L47,56 L46,74 L37,74 L37,62 L33,62 L33,74 L24,74 Z" fill="#1e3a8a"/>
+                  <!-- Legs -->
+                  <rect class="figure-skin" x="26" y="74" width="5" height="26" rx="2" fill="#fcd34d"/>
+                  <rect class="figure-skin" x="39" y="74" width="5" height="26" rx="2" fill="#fcd34d"/>
+                  <!-- Shoes -->
+                  <path class="figure-shoes" d="M24,98 L32,98 L32,102 L23,102 Z" fill="#1f2937"/>
+                  <path class="figure-shoes" d="M37,98 L45,98 L45,102 L36,102 Z" fill="#1f2937"/>
                 </svg>
               </div>
             </div>

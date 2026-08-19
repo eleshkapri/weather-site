@@ -26,9 +26,21 @@ body.theme-night {
 }
 
 body.theme-day {
-  --bg-gradient: linear-gradient(180deg, #1d64c2 0%, #3a86e9 45%, #60a5fa 100%);
-  --card-bg: rgba(255, 255, 255, 0.15);
-  --card-border: rgba(255, 255, 255, 0.22);
+  --bg-gradient: linear-gradient(180deg, #1b6cdb 0%, #358cee 35%, #5eb0fc 70%, #9ad3fd 100%);
+  --card-bg: rgba(255, 255, 255, 0.22);
+  --card-bg-hover: rgba(255, 255, 255, 0.28);
+  --card-border: rgba(255, 255, 255, 0.35);
+  --card-shadow: 0 16px 40px rgba(10, 50, 110, 0.2);
+}
+
+body.theme-day .ambient-bg {
+  background: radial-gradient(circle at 80% 12%, rgba(255, 248, 214, 0.5) 0%, rgba(255, 220, 110, 0.18) 35%, transparent 70%);
+}
+
+body.theme-day .summary-card,
+body.theme-day .forecast-card,
+body.theme-day .widget-card {
+  box-shadow: 0 16px 36px rgba(12, 45, 95, 0.18);
 }
 
 body.theme-sunset {
@@ -537,7 +549,7 @@ input[type="text"]:focus {
    ========================================================= */
 .hero-scenery-card {
   position: relative;
-  height: 380px;
+  height: 390px;
   border-radius: var(--radius-card);
   overflow: hidden;
   border: 1px solid var(--card-border);
@@ -546,7 +558,16 @@ input[type="text"]:focus {
   flex-direction: column;
   justify-content: space-between;
   padding: 32px 36px;
-  transition: all 0.4s ease;
+  transition: all 0.6s ease;
+}
+
+body.theme-day .hero-scenery-card {
+  background: linear-gradient(180deg, #1d6ed8 0%, #3e90f2 40%, #68b2fd 75%, #92cdfd 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+body.theme-night .hero-scenery-card {
+  background: linear-gradient(180deg, #050d1e 0%, #0c1c3c 50%, #112854 100%);
 }
 
 .scenery-canvas {
@@ -566,41 +587,68 @@ input[type="text"]:focus {
 
 .celestial-body {
   position: absolute;
-  top: 40px;
-  right: 120px;
+  top: 36px;
+  right: 110px;
   border-radius: 50%;
   transition: all 1s ease;
 }
 
 .sun-glow {
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, #fff7cc 0%, #ffd700 45%, rgba(255, 215, 0, 0) 75%);
-  box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
-  animation: sunPulse 6s ease-in-out infinite alternate;
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, #ffffff 0%, #fff3b0 30%, #ffd000 60%, rgba(255, 208, 0, 0) 75%);
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.75), 0 0 100px rgba(255, 235, 130, 0.4);
+  animation: sunPulse 5s ease-in-out infinite alternate;
+}
+
+.sun-glow::after {
+  content: "";
+  position: absolute;
+  inset: -25px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 215, 0, 0.15) 50%, transparent 70%);
+  animation: sunFlareRotate 20s linear infinite;
 }
 
 .moon-glow {
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
   background: #fdfbf7;
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(180, 210, 255, 0.3);
 }
 
 .star-particle {
   position: absolute;
   background: #ffffff;
   border-radius: 50%;
-  opacity: 0.8;
+  opacity: 0.85;
   animation: starTwinkle 3s ease-in-out infinite alternate;
 }
 
+/* Day Volumetric Cloud Puffs */
 .cloud-layer {
   position: absolute;
-  opacity: 0.65;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
-  filter: blur(14px);
-  animation: cloudDrift 45s linear infinite;
+  opacity: 0.75;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 45%, rgba(255, 255, 255, 0) 72%);
+  filter: blur(12px);
+  animation: cloudDrift 50s linear infinite;
+}
+
+body.theme-day .cloud-layer {
+  opacity: 0.88;
+  filter: blur(10px);
+}
+
+.sun-ray-beam {
+  position: absolute;
+  top: -20px;
+  right: 60px;
+  width: 280px;
+  height: 380px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 235, 140, 0.12) 40%, transparent 75%);
+  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+  filter: blur(15px);
+  animation: rayGleam 8s ease-in-out infinite alternate;
 }
 
 .rain-streak {
@@ -614,8 +662,12 @@ input[type="text"]:focus {
 .mist-layer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(10, 25, 55, 0.4) 80%, rgba(10, 25, 55, 0.85) 100%);
+  background: linear-gradient(180deg, transparent 40%, rgba(10, 25, 55, 0.3) 80%, rgba(10, 25, 55, 0.75) 100%);
   z-index: 2;
+}
+
+body.theme-day .mist-layer {
+  background: linear-gradient(180deg, transparent 45%, rgba(180, 220, 255, 0.2) 80%, rgba(255, 255, 255, 0.35) 100%);
 }
 
 /* Landscape hill & silhouette */
@@ -624,7 +676,7 @@ input[type="text"]:focus {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 180px;
+  height: 175px;
   z-index: 3;
 }
 
@@ -647,27 +699,43 @@ input[type="text"]:focus {
 }
 
 body.theme-day .hill-front {
-  fill: #347644;
+  fill: #3b8744;
 }
 body.theme-day .mountain-back {
-  fill: #5b9468;
+  fill: #6bb076;
 }
 
 /* Character figure standing on hill */
 .character-silhouette {
   position: absolute;
-  bottom: 64px;
-  right: 18%;
-  width: 44px;
-  height: 80px;
-  color: #060e1d;
+  bottom: 58px;
+  right: 20%;
+  width: 48px;
+  height: 84px;
   z-index: 4;
   transform-origin: bottom center;
   animation: gentleBreathe 4s ease-in-out infinite;
 }
 
-body.theme-day .character-silhouette {
-  color: #1e3a24;
+.person-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
+body.theme-night .figure-shirt,
+body.theme-night .figure-shorts,
+body.theme-night .figure-skin,
+body.theme-night .figure-cap,
+body.theme-night .figure-shoes {
+  fill: #060e1d !important;
+}
+
+body.theme-rain .figure-shirt {
+  fill: #eab308;
+}
+body.theme-rain .figure-shorts {
+  fill: #334155;
 }
 
 /* Hero Text Content (Left overlay) */
@@ -678,6 +746,8 @@ body.theme-day .character-silhouette {
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  pointer-events: auto;
+}
   pointer-events: auto;
 }
 
@@ -1086,6 +1156,16 @@ body.theme-day .character-silhouette {
 @keyframes sunPulse {
   0% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4)); }
   100% { transform: scale(1.08); filter: drop-shadow(0 0 45px rgba(255, 215, 0, 0.7)); }
+}
+
+@keyframes sunFlareRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes rayGleam {
+  0% { opacity: 0.4; transform: scaleX(0.9) skewX(-4deg); }
+  100% { opacity: 0.85; transform: scaleX(1.1) skewX(4deg); }
 }
 
 @keyframes starTwinkle {

@@ -580,6 +580,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("theme-day");
     }
 
+    // Clear ambient sky canvas so moon/stars don't bleed into daytime background!
+    if (ambientSkyCanvas) ambientSkyCanvas.innerHTML = "";
+
     // Build sky elements inside hero scenery card
     skyElements.innerHTML = "";
 
@@ -599,21 +602,44 @@ document.addEventListener("DOMContentLoaded", () => {
         skyElements.appendChild(star);
       }
     } else {
+      // Daytime Sun with radiant flare corona
       const sun = document.createElement("div");
       sun.className = "celestial-body sun-glow";
       skyElements.appendChild(sun);
+
+      // Light sun beam rays
+      const rays = document.createElement("div");
+      rays.className = "sun-ray-beam";
+      skyElements.appendChild(rays);
+
+      // Soft ambient background clouds in daytime
+      if (ambientSkyCanvas) {
+        for (let i = 0; i < 3; i++) {
+          const bgCloud = document.createElement("div");
+          bgCloud.className = "cloud-layer";
+          bgCloud.style.top = `${6 + i * 20}%`;
+          bgCloud.style.left = `${-180 + i * 360}px`;
+          bgCloud.style.width = `${380 + i * 140}px`;
+          bgCloud.style.height = `${130 + i * 40}px`;
+          bgCloud.style.opacity = "0.45";
+          bgCloud.style.animationDuration = `${55 + i * 18}s`;
+          ambientSkyCanvas.appendChild(bgCloud);
+        }
+      }
     }
 
-    if (condition === "Clouds" || condition === "Rain" || condition === "Mist") {
-      for (let i = 0; i < 4; i++) {
+    // Floating Clouds inside hero card
+    if (condition === "Clouds" || condition === "Rain" || condition === "Mist" || condition === "Clear") {
+      const cloudCount = condition === "Clear" ? 2 : 4;
+      for (let i = 0; i < cloudCount; i++) {
         const cloud = document.createElement("div");
         cloud.className = "cloud-layer";
-        cloud.style.top = `${15 + i * 20}%`;
-        cloud.style.left = `${-100 + i * 240}px`;
-        cloud.style.width = `${240 + i * 80}px`;
-        cloud.style.height = `${100 + i * 30}px`;
-        cloud.style.animationDuration = `${35 + i * 15}s`;
-        cloud.style.animationDelay = `${i * 3}s`;
+        cloud.style.top = `${10 + i * 18}%`;
+        cloud.style.left = `${-120 + i * 260}px`;
+        cloud.style.width = `${260 + i * 80}px`;
+        cloud.style.height = `${110 + i * 30}px`;
+        cloud.style.animationDuration = `${38 + i * 15}s`;
+        cloud.style.animationDelay = `${i * 2.5}s`;
         skyElements.appendChild(cloud);
       }
     }
