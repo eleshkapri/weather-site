@@ -65,9 +65,17 @@ body {
 .ambient-bg {
   position: fixed;
   inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+}
+
+.ambient-sky-canvas {
+  position: fixed;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  overflow: hidden;
 }
 
 /* --- MAIN APP CONTAINER --- */
@@ -81,6 +89,129 @@ body {
   z-index: 10;
 }
 
+/* =========================================================
+   WELCOME SCREEN (INITIAL STATE BEFORE SEARCH)
+   ========================================================= */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+  gap: 36px;
+  padding: 40px 20px;
+  animation: welcomeFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.welcome-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-logo-icon {
+  width: 64px;
+  height: 64px;
+  stroke: var(--primary-accent);
+  filter: drop-shadow(0 4px 18px var(--accent-glow));
+  animation: floatLogo 4s ease-in-out infinite alternate;
+}
+
+.welcome-title {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  background: linear-gradient(135deg, #ffffff 40%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  color: var(--text-muted);
+  font-weight: 400;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.welcome-search-wrapper {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.welcome-search-wrapper input[type="text"] {
+  padding: 16px 42px 16px 48px;
+  font-size: 15.5px;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-search-wrapper .search-icon {
+  width: 20px;
+  height: 20px;
+  left: 18px;
+}
+
+.welcome-search-wrapper .search-btn {
+  padding: 16px 28px;
+  font-size: 15px;
+}
+
+/* Quick Search City Pills */
+.quick-cities-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.city-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.city-pill:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-color: rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes welcomeFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
+}
+
 /* --- TOP NAVIGATION & SEARCH --- */
 .top-nav {
   display: flex;
@@ -88,12 +219,19 @@ body {
   justify-content: space-between;
   gap: 20px;
   padding: 6px 0;
+  animation: fadeIn 0.4s ease;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.nav-brand:hover {
+  transform: scale(1.03);
 }
 
 .brand-icon {

@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   // --- DOM Elements ---
+  const welcomeScreen = document.getElementById("welcome-screen");
+  const topNav = document.getElementById("top-nav");
+  const brandHomeBtn = document.getElementById("brand-home-btn");
+  const navSearchMount = document.getElementById("nav-search-mount");
+  const welcomeSearchWrapper = document.querySelector(".welcome-search-wrapper");
+  const searchBoxWrapper = document.querySelector(".search-box-wrapper");
+
   const cityInput = document.getElementById("city-input");
   const clearInputBtn = document.getElementById("clear-input-btn");
   const getWeatherBtn = document.getElementById("get-weather-btn");
@@ -10,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const weatherDashboard = document.getElementById("weather-dashboard");
 
   // Hero Scenery Elements
-  const sceneryCanvas = document.getElementById("scenery-canvas");
+  const ambientSkyCanvas = document.getElementById("ambient-sky-canvas");
   const skyElements = document.getElementById("sky-elements");
   const cityNameDisplay = document.getElementById("city-name");
   const localTimeDisplay = document.getElementById("local-time");
@@ -57,9 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeDropdownIndex = -1;
   let currentSuggestions = [];
 
-  // --- Initial Launch ---
-  // Load initial city search (default: "London")
-  handleSearch("London");
+  // --- Initial Launch State ---
+  // Create beautiful ambient sky background for the welcome screen
+  initAmbientSky();
 
   // --- Event Listeners ---
   getWeatherBtn.addEventListener("click", () => {
@@ -78,12 +85,75 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHistoryDropdown();
   });
 
+  // Quick search city pill buttons
+  document.querySelectorAll(".city-pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const city = pill.getAttribute("data-city");
+      cityInput.value = city;
+      clearInputBtn.classList.remove("hidden");
+      closeDropdown();
+      handleSearch(city);
+    });
+  });
+
+  // Click Atmosphere Brand / Logo to return to Home Welcome Screen
+  if (brandHomeBtn) {
+    brandHomeBtn.addEventListener("click", returnToHomeScreen);
+  }
+
   // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search-box-wrapper")) {
       closeDropdown();
     }
   });
+
+  // --- View Switcher (Welcome Screen <-> Weather Dashboard) ---
+  function activateDashboardView() {
+    if (!welcomeScreen.classList.contains("hidden")) {
+      welcomeScreen.classList.add("hidden");
+      topNav.classList.remove("hidden");
+      navSearchMount.appendChild(searchBoxWrapper);
+    }
+    weatherDashboard.classList.remove("hidden");
+  }
+
+  function returnToHomeScreen() {
+    weatherDashboard.classList.add("hidden");
+    topNav.classList.add("hidden");
+    errorMessage.classList.add("hidden");
+    welcomeScreen.classList.remove("hidden");
+    welcomeSearchWrapper.insertBefore(searchBoxWrapper, welcomeSearchWrapper.firstChild);
+    cityInput.value = "";
+    clearInputBtn.classList.add("hidden");
+    document.body.className = "theme-night";
+    initAmbientSky();
+  }
+
+  // --- Ambient Background Generator ---
+  function initAmbientSky() {
+    if (!ambientSkyCanvas) return;
+    ambientSkyCanvas.innerHTML = "";
+
+    // Glowing Ambient Moon
+    const moon = document.createElement("div");
+    moon.className = "celestial-body moon-glow";
+    moon.style.top = "60px";
+    moon.style.right = "10%";
+    ambientSkyCanvas.appendChild(moon);
+
+    // Stars
+    for (let i = 0; i < 40; i++) {
+      const star = document.createElement("div");
+      star.className = "star-particle";
+      star.style.top = `${Math.random() * 85}%`;
+      star.style.left = `${Math.random() * 95}%`;
+      star.style.width = `${Math.random() * 3 + 1}px`;
+      star.style.height = star.style.width;
+      star.style.animationDelay = `${Math.random() * 4}s`;
+      ambientSkyCanvas.appendChild(star);
+    }
+  }
 
   // --- Input & Autocomplete Handlers ---
   function onInputChange() {
@@ -410,6 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetchForecastByCoords(lat, lon),
       ]);
 
+      activateDashboardView();
       renderAtmosphereDashboard(currentWeather, forecastData, locationData);
       saveSearchToHistory(locationData);
     } catch (error) {
@@ -459,7 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Render Master Dashboard ---
   function renderAtmosphereDashboard(current, forecast, location) {
     const { main, weather, wind, sys, visibility, timezone } = current;
-    const { name, state, country } = location;
+    const { name } = location;
 
     // 1. Header & Location Meta
     cityNameDisplay.textContent = name;
@@ -491,12 +562,11 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMetricCards(current);
 
     errorMessage.classList.add("hidden");
-    weatherDashboard.classList.remove("hidden");
   }
 
   // --- Animated Scenery & Theme Engine ---
   function updateSceneryAndTheme(weatherData) {
-    const { weather, sys, timezone, dt } = weatherData;
+    const { weather, sys, dt } = weatherData;
     const condition = weather[0].main;
     const isNight = isNightTime(dt, sys.sunrise, sys.sunset);
 
@@ -510,16 +580,14 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("theme-day");
     }
 
-    // Build sky elements
+    // Build sky elements inside hero scenery card
     skyElements.innerHTML = "";
 
     if (isNight) {
-      // Celestial Moon
       const moon = document.createElement("div");
       moon.className = "celestial-body moon-glow";
       skyElements.appendChild(moon);
 
-      // Star Particles
       for (let i = 0; i < 35; i++) {
         const star = document.createElement("div");
         star.className = "star-particle";
@@ -531,13 +599,11 @@ document.addEventListener("DOMContentLoaded", () => {
         skyElements.appendChild(star);
       }
     } else {
-      // Celestial Glowing Sun
       const sun = document.createElement("div");
       sun.className = "celestial-body sun-glow";
       skyElements.appendChild(sun);
     }
 
-    // Clouds
     if (condition === "Clouds" || condition === "Rain" || condition === "Mist") {
       for (let i = 0; i < 4; i++) {
         const cloud = document.createElement("div");
@@ -552,7 +618,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Rain Streaks
     if (condition === "Rain" || condition === "Drizzle" || condition === "Thunderstorm") {
       for (let i = 0; i < 40; i++) {
         const rain = document.createElement("div");
@@ -603,7 +668,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const graphHeight = 85;
     const graphTopPadding = 25;
 
-    // Calculate curve point coordinates (x, y)
     const points = list.map((item, index) => {
       const x = index * colWidth + colWidth / 2;
       const normalized = (item.main.temp - minTemp) / tempRange;
@@ -611,7 +675,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return { x, y, temp: Math.round(item.main.temp) };
     });
 
-    // Build SVG Spline path string
     const svgPath = createSmoothSplinePath(points);
 
     let html = `
@@ -619,7 +682,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     list.forEach((item, index) => {
-      const hourDate = new Date((item.dt + timezoneOffset) * 1000);
       const hourStr = index === 0 ? "Now" : formatHourOnly(item.dt, timezoneOffset);
       const iconCode = item.weather[0].icon;
       const popPercent = Math.round((item.pop || 0) * 100);
@@ -638,7 +700,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     html += `</div>`;
 
-    // SVG Line and glowing dots
     let svgOverlay = `
       <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px;">
         <path d="${svgPath}" class="hourly-graph-path"/>
@@ -692,7 +753,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let progress = elapsed / totalDay;
     progress = Math.max(0, Math.min(1, progress));
 
-    // Semi-circle arc geometry: center=(120, 105), radius=95
     const cx = 120 - 95 * Math.cos(progress * Math.PI);
     const cy = 105 - 95 * Math.sin(progress * Math.PI);
 
@@ -735,24 +795,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderMetricCards(current) {
     const { main, wind, visibility } = current;
 
-    // Humidity
     humidityDisplay.textContent = `${main.humidity}%`;
     humidityBar.style.width = `${main.humidity}%`;
     if (main.humidity < 40) humidityStatus.textContent = "Dry air";
     else if (main.humidity <= 70) humidityStatus.textContent = "Comfortable level";
     else humidityStatus.textContent = "High humidity";
 
-    // Wind
     windSpeedDisplay.textContent = `${wind.speed} m/s`;
     windDirection.textContent = getWindDirectionText(wind.deg);
     if (wind.speed < 3) windCaption.textContent = "Light air";
     else if (wind.speed < 8) windCaption.textContent = "Gentle breeze";
     else windCaption.textContent = "Strong breeze";
 
-    // Pressure
     pressureDisplay.textContent = `${main.pressure} hPa`;
 
-    // Visibility
     const visKm = visibility ? (visibility / 1000).toFixed(1) : "--";
     visibilityDisplay.textContent = `${visKm} km`;
     if (visibility >= 9000) visibilityStatus.textContent = "Clear visibility";

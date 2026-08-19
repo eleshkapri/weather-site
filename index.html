@@ -13,21 +13,26 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="theme-day">
-    <!-- Dynamic Ambient Backdrop Overlay -->
+  <body class="theme-night">
+    <!-- Dynamic Ambient Backdrop & Animated Celestial Sky -->
     <div id="ambient-bg" class="ambient-bg"></div>
+    <div class="ambient-sky-canvas" id="ambient-sky-canvas">
+      <!-- Stars, glowing moon/sun, soft clouds -->
+    </div>
 
-    <div class="app-layout">
-      <!-- Top Navigation & Search Bar -->
-      <header class="top-nav">
-        <div class="nav-brand">
-          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="app-layout" id="app-layout">
+      <!-- Welcome Center Screen (Shown on initial load before search) -->
+      <section class="welcome-screen" id="welcome-screen">
+        <div class="welcome-brand">
+          <svg class="welcome-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
           </svg>
-          <span class="brand-title">Atmosphere</span>
+          <h1 class="welcome-title">Atmosphere</h1>
+          <p class="welcome-subtitle">Experience real-time weather with live atmospheric forecasts</p>
         </div>
 
-        <div class="nav-search-container">
+        <!-- Prominent Center Search Box -->
+        <div class="welcome-search-wrapper">
           <div class="search-box-wrapper">
             <div class="search-input-group">
               <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -37,7 +42,7 @@
               <input
                 type="text"
                 id="city-input"
-                placeholder="Search city, state or country..."
+                placeholder="Search any city, state or country..."
                 autocomplete="off"
                 autocorrect="off"
                 autocapitalize="off"
@@ -56,6 +61,30 @@
             <!-- Dynamic Autocomplete & Search History Dropdown -->
             <div id="search-dropdown" class="search-dropdown hidden"></div>
           </div>
+
+          <!-- Quick Search City Pills -->
+          <div class="quick-cities-row">
+            <span class="quick-label">Popular:</span>
+            <button class="city-pill" data-city="London">London</button>
+            <button class="city-pill" data-city="New York">New York</button>
+            <button class="city-pill" data-city="Tokyo">Tokyo</button>
+            <button class="city-pill" data-city="Paris">Paris</button>
+            <button class="city-pill" data-city="Dubai">Dubai</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top Header Navigation (Shown when weather dashboard is active) -->
+      <header class="top-nav hidden" id="top-nav">
+        <div class="nav-brand" id="brand-home-btn" title="Back to Home">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          <span class="brand-title">Atmosphere</span>
+        </div>
+
+        <div class="nav-search-container" id="nav-search-mount">
+          <!-- Search box mounts here when dashboard is active -->
         </div>
       </header>
 
@@ -75,8 +104,8 @@
         <p class="loading-text">Loading forecast data...</p>
       </div>
 
-      <!-- Main Weather Dashboard -->
-      <main id="weather-dashboard" class="weather-dashboard">
+      <!-- Main Weather Dashboard (Hidden on initial load) -->
+      <main id="weather-dashboard" class="weather-dashboard hidden">
         <!-- 1. Hero Atmospheric Scenery Section -->
         <section class="hero-scenery-card">
           <!-- Dynamic Animated Artwork Backdrop -->
