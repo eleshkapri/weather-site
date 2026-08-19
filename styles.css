@@ -971,17 +971,149 @@ body.theme-night .oneui-card {
   75% { transform: translateX(4px); }
 }
 
+/* --- DASHBOARD RESPONSIVE LAYOUT (LAPTOP / DESKTOP / MOBILE) --- */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dashboard-col-main,
+.dashboard-col-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 /* ==========================================================================
-   RESPONSIVENESS
+   RESPONSIVENESS (DESKTOP, LAPTOP, TABLET & MOBILE)
    ========================================================================== */
-@media (max-width: 480px) {
+
+/* Large Screens & Laptops (min-width: 992px) */
+@media (min-width: 992px) {
+  body {
+    padding: 30px 20px;
+    align-items: center;
+  }
+
+  .app-viewport {
+    max-width: 1080px;
+    border-radius: 36px;
+    padding-bottom: 20px;
+    min-height: auto;
+  }
+
+  .top-nav-bar {
+    padding: 20px 24px 14px;
+  }
+
+  .search-container {
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .weather-content {
+    padding: 0 24px 20px;
+    gap: 18px;
+  }
+
+  .hero-scenic-section {
+    height: 380px;
+  }
+
+  .hero-temp {
+    font-size: 92px;
+  }
+
+  .hero-degree {
+    font-size: 48px;
+  }
+
+  .hero-city-name {
+    font-size: 26px;
+  }
+
+  .hero-condition {
+    font-size: 22px;
+  }
+
+  /* 2-Column Balanced Dashboard Layout on Big Screen */
+  .dashboard-layout {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .dashboard-col-main,
+  .dashboard-col-side {
+    gap: 18px;
+  }
+
+  .hourly-track {
+    min-width: 100%;
+    justify-content: space-between;
+  }
+
+  .hourly-item {
+    flex: 1;
+    min-width: 65px;
+  }
+
+  .temp-curve-svg {
+    width: 100%;
+  }
+}
+
+/* Medium Tablets & Small Laptops (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  body {
+    padding: 24px 16px;
+  }
+
+  .app-viewport {
+    max-width: 740px;
+    border-radius: 32px;
+  }
+
+  .hero-scenic-section {
+    height: 350px;
+  }
+
+  .search-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+/* Mobile Phones (max-width: 767px) */
+@media (max-width: 767px) {
   body {
     padding: 0;
   }
+
   .app-viewport {
     border-radius: 0;
     min-height: 100vh;
     box-shadow: none;
+    max-width: 100%;
+  }
+
+  .hero-scenic-section {
+    height: 310px;
+  }
+
+  .hero-temp {
+    font-size: 72px;
+  }
+
+  .hero-degree {
+    font-size: 38px;
+  }
+
+  .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 

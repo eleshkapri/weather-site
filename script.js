@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAbortController = null;
   let activeDropdownIndex = -1;
   let currentSuggestions = [];
+  let cachedWeatherData = null;
 
   // Default initial city
   handleSearch("London");
@@ -77,6 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search-container")) {
       closeDropdown();
+    }
+  });
+
+  // Window resize handler for curve recalculation
+  window.addEventListener("resize", () => {
+    if (cachedWeatherData) {
+      const { forecast, timezone, currentTemp, currentIcon } = cachedWeatherData;
+      renderHourlyForecast(forecast, timezone, currentTemp, currentIcon);
     }
   });
 
@@ -375,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
     hideError();
 
     try {
-      // Fetch both current weather and 5-day forecast simultaneously
+      // Fetch current weather and 5-day forecast concurrently
       const [currentWeather, forecastData] = await Promise.all([
         fetchCurrentWeather(lat, lon),
         fetchForecastData(lat, lon)
@@ -433,11 +442,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const conditionDesc = weather[0].description;
     const isNight = isNightTime(dt, sys.sunrise, sys.sunset);
 
-    // 1. Set Theme & Atmosphere Animation
+    // Cache state for resize events
+    cachedWeatherData = {
+      forecast,
+      timezone,
+      currentTemp: main.temp,
+      currentIcon: weather[0].icon,
+    };
+
+    // 1. Theme & Scene Atmosphere
     updateThemeAtmosphere(condition, isNight);
 
     // 2. Hero Weather Header
-    const locationName = location.state ? `${location.name}, ${location.state}` : `${location.name}, ${location.country}`;
     cityNameDisplay.textContent = location.name;
     heroTempDisplay.textContent = Math.round(main.temp);
     heroConditionDisplay.textContent = formatConditionTitle(conditionDesc);
@@ -452,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Summary Text Pill
     weatherSummaryText.textContent = `Generally ${conditionDesc.toLowerCase()}. Highs ${maxTemp - 1} to ${maxTemp + 1}°C and lows ${minTemp - 1} to ${minTemp + 1}°C.`;
 
-    // 3. Hourly Forecast with SVG Temperature Trendline Curve
+    // 3. Hourly Forecast with Dynamic SVG Temperature Curve
     renderHourlyForecast(forecast, timezone, main.temp, weather[0].icon);
 
     // 4. Rise & Shine (Sun Arc Widget)
@@ -537,10 +553,13 @@ document.addEventListener("DOMContentLoaded", () => {
       })),
     ];
 
-    const itemWidth = 70;
-    const totalWidth = hourlyData.length * itemWidth;
-    hourlyTrack.style.minWidth = `${totalWidth}px`;
-    tempCurveSvg.setAttribute("width", totalWidth);
+    // Determine layout width based on viewport
+    const isWidescreen = window.innerWidth >= 992;
+    const itemWidth = isWidescreen ? 68 : 70;
+    const totalWidth = isWidescreen ? hourlyTrack.clientWidth || 560 : hourlyData.length * itemWidth;
+
+    hourlyTrack.style.minWidth = isWidescreen ? "100%" : `${hourlyData.length * itemWidth}px`;
+    tempCurveSvg.setAttribute("width", "100%");
     tempCurveSvg.setAttribute("viewBox", `0 0 ${totalWidth} 60`);
 
     // Min and Max temperatures for normalizing curve
@@ -549,10 +568,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxT = Math.max(...temps);
     const rangeT = maxT - minT || 1;
 
-    const points = [];
+    const columnElements = [];
 
     // Render column elements
-    hourlyData.forEach((item, index) => {
+    hourlyData.forEach((item) => {
       const col = document.createElement("div");
       col.className = "hourly-item";
 
@@ -567,51 +586,64 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="hourly-temp-val">${item.temp}°</span>
       `;
       hourlyTrack.appendChild(col);
-
-      // Coordinate calculation for SVG curve
-      const x = index * itemWidth + itemWidth / 2;
-      const normalizedY = 48 - ((item.temp - minT) / rangeT) * 36;
-      points.push({ x, y: normalizedY, temp: item.temp });
+      columnElements.push({ col, temp: item.temp });
     });
 
-    // Draw Smooth Spline / Cubic Bézier Path
-    let pathD = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i];
-      const p1 = points[i + 1];
-      const cp1x = p0.x + (p1.x - p0.x) / 2;
-      const cp1y = p0.y;
-      const cp2x = p0.x + (p1.x - p0.x) / 2;
-      const cp2y = p1.y;
-      pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`;
-    }
+    // Calculate curve points matching rendered columns
+    requestAnimationFrame(() => {
+      const trackRect = hourlyTrack.getBoundingClientRect();
+      const points = [];
 
-    // Path Line
-    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    pathEl.setAttribute("d", pathD);
-    pathEl.setAttribute("fill", "none");
-    pathEl.setAttribute("stroke", "rgba(255, 255, 255, 0.7)");
-    pathEl.setAttribute("stroke-width", "2");
-    pathEl.setAttribute("stroke-linecap", "round");
-    tempCurveSvg.appendChild(pathEl);
+      columnElements.forEach((item, index) => {
+        const colRect = item.col.getBoundingClientRect();
+        const x = (colRect.left - trackRect.left) + colRect.width / 2;
+        const normalizedY = 48 - ((item.temp - minT) / rangeT) * 36;
+        points.push({ x: isNaN(x) || x === 0 ? index * itemWidth + itemWidth / 2 : x, y: normalizedY, temp: item.temp });
+      });
 
-    // Glowing Markers at each data point
-    points.forEach((p) => {
-      const outerGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      outerGlow.setAttribute("cx", p.x);
-      outerGlow.setAttribute("cy", p.y);
-      outerGlow.setAttribute("r", "6");
-      outerGlow.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
-      tempCurveSvg.appendChild(outerGlow);
+      if (points.length < 2) return;
 
-      const circleEl = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circleEl.setAttribute("cx", p.x);
-      circleEl.setAttribute("cy", p.y);
-      circleEl.setAttribute("r", "3.5");
-      circleEl.setAttribute("fill", "#ffffff");
-      circleEl.setAttribute("stroke", "#38bdf8");
-      circleEl.setAttribute("stroke-width", "1.5");
-      tempCurveSvg.appendChild(circleEl);
+      // Draw Smooth Spline / Cubic Bézier Path
+      let pathD = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cp1x = p0.x + (p1.x - p0.x) / 2;
+        const cp1y = p0.y;
+        const cp2x = p0.x + (p1.x - p0.x) / 2;
+        const cp2y = p1.y;
+        pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`;
+      }
+
+      tempCurveSvg.innerHTML = "";
+
+      // Path Line
+      const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathEl.setAttribute("d", pathD);
+      pathEl.setAttribute("fill", "none");
+      pathEl.setAttribute("stroke", "rgba(255, 255, 255, 0.75)");
+      pathEl.setAttribute("stroke-width", "2");
+      pathEl.setAttribute("stroke-linecap", "round");
+      tempCurveSvg.appendChild(pathEl);
+
+      // Glowing Markers at each data point
+      points.forEach((p) => {
+        const outerGlow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        outerGlow.setAttribute("cx", p.x);
+        outerGlow.setAttribute("cy", p.y);
+        outerGlow.setAttribute("r", "6");
+        outerGlow.setAttribute("fill", "rgba(255, 255, 255, 0.25)");
+        tempCurveSvg.appendChild(outerGlow);
+
+        const circleEl = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circleEl.setAttribute("cx", p.x);
+        circleEl.setAttribute("cy", p.y);
+        circleEl.setAttribute("r", "3.5");
+        circleEl.setAttribute("fill", "#ffffff");
+        circleEl.setAttribute("stroke", "#38bdf8");
+        circleEl.setAttribute("stroke-width", "1.5");
+        tempCurveSvg.appendChild(circleEl);
+      });
     });
   }
 
@@ -639,7 +671,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     progress = Math.max(0, Math.min(1, progress));
 
-    // Calculate position along semicircular arc (rx = 120, ry = 100, center = 150, 120)
     const angle = Math.PI * (1 - progress);
     const cx = 150 - 120 * Math.cos(angle);
     const cy = 120 - 100 * Math.sin(angle);
@@ -649,7 +680,6 @@ document.addEventListener("DOMContentLoaded", () => {
     sunIndicatorGlow.setAttribute("cx", cx);
     sunIndicatorGlow.setAttribute("cy", cy);
 
-    // Progress path
     if (progress <= 0.01) {
       sunProgressPath.setAttribute("d", `M 30 120 A 120 100 0 0 1 31 119`);
     } else {
@@ -661,7 +691,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderDailyForecast(forecast, timezoneOffset) {
     dailyForecastList.innerHTML = "";
 
-    // Group list by date
     const dailyMap = {};
     forecast.list.forEach((item) => {
       const dateKey = getDayDateKey(item.dt, timezoneOffset);
@@ -680,7 +709,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const days = Object.values(dailyMap).slice(0, 5);
 
-    // Find global min and max across the 5 days for the relative bar
     let allTemps = [];
     days.forEach((d) => (allTemps = allTemps.concat(d.temps)));
     const globalMin = Math.min(...allTemps);
@@ -693,7 +721,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const dominantIcon = day.icons[Math.floor(day.icons.length / 2)] || day.icons[0];
       const dayName = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : formatDayOfWeek(day.dt, timezoneOffset);
 
-      // Relative bar fill percentages
       const leftPercent = Math.max(0, ((min - globalMin) / totalRange) * 100);
       const widthPercent = Math.max(15, ((max - min) / totalRange) * 100);
 
@@ -811,4 +838,5 @@ document.addEventListener("DOMContentLoaded", () => {
     loadingSpinner.classList.add("hidden");
   }
 });
+
 

@@ -196,117 +196,128 @@
           </p>
         </section>
 
-        <!-- SECTION 3: Hourly Forecast Card with Continuous Temperature Curve Graph -->
-        <section class="oneui-card hourly-forecast-card">
-          <div class="card-header-row">
-            <span class="card-title">Hourly Forecast</span>
-            <span class="card-badge" id="hourly-summary-badge">Next 24 Hours</span>
+        <!-- Responsive Dashboard Grid for Laptop & Mobile -->
+        <div class="dashboard-layout">
+          
+          <!-- LEFT COLUMN: Hourly & Daily Forecasts -->
+          <div class="dashboard-col-main">
+            <!-- SECTION 3: Hourly Forecast Card with Continuous Temperature Curve Graph -->
+            <section class="oneui-card hourly-forecast-card">
+              <div class="card-header-row">
+                <span class="card-title">Hourly Forecast</span>
+                <span class="card-badge" id="hourly-summary-badge">Next 24 Hours</span>
+              </div>
+
+              <!-- Scrollable Hourly Forecast Track -->
+              <div class="hourly-scroll-container">
+                <div class="hourly-track" id="hourly-track">
+                  <!-- Dynamically populated hourly columns and SVG line -->
+                </div>
+                <!-- Dynamic SVG Temperature Curve Canvas/Overlay -->
+                <svg id="temp-curve-svg" class="temp-curve-svg"></svg>
+              </div>
+            </section>
+
+            <!-- SECTION 5: 5-Day Forecast Card -->
+            <section class="oneui-card daily-forecast-card">
+              <div class="card-header-row">
+                <span class="card-title">5-Day Forecast</span>
+              </div>
+              <div id="daily-forecast-list" class="daily-forecast-list">
+                <!-- Dynamically populated daily forecast rows -->
+              </div>
+            </section>
           </div>
 
-          <!-- Scrollable Hourly Forecast Track -->
-          <div class="hourly-scroll-container">
-            <div class="hourly-track" id="hourly-track">
-              <!-- Dynamically populated hourly columns and SVG line -->
-            </div>
-            <!-- Dynamic SVG Temperature Curve Canvas/Overlay -->
-            <svg id="temp-curve-svg" class="temp-curve-svg"></svg>
-          </div>
-        </section>
+          <!-- RIGHT COLUMN: Sun Arc Widget & Metric Cards -->
+          <div class="dashboard-col-side">
+            <!-- SECTION 4: Rise and Shine (Sun Arc Widget) -->
+            <section class="oneui-card sun-cycle-card">
+              <div class="sun-card-header">
+                <div class="sun-title-group">
+                  <svg class="sun-icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                  </svg>
+                  <span>Rise and shine</span>
+                </div>
+                <p id="sun-status-text" class="sun-status-text">Sunrise will be at 05:43</p>
+              </div>
 
-        <!-- SECTION 4: Rise and Shine (Sun Arc Widget) -->
-        <section class="oneui-card sun-cycle-card">
-          <div class="sun-card-header">
-            <div class="sun-title-group">
-              <svg class="sun-icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4"/>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-              </svg>
-              <span>Rise and shine</span>
-            </div>
-            <p id="sun-status-text" class="sun-status-text">Sunrise will be at 05:43</p>
-          </div>
+              <!-- Semicircular Sun Arc Graph -->
+              <div class="sun-arc-container">
+                <svg class="sun-arc-svg" viewBox="0 0 300 140">
+                  <!-- Base Horizon Line -->
+                  <line x1="20" y1="120" x2="280" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+                  <!-- Semicircular Arc Path -->
+                  <path id="sun-path" d="M 30 120 A 120 100 0 0 1 270 120" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" stroke-dasharray="4 4" />
+                  <!-- Progress Arc Path -->
+                  <path id="sun-progress-path" d="M 30 120 A 120 100 0 0 1 150 20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" />
+                  <!-- Sun Icon Indicator -->
+                  <circle id="sun-indicator-glow" cx="150" cy="20" r="14" fill="rgba(251, 191, 36, 0.3)" />
+                  <circle id="sun-indicator" cx="150" cy="20" r="8" fill="#fbbf24" stroke="#fff" stroke-width="2" />
+                </svg>
+                <div class="sun-timestamps">
+                  <span id="arc-sunrise-time">05:43</span>
+                  <span id="arc-sunset-time">18:51</span>
+                </div>
+              </div>
+            </section>
 
-          <!-- Semicircular Sun Arc Graph -->
-          <div class="sun-arc-container">
-            <svg class="sun-arc-svg" viewBox="0 0 300 140">
-              <!-- Base Horizon Line -->
-              <line x1="20" y1="120" x2="280" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
-              <!-- Semicircular Arc Path -->
-              <path id="sun-path" d="M 30 120 A 120 100 0 0 1 270 120" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" stroke-dasharray="4 4" />
-              <!-- Progress Arc Path -->
-              <path id="sun-progress-path" d="M 30 120 A 120 100 0 0 1 150 20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" />
-              <!-- Sun Icon Indicator -->
-              <circle id="sun-indicator-glow" cx="150" cy="20" r="14" fill="rgba(251, 191, 36, 0.3)" />
-              <circle id="sun-indicator" cx="150" cy="20" r="8" fill="#fbbf24" stroke="#fff" stroke-width="2" />
-            </svg>
-            <div class="sun-timestamps">
-              <span id="arc-sunrise-time">05:43</span>
-              <span id="arc-sunset-time">18:51</span>
-            </div>
-          </div>
-        </section>
+            <!-- SECTION 6: Weather Details Grid Cards (One UI Style) -->
+            <section class="details-grid">
+              <div class="oneui-card metric-sub-card">
+                <div class="metric-top">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                    <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                    <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+                  </svg>
+                  <span>Wind Speed</span>
+                </div>
+                <p id="metric-wind" class="metric-large-text">-- m/s</p>
+                <span class="metric-sub-info" id="metric-wind-dir">Gentle Breeze</span>
+              </div>
 
-        <!-- SECTION 5: 5-Day Forecast Card -->
-        <section class="oneui-card daily-forecast-card">
-          <div class="card-header-row">
-            <span class="card-title">5-Day Forecast</span>
-          </div>
-          <div id="daily-forecast-list" class="daily-forecast-list">
-            <!-- Dynamically populated daily forecast rows -->
-          </div>
-        </section>
+              <div class="oneui-card metric-sub-card">
+                <div class="metric-top">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                  <span>Humidity</span>
+                </div>
+                <p id="metric-humidity" class="metric-large-text">--%</p>
+                <span class="metric-sub-info" id="metric-dew-point">Dew point: 22°</span>
+              </div>
 
-        <!-- SECTION 6: Weather Details Grid Cards (One UI Style) -->
-        <section class="details-grid">
-          <div class="oneui-card metric-sub-card">
-            <div class="metric-top">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
-                <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
-                <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
-              </svg>
-              <span>Wind Speed</span>
-            </div>
-            <p id="metric-wind" class="metric-large-text">-- m/s</p>
-            <span class="metric-sub-info" id="metric-wind-dir">Gentle Breeze</span>
-          </div>
+              <div class="oneui-card metric-sub-card">
+                <div class="metric-top">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 2a10 10 0 0 1 10 10"/>
+                    <path d="m14 14-4-4 4-4"/>
+                  </svg>
+                  <span>Pressure</span>
+                </div>
+                <p id="metric-pressure" class="metric-large-text">-- hPa</p>
+                <span class="metric-sub-info">Standard Atmospheric</span>
+              </div>
 
-          <div class="oneui-card metric-sub-card">
-            <div class="metric-top">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-              <span>Humidity</span>
-            </div>
-            <p id="metric-humidity" class="metric-large-text">--%</p>
-            <span class="metric-sub-info" id="metric-dew-point">Dew point: 22°</span>
-          </div>
-
-          <div class="oneui-card metric-sub-card">
-            <div class="metric-top">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 2a10 10 0 0 1 10 10"/>
-                <path d="m14 14-4-4 4-4"/>
-              </svg>
-              <span>Pressure</span>
-            </div>
-            <p id="metric-pressure" class="metric-large-text">-- hPa</p>
-            <span class="metric-sub-info">Standard Atmospheric</span>
+              <div class="oneui-card metric-sub-card">
+                <div class="metric-top">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <span>Visibility</span>
+                </div>
+                <p id="metric-visibility" class="metric-large-text">-- km</p>
+                <span class="metric-sub-info" id="metric-vis-quality">Clear View</span>
+              </div>
+            </section>
           </div>
 
-          <div class="oneui-card metric-sub-card">
-            <div class="metric-top">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-              <span>Visibility</span>
-            </div>
-            <p id="metric-visibility" class="metric-large-text">-- km</p>
-            <span class="metric-sub-info" id="metric-vis-quality">Clear View</span>
-          </div>
-        </section>
+        </div>
 
       </main>
     </div>
