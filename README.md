@@ -1,4 +1,4 @@
-﻿# ☀️ Atmosphere — Next-Gen 3D Live Weather Experience
+# ☀️ Atmosphere — Next-Gen 3D Live Weather Experience
 
 ![Atmosphere Live Weather Banner](https://img.shields.io/badge/Atmosphere-Live%20Weather-38bdf8?style=for-the-badge&logo=google-chrome&logoColor=white)
 ![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
@@ -52,14 +52,20 @@ The entire site backdrop, card materials, and scenery dynamically transform base
 
 ## 📂 Project Architecture
 
-`
+```
 weather-site/
-├── favicon.svg          # Official Atmosphere Sun & Cloud browser tab icon
-├── index.html           # Semantic HTML5 layout, SVG scenery defs, modular widget grid
-├── styles.css           # Design system, glassmorphism, 3D scenery, theme palettes, media queries
-├── script.js            # View switching, Open-Meteo APIs, SVG spline math, sun cycle tracker
-└── README.md            # Comprehensive documentation
-`
+├── assets/
+│   ├── css/
+│   │   └── styles.css       # Design system, glassmorphism, 3D scenery, theme palettes, media queries
+│   ├── js/
+│   │   └── script.js        # View switching, Open-Meteo APIs, SVG spline math, sun cycle tracker
+│   └── icons/
+│       └── favicon.svg      # Official Atmosphere Sun & Cloud vector icon
+├── .gitignore               # System & editor ignore rules
+├── index.html               # Semantic HTML5 layout, SVG scenery defs, modular widget grid
+├── LICENSE                  # MIT Open-source License
+└── README.md                # Comprehensive documentation
+```
 
 ---
 
