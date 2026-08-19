@@ -578,12 +578,12 @@ input[type="text"]:focus {
 }
 
 body.theme-day .hero-scenery-card {
-  background: linear-gradient(180deg, #1d6ed8 0%, #3e90f2 40%, #68b2fd 75%, #92cdfd 100%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(180deg, #1967d2 0%, #3b8cf0 38%, #6cb4fd 72%, #9ad3fd 100%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
 body.theme-night .hero-scenery-card {
-  background: linear-gradient(180deg, #050d1e 0%, #0c1c3c 50%, #112854 100%);
+  background: linear-gradient(180deg, #040916 0%, #0a1936 50%, #0f244c 100%);
 }
 
 .scenery-canvas {
@@ -594,43 +594,93 @@ body.theme-night .hero-scenery-card {
   overflow: hidden;
 }
 
-/* Sky layers & animated celestial elements */
+/* Sky layers & animated 3D celestial elements */
 .sky-elements {
   position: absolute;
   inset: 0;
   z-index: 1;
 }
 
-.celestial-body {
+/* --- 3D SUN --- */
+.sun-3d {
   position: absolute;
-  top: 36px;
-  right: 110px;
+  top: 28px;
+  right: 90px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  transition: all 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
-.sun-glow {
-  width: 90px;
-  height: 90px;
-  background: radial-gradient(circle, #ffffff 0%, #fff3b0 30%, #ffd000 60%, rgba(255, 208, 0, 0) 75%);
-  box-shadow: 0 0 60px rgba(255, 215, 0, 0.75), 0 0 100px rgba(255, 235, 130, 0.4);
+.sun-core {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7b8 25%, #fec810 65%, #f59e0b 100%);
+  box-shadow: 0 0 45px rgba(254, 200, 16, 0.85), 0 0 90px rgba(255, 230, 100, 0.5), inset -4px -4px 10px rgba(217, 119, 6, 0.4);
   animation: sunPulse 5s ease-in-out infinite alternate;
 }
 
-.sun-glow::after {
-  content: "";
+.sun-corona {
   position: absolute;
-  inset: -25px;
+  inset: -18px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 215, 0, 0.15) 50%, transparent 70%);
-  animation: sunFlareRotate 20s linear infinite;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(254, 200, 16, 0.22) 45%, transparent 70%);
+  animation: sunFlareRotate 24s linear infinite;
 }
 
-.moon-glow {
-  width: 54px;
-  height: 54px;
-  background: #fdfbf7;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), 0 0 80px rgba(180, 210, 255, 0.3);
+.sun-ambient-halo {
+  position: absolute;
+  inset: -45px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 240, 160, 0.28) 0%, rgba(255, 215, 0, 0.08) 45%, transparent 70%);
+  pointer-events: none;
+}
+
+/* --- 3D MOON --- */
+.moon-3d {
+  position: absolute;
+  top: 28px;
+  right: 90px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.moon-sphere {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e2e8f0 40%, #cbd5e1 80%, #94a3b8 100%);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.85), 0 0 70px rgba(180, 210, 255, 0.35), inset -5px -5px 12px rgba(71, 85, 105, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.moon-crater {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(100, 116, 139, 0.25);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.moon-crater.c1 { width: 12px; height: 12px; top: 14px; left: 16px; }
+.moon-crater.c2 { width: 8px; height: 8px; top: 32px; left: 28px; }
+.moon-crater.c3 { width: 10px; height: 10px; top: 36px; left: 12px; }
+
+.moon-halo {
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(220, 235, 255, 0.25) 0%, rgba(200, 225, 255, 0.08) 50%, transparent 70%);
+  pointer-events: none;
 }
 
 .star-particle {
@@ -641,30 +691,20 @@ body.theme-night .hero-scenery-card {
   animation: starTwinkle 3s ease-in-out infinite alternate;
 }
 
-/* Day Volumetric Cloud Puffs */
-.cloud-layer {
+/* --- 3D FLUFFY VOLUMETRIC CLOUDS --- */
+.fluffy-cloud-3d {
   position: absolute;
-  opacity: 0.75;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 45%, rgba(255, 255, 255, 0) 72%);
-  filter: blur(12px);
+  width: 220px;
+  height: 110px;
+  pointer-events: none;
+  z-index: 2;
   animation: cloudDrift 50s linear infinite;
+  filter: drop-shadow(0 12px 24px rgba(10, 35, 75, 0.16));
 }
 
-body.theme-day .cloud-layer {
-  opacity: 0.88;
-  filter: blur(10px);
-}
-
-.sun-ray-beam {
-  position: absolute;
-  top: -20px;
-  right: 60px;
-  width: 280px;
-  height: 380px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 235, 140, 0.12) 40%, transparent 75%);
-  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
-  filter: blur(15px);
-  animation: rayGleam 8s ease-in-out infinite alternate;
+.cloud-svg {
+  width: 100%;
+  height: 100%;
 }
 
 .rain-streak {
@@ -678,12 +718,12 @@ body.theme-day .cloud-layer {
 .mist-layer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(10, 25, 55, 0.3) 80%, rgba(10, 25, 55, 0.75) 100%);
+  background: linear-gradient(180deg, transparent 40%, rgba(10, 25, 55, 0.25) 80%, rgba(10, 25, 55, 0.65) 100%);
   z-index: 2;
 }
 
 body.theme-day .mist-layer {
-  background: linear-gradient(180deg, transparent 45%, rgba(180, 220, 255, 0.2) 80%, rgba(255, 255, 255, 0.35) 100%);
+  background: linear-gradient(180deg, transparent 45%, rgba(180, 220, 255, 0.15) 80%, rgba(255, 255, 255, 0.25) 100%);
 }
 
 /* Landscape hill & silhouette */
@@ -709,23 +749,49 @@ body.theme-day .mist-layer {
   transition: fill 1s ease;
 }
 
+.mountain-mid {
+  fill: rgba(10, 22, 45, 0.6);
+  transition: fill 1s ease;
+}
+
 .hill-front {
   fill: #0c1a36;
   transition: fill 1s ease;
 }
 
-body.theme-day .hill-front {
-  fill: #3b8744;
-}
 body.theme-day .mountain-back {
-  fill: #6bb076;
+  fill: url(#distantMountainGrad);
+  opacity: 0.65;
+}
+
+body.theme-day .mountain-mid {
+  fill: url(#midHillGrad);
+  opacity: 0.9;
+}
+
+body.theme-day .hill-front {
+  fill: url(#frontHillGrad);
+}
+
+body.theme-night .mountain-back {
+  fill: #08162f;
+  opacity: 0.55;
+}
+
+body.theme-night .mountain-mid {
+  fill: #091a38;
+  opacity: 0.85;
+}
+
+body.theme-night .hill-front {
+  fill: #0c1f44;
 }
 
 /* Character figure standing on hill */
 .character-silhouette {
   position: absolute;
-  bottom: 58px;
-  right: 20%;
+  bottom: 46px;
+  right: 18%;
   width: 48px;
   height: 84px;
   z-index: 4;
@@ -754,7 +820,9 @@ body.theme-rain .figure-shorts {
   fill: #334155;
 }
 
-/* Hero Text Content (Left overlay) */
+/* =========================================================
+   HERO SCENERY TYPOGRAPHY (PURE CRISP WHITE)
+   ========================================================= */
 .hero-overlay-content {
   position: relative;
   z-index: 10;
@@ -764,7 +832,9 @@ body.theme-rain .figure-shorts {
   height: 100%;
   pointer-events: auto;
 }
-  pointer-events: auto;
+
+.hero-overlay-content * {
+  color: #ffffff !important;
 }
 
 .hero-header-meta {
@@ -782,22 +852,24 @@ body.theme-rain .figure-shorts {
 .city-location-badge svg {
   width: 22px;
   height: 22px;
-  stroke: var(--text-main);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  stroke: #ffffff !important;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
 }
 
 .city-location-badge h1 {
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.5px;
+  color: #ffffff !important;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .hero-local-time {
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.88) !important;
   font-weight: 400;
   margin-left: 30px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .hero-temp-block {
@@ -812,21 +884,23 @@ body.theme-rain .figure-shorts {
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -4px;
-  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  color: #ffffff !important;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
 }
 
 .deg-symbol {
   font-size: 54px;
   font-weight: 300;
   margin-top: 4px;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .hero-condition-title {
   font-size: 22px;
-  font-weight: 500;
-  margin-top: 4px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-weight: 600;
+  margin-top: 6px;
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   text-transform: capitalize;
 }
 
@@ -836,16 +910,18 @@ body.theme-rain .figure-shorts {
   gap: 10px;
   margin-top: 8px;
   font-size: 13.5px;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .range-pill,
 .feels-pill {
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 
 .dot-sep {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 /* =========================================================

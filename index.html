@@ -117,10 +117,30 @@
             <div class="landscape-ground">
               <!-- Hill Silhouette and Stargazer/Lookout Character -->
               <svg class="landscape-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
-                <!-- Distant Mountains -->
-                <path class="mountain-back" d="M0,220 Q250,140 500,200 T1000,180 L1000,320 L0,320 Z"/>
-                <!-- Front Grassy Hill -->
-                <path class="hill-front" d="M0,240 Q320,160 650,220 Q820,250 1000,210 L1000,320 L0,320 Z"/>
+                <defs>
+                  <linearGradient id="distantMountainGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#7dbed4"/>
+                    <stop offset="100%" stop-color="#5599b0"/>
+                  </linearGradient>
+                  <linearGradient id="midHillGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5fb369"/>
+                    <stop offset="100%" stop-color="#3d8745"/>
+                  </linearGradient>
+                  <linearGradient id="frontHillGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#6ec97a"/>
+                    <stop offset="35%" stop-color="#4ea858"/>
+                    <stop offset="100%" stop-color="#2a6e32"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- Distant Mountain Ridge -->
+                <path class="mountain-back" d="M0,190 Q260,120 520,170 T1000,150 L1000,320 L0,320 Z"/>
+                <!-- Middle Rolling Meadow -->
+                <path class="mountain-mid" d="M0,220 Q380,160 720,205 Q880,220 1000,190 L1000,320 L0,320 Z"/>
+                <!-- Foreground Sunlit Grassy Hill -->
+                <path class="hill-front" d="M0,242 Q300,180 640,225 Q840,245 1000,215 L1000,320 L0,320 Z"/>
+                <!-- Sunlit Crest Accent Line -->
+                <path class="hill-crest-glow" d="M0,242 Q300,180 640,225 Q840,245 1000,215" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"/>
               </svg>
               
               <!-- Character Silhouette standing on the hill -->

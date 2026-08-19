@@ -587,14 +587,24 @@ document.addEventListener("DOMContentLoaded", () => {
     skyElements.innerHTML = "";
 
     if (isNight) {
-      const moon = document.createElement("div");
-      moon.className = "celestial-body moon-glow";
-      skyElements.appendChild(moon);
+      // 3D Celestial Moon with craters & glowing halo
+      const moon3d = document.createElement("div");
+      moon3d.className = "moon-3d";
+      moon3d.innerHTML = `
+        <div class="moon-sphere">
+          <div class="moon-crater c1"></div>
+          <div class="moon-crater c2"></div>
+          <div class="moon-crater c3"></div>
+        </div>
+        <div class="moon-halo"></div>
+      `;
+      skyElements.appendChild(moon3d);
 
+      // Starfield particles
       for (let i = 0; i < 35; i++) {
         const star = document.createElement("div");
         star.className = "star-particle";
-        star.style.top = `${Math.random() * 65}%`;
+        star.style.top = `${Math.random() * 60}%`;
         star.style.left = `${Math.random() * 95}%`;
         star.style.width = `${Math.random() * 3 + 1}px`;
         star.style.height = star.style.width;
@@ -602,48 +612,35 @@ document.addEventListener("DOMContentLoaded", () => {
         skyElements.appendChild(star);
       }
     } else {
-      // Daytime Sun with radiant flare corona
-      const sun = document.createElement("div");
-      sun.className = "celestial-body sun-glow";
-      skyElements.appendChild(sun);
-
-      // Light sun beam rays
-      const rays = document.createElement("div");
-      rays.className = "sun-ray-beam";
-      skyElements.appendChild(rays);
-
-      // Soft ambient background clouds in daytime
-      if (ambientSkyCanvas) {
-        for (let i = 0; i < 3; i++) {
-          const bgCloud = document.createElement("div");
-          bgCloud.className = "cloud-layer";
-          bgCloud.style.top = `${6 + i * 20}%`;
-          bgCloud.style.left = `${-180 + i * 360}px`;
-          bgCloud.style.width = `${380 + i * 140}px`;
-          bgCloud.style.height = `${130 + i * 40}px`;
-          bgCloud.style.opacity = "0.45";
-          bgCloud.style.animationDuration = `${55 + i * 18}s`;
-          ambientSkyCanvas.appendChild(bgCloud);
-        }
-      }
+      // 3D Radiant Sun with rotating corona and ambient halo
+      const sun3d = document.createElement("div");
+      sun3d.className = "sun-3d";
+      sun3d.innerHTML = `
+        <div class="sun-ambient-halo"></div>
+        <div class="sun-corona"></div>
+        <div class="sun-core"></div>
+      `;
+      skyElements.appendChild(sun3d);
     }
 
-    // Floating Clouds inside hero card
+    // 3D Volumetric Fluffy Clouds
     if (condition === "Clouds" || condition === "Rain" || condition === "Mist" || condition === "Clear") {
-      const cloudCount = condition === "Clear" ? 2 : 4;
-      for (let i = 0; i < cloudCount; i++) {
-        const cloud = document.createElement("div");
-        cloud.className = "cloud-layer";
-        cloud.style.top = `${10 + i * 18}%`;
-        cloud.style.left = `${-120 + i * 260}px`;
-        cloud.style.width = `${260 + i * 80}px`;
-        cloud.style.height = `${110 + i * 30}px`;
-        cloud.style.animationDuration = `${38 + i * 15}s`;
-        cloud.style.animationDelay = `${i * 2.5}s`;
+      const cloudConfigs = [
+        { top: "14%", left: "-60px", scale: 1.15, dur: "42s", delay: "0s" },
+        { top: "28%", left: "160px", scale: 0.85, dur: "52s", delay: "-12s" },
+        { top: "8%", left: "380px", scale: 0.95, dur: "48s", delay: "-24s" },
+        { top: "22%", left: "620px", scale: 0.75, dur: "58s", delay: "-6s" },
+      ];
+
+      const count = condition === "Clear" ? 2 : cloudConfigs.length;
+      for (let i = 0; i < count; i++) {
+        const cfg = cloudConfigs[i];
+        const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
         skyElements.appendChild(cloud);
       }
     }
 
+    // Rain Streaks in rainy conditions
     if (condition === "Rain" || condition === "Drizzle" || condition === "Thunderstorm") {
       for (let i = 0; i < 40; i++) {
         const rain = document.createElement("div");
@@ -655,6 +652,39 @@ document.addEventListener("DOMContentLoaded", () => {
         skyElements.appendChild(rain);
       }
     }
+  }
+
+  function create3DFluffyCloud(top, left, scale, duration, delay) {
+    const cloud = document.createElement("div");
+    cloud.className = "fluffy-cloud-3d";
+    cloud.style.top = top;
+    cloud.style.left = left;
+    cloud.style.transform = `scale(${scale})`;
+    cloud.style.animationDuration = duration;
+    cloud.style.animationDelay = delay;
+
+    cloud.innerHTML = `
+      <svg class="cloud-svg" viewBox="0 0 200 110">
+        <defs>
+          <radialGradient id="cloudVolumetricGrad" cx="38%" cy="28%" r="72%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="55%" stop-color="#f2f8ff"/>
+            <stop offset="85%" stop-color="#d8ebfd"/>
+            <stop offset="100%" stop-color="#bddbf7"/>
+          </radialGradient>
+          <filter id="cloudDepthShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(15, 35, 75, 0.15)"/>
+          </filter>
+        </defs>
+        <g filter="url(#cloudDepthShadow)">
+          <circle cx="52" cy="66" r="32" fill="url(#cloudVolumetricGrad)"/>
+          <circle cx="98" cy="48" r="44" fill="url(#cloudVolumetricGrad)"/>
+          <circle cx="146" cy="62" r="36" fill="url(#cloudVolumetricGrad)"/>
+          <rect x="52" y="62" width="94" height="36" rx="18" fill="url(#cloudVolumetricGrad)"/>
+        </g>
+      </svg>
+    `;
+    return cloud;
   }
 
   function isNightTime(currentTimestamp, sunriseTimestamp, sunsetTimestamp) {
