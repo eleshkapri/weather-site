@@ -3,52 +3,188 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather</title>
+    <title>Atmosphere • Modern Weather</title>
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    
+    <!-- Dynamic background layer container -->
     <div id="bg-container"></div>
+    <div class="bg-overlay"></div>
 
-    <div class="container">
-      <h1>Weather Info</h1>
-      
-      <div class="input-container">
-        <input type="text" id="city-input" placeholder="Enter city name..." />
-        <button id="get-weather-btn">Search</button>
+    <!-- Main Glass Card Container -->
+    <main class="container">
+      <header class="app-header">
+        <div class="logo-area">
+          <svg class="app-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          <h1>Atmosphere</h1>
+        </div>
+        <p class="app-subtitle">Real-time global weather forecasts</p>
+      </header>
+
+      <!-- Search Section -->
+      <section class="search-section">
+        <div class="search-box-wrapper">
+          <div class="search-input-group">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input
+              type="text"
+              id="city-input"
+              placeholder="Search city, state or country..."
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+            <button id="clear-input-btn" class="clear-btn hidden" aria-label="Clear input" title="Clear">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <button id="get-weather-btn" class="search-btn">
+            <span>Search</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          <!-- Dynamic Autocomplete & Search History Dropdown -->
+          <div id="search-dropdown" class="search-dropdown hidden"></div>
+        </div>
+      </section>
+
+      <!-- Error Message Banner -->
+      <div id="error-message" class="error-banner hidden" role="alert">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" x2="12" y1="8" y2="12"/>
+          <line x1="12" x2="12.01" y1="16" y2="16"/>
+        </svg>
+        <span id="error-text"></span>
       </div>
 
-      <p id="error-message" class="error-message hidden"></p>
-
-      <div id="loading-spinner" class="spinner hidden"></div>
-
-      <div id="weather-info" class="hidden">
-        
-        <h2 id="city-name">--</h2>
-        
-        <div class="weather-icon-container">
-            <img id="weather-icon" src="" alt="Weather Condition Icon">
-        </div>
-
-        <p id="temperature">--°C</p>
-        <p id="description">--</p>
-
-        <div class="weather-details">
-            <div class="detail-col">
-                <p>Feels Like</p>
-                <p class="detail-value" id="feels-like">--</p>
-            </div>
-            <div class="detail-col">
-                <p>Humidity</p>
-                <p class="detail-value" id="humidity">--</p>
-            </div>
-            <div class="detail-col">
-                <p>Wind</p>
-                <p class="detail-value" id="wind-speed">--</p>
-            </div>
-        </div>
+      <!-- Loading Spinner -->
+      <div id="loading-spinner" class="spinner-container hidden">
+        <div class="pulse-loader"></div>
+        <p class="loading-text">Fetching weather data...</p>
       </div>
-    </div>
+
+      <!-- Weather Info Card -->
+      <section id="weather-info" class="weather-info hidden">
+        <!-- Location & Time Header -->
+        <div class="location-header">
+          <div class="location-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <h2 id="city-name">--</h2>
+          </div>
+          <p id="local-time" class="local-time">--</p>
+        </div>
+
+        <!-- Hero Weather Display -->
+        <div class="hero-weather">
+          <div class="weather-visual">
+            <img id="weather-icon" src="" alt="Weather Condition" />
+          </div>
+          <div class="temp-wrapper">
+            <div class="temp-reading">
+              <span id="temperature">--</span><span class="temp-unit">°C</span>
+            </div>
+            <div class="condition-badge" id="description">--</div>
+            <div class="temp-range">
+              <span>H: <strong id="temp-max">--°</strong></span>
+              <span class="divider">•</span>
+              <span>L: <strong id="temp-min">--°</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+              <span>Feels Like</span>
+            </div>
+            <p class="metric-value" id="feels-like">--°C</p>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              <span>Humidity</span>
+            </div>
+            <p class="metric-value" id="humidity">--%</p>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+              </svg>
+              <span>Wind</span>
+            </div>
+            <p class="metric-value" id="wind-speed">-- m/s</p>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m14 14-4-4 4-4"/>
+                <path d="M12 2a10 10 0 0 1 10 10"/>
+              </svg>
+              <span>Pressure</span>
+            </div>
+            <p class="metric-value" id="pressure">-- hPa</p>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>Visibility</span>
+            </div>
+            <p class="metric-value" id="visibility">-- km</p>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <span>Sun Cycle</span>
+            </div>
+            <p class="metric-value sun-times">
+              <span id="sunrise-time">🌅 --</span>
+              <span id="sunset-time">🌇 --</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
 
     <script src="script.js"></script>
   </body>
