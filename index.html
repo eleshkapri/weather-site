@@ -2,323 +2,268 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Weather • One UI</title>
-    <!-- Google Fonts: Inter & Outfit for authentic One UI feel -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atmosphere • Live Weather</title>
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="theme-day">
-    <!-- Main Device / App Wrapper -->
-    <div class="app-viewport">
-      
-      <!-- Top Search & Status Bar -->
-      <header class="top-nav-bar">
-        <div class="search-container">
-          <div class="search-input-pill">
-            <svg class="nav-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
-            </svg>
-            <input
-              type="text"
-              id="city-input"
-              placeholder="Search city, state or country..."
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-              spellcheck="false"
-            />
-            <button id="clear-input-btn" class="clear-btn hidden" aria-label="Clear input">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-            <button id="get-weather-btn" class="nav-action-btn" title="Search">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </button>
-          </div>
+    <!-- Dynamic Ambient Backdrop Overlay -->
+    <div id="ambient-bg" class="ambient-bg"></div>
 
-          <!-- Live Autocomplete & Search History Dropdown -->
-          <div id="search-dropdown" class="search-dropdown hidden"></div>
+    <div class="app-layout">
+      <!-- Top Navigation & Search Bar -->
+      <header class="top-nav">
+        <div class="nav-brand">
+          <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          <span class="brand-title">Atmosphere</span>
+        </div>
+
+        <div class="nav-search-container">
+          <div class="search-box-wrapper">
+            <div class="search-input-group">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+              <input
+                type="text"
+                id="city-input"
+                placeholder="Search city, state or country..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+              />
+              <button id="clear-input-btn" class="clear-btn hidden" aria-label="Clear input">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <button id="get-weather-btn" class="search-btn">
+              <span>Search</span>
+            </button>
+
+            <!-- Dynamic Autocomplete & Search History Dropdown -->
+            <div id="search-dropdown" class="search-dropdown hidden"></div>
+          </div>
         </div>
       </header>
 
       <!-- Error Message Banner -->
-      <div id="error-message" class="oneui-alert hidden" role="alert">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div id="error-message" class="error-banner hidden" role="alert">
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
+          <line x1="12" x2="12" y1="8" y2="12"/>
+          <line x1="12" x2="12.01" y1="16" y2="16"/>
         </svg>
-        <span id="error-text">Unable to find city. Please try again.</span>
+        <span id="error-text"></span>
       </div>
 
-      <!-- Loading State -->
-      <div id="loading-spinner" class="oneui-loader-overlay hidden">
-        <div class="oneui-spinner"></div>
-        <p>Updating weather...</p>
+      <!-- Loading Spinner -->
+      <div id="loading-spinner" class="spinner-container hidden">
+        <div class="pulse-loader"></div>
+        <p class="loading-text">Loading forecast data...</p>
       </div>
 
-      <!-- Weather Content Container -->
-      <main id="weather-content" class="weather-content">
-        
-        <!-- SECTION 1: Scenic Artwork Hero Section -->
-        <section class="hero-scenic-section" id="hero-scene">
-          
-          <!-- Animated Atmosphere Layers -->
-          <div class="sky-background" id="sky-bg">
-            <div class="sun-moon-element" id="celestial-body"></div>
-            <div class="stars-layer" id="stars-layer"></div>
-            <div class="clouds-layer" id="clouds-layer"></div>
-            <div class="particles-layer" id="particles-layer"></div>
-          </div>
-
-          <!-- Scenic Landscape SVG Artwork with One UI Character -->
-          <div class="scenic-landscape-container">
-            <svg class="scenic-svg" viewBox="0 0 800 480" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <!-- Day Hills Gradients -->
-                <linearGradient id="hillBackGradDay" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#4ea8de" stop-opacity="0.8"/>
-                  <stop offset="100%" stop-color="#64dfdf" stop-opacity="0.9"/>
-                </linearGradient>
-                <linearGradient id="hillMidGradDay" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#38b000"/>
-                  <stop offset="100%" stop-color="#007200"/>
-                </linearGradient>
-                <linearGradient id="hillFrontGradDay" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#70e000"/>
-                  <stop offset="100%" stop-color="#004b23"/>
-                </linearGradient>
-                <linearGradient id="waterGradDay" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#90e0ef"/>
-                  <stop offset="100%" stop-color="#0077b6"/>
-                </linearGradient>
-
-                <!-- Night Hills Gradients -->
-                <linearGradient id="hillBackGradNight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#14213d"/>
-                  <stop offset="100%" stop-color="#0d1b2a"/>
-                </linearGradient>
-                <linearGradient id="hillMidGradNight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1b263b"/>
-                  <stop offset="100%" stop-color="#0a1128"/>
-                </linearGradient>
-                <linearGradient id="hillFrontGradNight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1e3d59"/>
-                  <stop offset="100%" stop-color="#091833"/>
-                </linearGradient>
-                <linearGradient id="waterGradNight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#102a43"/>
-                  <stop offset="100%" stop-color="#06121e"/>
-                </linearGradient>
-              </defs>
-
-              <!-- Distant Mountains / Water -->
-              <path class="scenic-water" d="M0 320 Q200 300 400 315 T800 310 L800 480 L0 480 Z" />
-              <path class="scenic-hill-back" d="M0 290 Q220 230 450 280 T800 240 L800 480 L0 480 Z" />
-              <path class="scenic-hill-mid" d="M-50 340 Q250 270 520 330 T850 300 L850 480 L-50 480 Z" />
-              
-              <!-- Foreground Grassy Cliff -->
-              <path class="scenic-hill-front" d="M220 350 Q480 320 620 310 Q740 300 850 360 L850 480 L200 480 Z" />
-
-              <!-- Character Figure Standing on Grass (One UI Signature Look) -->
-              <g class="oneui-character" transform="translate(560, 160)">
-                <!-- Fedora / Sun Hat -->
-                <ellipse cx="28" cy="18" rx="14" ry="4" fill="#334155" />
-                <path d="M20 18 C20 10 36 10 36 18 Z" fill="#475569"/>
-                <!-- Head -->
-                <circle cx="28" cy="24" r="7" fill="#fed7aa"/>
-                <!-- Torso / Jacket -->
-                <path d="M20 32 Q28 30 36 32 L40 68 Q28 72 16 68 Z" fill="#f8fafc"/>
-                <path d="M22 34 L28 65 L34 34 Z" fill="#cbd5e1" opacity="0.6"/>
-                <!-- Arms / Holding Phone -->
-                <path d="M18 34 L12 50 L24 52" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <path d="M38 34 L44 48 L32 52" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <!-- Phone with small glow -->
-                <rect x="24" y="46" width="6" height="10" rx="1" fill="#0284c7"/>
-                <circle cx="27" cy="51" r="2" fill="#38bdf8" opacity="0.8"/>
-                <!-- Pants / Legs -->
-                <path d="M18 68 L15 105 L23 105 L26 70" fill="#1e293b"/>
-                <path d="M28 70 L31 105 L39 105 L36 68" fill="#1e293b"/>
-                <!-- Shoes -->
-                <ellipse cx="18" cy="107" rx="6" ry="3" fill="#0f172a"/>
-                <ellipse cx="36" cy="107" rx="6" ry="3" fill="#0f172a"/>
-                <!-- Grassy tufts near feet -->
-                <path d="M-10 110 Q-5 95 0 110 Q5 90 10 110" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.7"/>
-                <path d="M40 110 Q45 95 50 110 Q55 92 60 110" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.7"/>
-              </g>
-            </svg>
-          </div>
-
-          <!-- Hero Weather Information (Samsung One UI Top Left Overlay) -->
-          <div class="hero-weather-overlay">
-            <div class="location-row">
-              <svg class="location-marker-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      <!-- Main Weather Dashboard -->
+      <main id="weather-dashboard" class="weather-dashboard">
+        <!-- 1. Hero Atmospheric Scenery Section -->
+        <section class="hero-scenery-card">
+          <!-- Dynamic Animated Artwork Backdrop -->
+          <div class="scenery-canvas" id="scenery-canvas">
+            <div class="sky-elements" id="sky-elements">
+              <!-- Animated clouds, stars, sun/moon generated dynamically -->
+            </div>
+            <div class="mist-layer"></div>
+            <div class="landscape-ground">
+              <!-- Hill Silhouette and Stargazer/Lookout Character -->
+              <svg class="landscape-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
+                <!-- Distant Mountains -->
+                <path class="mountain-back" d="M0,220 Q250,140 500,200 T1000,180 L1000,320 L0,320 Z"/>
+                <!-- Front Grassy Hill -->
+                <path class="hill-front" d="M0,240 Q320,160 650,220 Q820,250 1000,210 L1000,320 L0,320 Z"/>
               </svg>
-              <h1 id="city-name" class="hero-city-name">Mapusa</h1>
-            </div>
-
-            <!-- Massive Temperature Reading -->
-            <div class="hero-temp-row">
-              <span id="hero-temp" class="hero-temp">32</span><span class="hero-degree">°</span>
-            </div>
-
-            <!-- Condition & High/Low Range -->
-            <p id="hero-condition" class="hero-condition">Partly Cloudy</p>
-
-            <div class="hero-meta-data">
-              <div class="meta-high-low">
-                <span>↑ <strong id="hero-temp-max">34°</strong></span>
-                <span>/</span>
-                <span>↓ <strong id="hero-temp-min">27°</strong></span>
-              </div>
-              <p class="meta-feels">Feels like <span id="hero-feels-like">39°</span></p>
-              <p id="hero-time" class="meta-time">Sat, 4:36 am</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- SECTION 2: Weather Summary Pill Card -->
-        <section class="summary-card">
-          <p id="weather-summary-text" class="summary-text">
-            Generally clear. Highs 26 to 28°C and lows 13 to 15°C.
-          </p>
-        </section>
-
-        <!-- Responsive Dashboard Grid for Laptop & Mobile -->
-        <div class="dashboard-layout">
-          
-          <!-- LEFT COLUMN: Hourly & Daily Forecasts -->
-          <div class="dashboard-col-main">
-            <!-- SECTION 3: Hourly Forecast Card with Continuous Temperature Curve Graph -->
-            <section class="oneui-card hourly-forecast-card">
-              <div class="card-header-row">
-                <span class="card-title">Hourly Forecast</span>
-                <span class="card-badge" id="hourly-summary-badge">Next 24 Hours</span>
-              </div>
-
-              <!-- Scrollable Hourly Forecast Track -->
-              <div class="hourly-scroll-container">
-                <div class="hourly-track" id="hourly-track">
-                  <!-- Dynamically populated hourly columns and SVG line -->
-                </div>
-                <!-- Dynamic SVG Temperature Curve Canvas/Overlay -->
-                <svg id="temp-curve-svg" class="temp-curve-svg"></svg>
-              </div>
-            </section>
-
-            <!-- SECTION 5: 5-Day Forecast Card -->
-            <section class="oneui-card daily-forecast-card">
-              <div class="card-header-row">
-                <span class="card-title">5-Day Forecast</span>
-              </div>
-              <div id="daily-forecast-list" class="daily-forecast-list">
-                <!-- Dynamically populated daily forecast rows -->
-              </div>
-            </section>
-          </div>
-
-          <!-- RIGHT COLUMN: Sun Arc Widget & Metric Cards -->
-          <div class="dashboard-col-side">
-            <!-- SECTION 4: Rise and Shine (Sun Arc Widget) -->
-            <section class="oneui-card sun-cycle-card">
-              <div class="sun-card-header">
-                <div class="sun-title-group">
-                  <svg class="sun-icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"/>
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                  </svg>
-                  <span>Rise and shine</span>
-                </div>
-                <p id="sun-status-text" class="sun-status-text">Sunrise will be at 05:43</p>
-              </div>
-
-              <!-- Semicircular Sun Arc Graph -->
-              <div class="sun-arc-container">
-                <svg class="sun-arc-svg" viewBox="0 0 300 140">
-                  <!-- Base Horizon Line -->
-                  <line x1="20" y1="120" x2="280" y2="120" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
-                  <!-- Semicircular Arc Path -->
-                  <path id="sun-path" d="M 30 120 A 120 100 0 0 1 270 120" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" stroke-dasharray="4 4" />
-                  <!-- Progress Arc Path -->
-                  <path id="sun-progress-path" d="M 30 120 A 120 100 0 0 1 150 20" fill="none" stroke="#fbbf24" stroke-width="3" stroke-linecap="round" />
-                  <!-- Sun Icon Indicator -->
-                  <circle id="sun-indicator-glow" cx="150" cy="20" r="14" fill="rgba(251, 191, 36, 0.3)" />
-                  <circle id="sun-indicator" cx="150" cy="20" r="8" fill="#fbbf24" stroke="#fff" stroke-width="2" />
+              
+              <!-- Character Silhouette standing on the hill -->
+              <div class="character-silhouette" id="character-figure">
+                <svg viewBox="0 0 60 110" fill="currentColor">
+                  <!-- Person looking at the horizon -->
+                  <circle cx="30" cy="14" r="8"/>
+                  <path d="M22,24 C18,24 16,32 16,42 L22,46 L20,78 L26,78 L28,52 L32,52 L34,78 L40,78 L38,46 L44,42 C44,32 42,24 38,24 Z"/>
+                  <!-- Telescope / binoculars / hat accent -->
+                  <path d="M20,10 Q30,4 40,10 L38,13 Q30,8 22,13 Z"/>
                 </svg>
-                <div class="sun-timestamps">
-                  <span id="arc-sunrise-time">05:43</span>
-                  <span id="arc-sunset-time">18:51</span>
-                </div>
               </div>
-            </section>
-
-            <!-- SECTION 6: Weather Details Grid Cards (One UI Style) -->
-            <section class="details-grid">
-              <div class="oneui-card metric-sub-card">
-                <div class="metric-top">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
-                    <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
-                    <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
-                  </svg>
-                  <span>Wind Speed</span>
-                </div>
-                <p id="metric-wind" class="metric-large-text">-- m/s</p>
-                <span class="metric-sub-info" id="metric-wind-dir">Gentle Breeze</span>
-              </div>
-
-              <div class="oneui-card metric-sub-card">
-                <div class="metric-top">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                  </svg>
-                  <span>Humidity</span>
-                </div>
-                <p id="metric-humidity" class="metric-large-text">--%</p>
-                <span class="metric-sub-info" id="metric-dew-point">Dew point: 22°</span>
-              </div>
-
-              <div class="oneui-card metric-sub-card">
-                <div class="metric-top">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 2a10 10 0 0 1 10 10"/>
-                    <path d="m14 14-4-4 4-4"/>
-                  </svg>
-                  <span>Pressure</span>
-                </div>
-                <p id="metric-pressure" class="metric-large-text">-- hPa</p>
-                <span class="metric-sub-info">Standard Atmospheric</span>
-              </div>
-
-              <div class="oneui-card metric-sub-card">
-                <div class="metric-top">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                  <span>Visibility</span>
-                </div>
-                <p id="metric-visibility" class="metric-large-text">-- km</p>
-                <span class="metric-sub-info" id="metric-vis-quality">Clear View</span>
-              </div>
-            </section>
+            </div>
           </div>
 
-        </div>
+          <!-- Hero Weather Information (Overlaid on Scenery) -->
+          <div class="hero-overlay-content">
+            <div class="hero-header-meta">
+              <div class="city-location-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <h1 id="city-name">--</h1>
+              </div>
+              <p id="local-time" class="hero-local-time">--</p>
+            </div>
 
+            <div class="hero-temp-block">
+              <div class="main-temperature">
+                <span id="temperature">--</span><span class="deg-symbol">°</span>
+              </div>
+              <div class="hero-condition-title" id="description">--</div>
+              <div class="hero-submetrics">
+                <span class="range-pill">↑ <strong id="temp-max">--°</strong> / ↓ <strong id="temp-min">--°</strong></span>
+                <span class="dot-sep">•</span>
+                <span class="feels-pill">Feels like <strong id="feels-like">--°</strong></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Condition Summary Pill Banner -->
+        <section class="summary-card" id="summary-card">
+          <svg class="summary-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
+          </svg>
+          <p id="summary-text" class="summary-text">Fetching current outlook...</p>
+        </section>
+
+        <!-- 3. Hourly Forecast Card with Continuous Temperature Curve -->
+        <section class="forecast-card">
+          <div class="card-header-bar">
+            <div class="card-title-group">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>Hourly Forecast</span>
+            </div>
+            <span class="forecast-hint">24-Hour Outlook</span>
+          </div>
+
+          <div class="hourly-forecast-scroll-wrapper" id="hourly-scroll-container">
+            <div class="hourly-timeline-container" id="hourly-timeline">
+              <!-- Dynamic Hourly columns and SVG Spline Graph will be injected here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Detailed Modular Widgets Grid -->
+        <section class="widgets-dashboard-grid">
+          <!-- Sun Cycle Widget with Interactive Arc -->
+          <div class="widget-card sun-cycle-widget">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+              <span id="sun-status-title">Sun Cycle</span>
+            </div>
+            <div class="sun-arc-visual">
+              <svg class="sun-arc-svg" viewBox="0 0 240 120">
+                <!-- Base Ground Line -->
+                <line x1="15" y1="105" x2="225" y2="105" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <!-- Semi-Circle Arc -->
+                <path id="sun-trajectory-path" d="M 25 105 A 95 95 0 0 1 215 105" fill="none" stroke="rgba(255, 215, 0, 0.3)" stroke-width="3" stroke-linecap="round"/>
+                <!-- Sun Position Indicator (Glow Circle) -->
+                <circle id="sun-glow-circle" cx="120" cy="10" r="8" fill="#ffd700" filter="drop-shadow(0 0 6px #ffd700)"/>
+                <text x="25" y="118" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Poppins" id="arc-sunrise-text">05:43</text>
+                <text x="215" y="118" fill="rgba(255,255,255,0.6)" font-size="11" text-anchor="end" font-family="Poppins" id="arc-sunset-text">18:51</text>
+              </svg>
+            </div>
+            <p class="sun-footer-text" id="sun-footer-text">Sunrise at --</p>
+          </div>
+
+          <!-- Insight & Daily Comparison Card -->
+          <div class="widget-card insight-widget">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span>Weather Insight</span>
+            </div>
+            <div class="insight-content">
+              <h3 id="insight-title">Condition Outlook</h3>
+              <p id="insight-desc">Today's conditions are pleasant with stable humidity and gentle breeze.</p>
+            </div>
+          </div>
+
+          <!-- Humidity Metric Card -->
+          <div class="widget-card metric-box">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+              <span>Humidity</span>
+            </div>
+            <div class="metric-main-value" id="humidity">--%</div>
+            <div class="metric-sub-bar">
+              <div class="progress-fill" id="humidity-bar" style="width: 50%;"></div>
+            </div>
+            <span class="metric-caption" id="humidity-status">Normal</span>
+          </div>
+
+          <!-- Wind Speed & Direction Card -->
+          <div class="widget-card metric-box">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/>
+                <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
+                <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
+              </svg>
+              <span>Wind</span>
+            </div>
+            <div class="metric-main-value" id="wind-speed">-- m/s</div>
+            <div class="wind-direction-row">
+              <span id="wind-direction">Calm</span>
+            </div>
+            <span class="metric-caption" id="wind-caption">Gentle breeze</span>
+          </div>
+
+          <!-- Atmospheric Pressure Card -->
+          <div class="widget-card metric-box">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m14 14-4-4 4-4"/>
+                <path d="M12 2a10 10 0 0 1 10 10"/>
+              </svg>
+              <span>Pressure</span>
+            </div>
+            <div class="metric-main-value" id="pressure">-- hPa</div>
+            <span class="metric-caption" id="pressure-status">Standard atmospheric level</span>
+          </div>
+
+          <!-- Visibility Card -->
+          <div class="widget-card metric-box">
+            <div class="widget-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <span>Visibility</span>
+            </div>
+            <div class="metric-main-value" id="visibility">-- km</div>
+            <span class="metric-caption" id="visibility-status">Clear view</span>
+          </div>
+        </section>
       </main>
     </div>
 
