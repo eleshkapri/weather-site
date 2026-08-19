@@ -771,16 +771,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxTemp = Math.max(...temps);
     const tempRange = Math.max(maxTemp - minTemp, 4);
 
-    const colWidth = 78;
+    const colWidth = 82;
     const totalWidth = sliceIndices.length * colWidth;
-    const graphHeight = 85;
-    const graphTopPadding = 25;
+    const graphHeight = 90;
+    const graphTopPadding = 26;
 
     // Calculate curve points
     const points = sliceIndices.map((itemIdx, seqIdx) => {
       const x = seqIdx * colWidth + colWidth / 2;
       const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
-      const y = graphTopPadding + (1 - normalized) * (graphHeight - 35);
+      const y = graphTopPadding + (1 - normalized) * (graphHeight - 40);
       return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
     });
 
