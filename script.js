@@ -40,6 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const insightTitle = document.getElementById("insight-title");
   const insightDesc = document.getElementById("insight-desc");
+  const insightBadge = document.getElementById("insight-badge");
+  const insightRangeVal = document.getElementById("insight-range-val");
+  const insightRainVal = document.getElementById("insight-rain-val");
+  const insightOutlookVal = document.getElementById("insight-outlook-val");
 
   const humidityDisplay = document.getElementById("humidity");
   const humidityBar = document.getElementById("humidity-bar");
@@ -894,17 +898,29 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderInsightWidget(daily) {
     const todayMax = Math.round(daily.temperature_2m_max[0]);
     const tomorrowMax = Math.round(daily.temperature_2m_max[1]);
+    const tomorrowMin = Math.round(daily.temperature_2m_min[1]);
+    const tomorrowRain = daily.precipitation_probability_max ? Math.round(daily.precipitation_probability_max[1] || 0) : 0;
+    const tomorrowCode = daily.weather_code[1] || 0;
+    const tomorrowWmo = WMO_WEATHER_MAP[tomorrowCode] || { desc: "Clear Sky" };
+
     const diff = tomorrowMax - todayMax;
 
     insightTitle.textContent = "Tomorrow's Temperature";
 
     if (diff > 0) {
-      insightDesc.textContent = `Temperatures will be around ${Math.abs(diff)}° higher than today (${tomorrowMax}°↑).`;
+      insightDesc.textContent = `Temperatures will be around ${Math.abs(diff)}° higher than today with highs reaching ${tomorrowMax}°C.`;
+      if (insightBadge) insightBadge.textContent = `+${Math.abs(diff)}° Warmer`;
     } else if (diff < 0) {
-      insightDesc.textContent = `Temperatures a little lower than today (${Math.abs(diff)}°↓, high ${tomorrowMax}°).`;
+      insightDesc.textContent = `Temperatures will be a little lower than today (${Math.abs(diff)}° cooler, high of ${tomorrowMax}°C).`;
+      if (insightBadge) insightBadge.textContent = `-${Math.abs(diff)}° Cooler`;
     } else {
-      insightDesc.textContent = `Expect similar temperatures to today (high near ${tomorrowMax}°).`;
+      insightDesc.textContent = `Expect similar temperatures to today with a high near ${tomorrowMax}°C.`;
+      if (insightBadge) insightBadge.textContent = `Steady Temp`;
     }
+
+    if (insightRangeVal) insightRangeVal.textContent = `${tomorrowMax}° / ${tomorrowMin}°`;
+    if (insightRainVal) insightRainVal.textContent = `☂ ${tomorrowRain}%`;
+    if (insightOutlookVal) insightOutlookVal.textContent = tomorrowWmo.desc;
   }
 
   // --- Detailed Metrics Grid ---
