@@ -33,13 +33,19 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleSearch() {
         const city = cityInput.value.trim();
         if (!city) return;
-  
+
         // 1. FORCE RESET: Clear previous data immediately
         resetUI();
+
+        // Validate minimum length (prevent single character accidental searches)
+        if (city.length < 2) {
+            showError("Please enter at least 2 characters.");
+            return;
+        }
         
         // 2. Show Loading
         showLoading();
-  
+
         try {
             // Step 1: Get Location (City, State, Country)
             const locationData = await fetchCoordinates(city);
@@ -73,13 +79,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function fetchCoordinates(city) {
-        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`;
+        const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=5&appid=${API_KEY}`;
         const response = await fetch(url);
         
         if (!response.ok) throw new Error("Failed to fetch location.");
         
         const data = await response.json();
         if (data.length === 0) throw new Error("City not found. Please try again.");
+
+        const searchLower = city.toLowerCase();
+        // Priority 1: Exact match (e.g. "Delhi" === "Delhi")
+        const exactMatch = data.find(item => item.name.toLowerCase() === searchLower);
+        if (exactMatch) return exactMatch;
+
+        // Priority 2: City name starts with search term
+        const startsWithMatch = data.find(item => item.name.toLowerCase().startsWith(searchLower));
+        if (startsWithMatch) return startsWithMatch;
 
         return data[0];
     }
