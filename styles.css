@@ -1330,40 +1330,277 @@ body.theme-day .city-pill:hover {
 }
 
 /* =========================================================
-   RESPONSIVE DESIGN FOR LAPTOPS & TABLETS
+   COMPREHENSIVE RESPONSIVE DESIGN (ALL DEVICES)
    ========================================================= */
-@media (max-width: 860px) {
+
+/* --- TABLETS & SMALL LAPTOPS (769px - 1024px) --- */
+@media (max-width: 1024px) {
+  .app-layout {
+    max-width: 100%;
+    padding: 0 8px;
+  }
+  
   .widgets-dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
+
   .insight-widget {
     grid-column: span 2;
   }
+
   .sun-cycle-widget {
     grid-column: span 2;
   }
 }
 
+/* --- SMALL TABLETS & LARGE PHONES (581px - 768px) --- */
+@media (max-width: 768px) {
+  body {
+    padding: 16px 12px 32px;
+  }
+
+  .app-layout {
+    gap: 16px;
+  }
+
+  .welcome-screen {
+    min-height: 75vh;
+    gap: 28px;
+    padding: 24px 12px;
+  }
+
+  .welcome-logo-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .welcome-title {
+    font-size: 40px;
+  }
+
+  .welcome-subtitle {
+    font-size: 14.5px;
+  }
+
+  .hero-scenery-card {
+    height: 350px;
+    padding: 24px 22px;
+  }
+
+  .main-temperature {
+    font-size: 78px;
+  }
+
+  .character-silhouette {
+    bottom: 50px;
+    right: 15%;
+    width: 40px;
+    height: 72px;
+  }
+
+  .widgets-dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .insight-widget,
+  .sun-cycle-widget {
+    grid-column: span 2;
+  }
+}
+
+/* --- MOBILE PHONES (Up to 580px) --- */
 @media (max-width: 580px) {
+  body {
+    padding: 12px 10px 28px;
+  }
+
+  .app-layout {
+    gap: 14px;
+  }
+
+  /* Welcome Screen on Mobile */
+  .welcome-screen {
+    min-height: 70vh;
+    gap: 22px;
+    padding: 20px 8px;
+  }
+
+  .welcome-logo-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .welcome-title {
+    font-size: 32px;
+    letter-spacing: -1px;
+  }
+
+  .welcome-subtitle {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .welcome-search-wrapper {
+    gap: 14px;
+  }
+
+  .welcome-search-wrapper input[type="text"] {
+    padding: 13px 36px 13px 40px;
+    font-size: 13.5px;
+  }
+
+  .welcome-search-wrapper .search-btn {
+    padding: 13px 18px;
+    font-size: 13.5px;
+  }
+
+  .quick-cities-row {
+    gap: 6px;
+  }
+
+  .city-pill {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  /* Top Navigation on Mobile */
   .top-nav {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
+
+  .nav-brand {
+    justify-content: center;
+  }
+
+  .brand-title {
+    font-size: 20px;
+  }
+
   .nav-search-container {
     max-width: 100%;
+    width: 100%;
   }
+
+  /* Hero Scenery Card on Mobile */
   .hero-scenery-card {
-    height: 340px;
-    padding: 24px 20px;
+    height: 320px;
+    padding: 20px 16px;
+    border-radius: 20px;
   }
+
+  .city-location-badge h1 {
+    font-size: 22px;
+  }
+
+  .city-location-badge svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .hero-local-time {
+    margin-left: 26px;
+    font-size: 12px;
+  }
+
   .main-temperature {
-    font-size: 72px;
+    font-size: 64px;
+    letter-spacing: -2px;
   }
+
+  .deg-symbol {
+    font-size: 36px;
+  }
+
+  .hero-condition-title {
+    font-size: 18px;
+  }
+
+  .hero-submetrics {
+    font-size: 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .character-silhouette {
+    bottom: 44px;
+    right: 10%;
+    width: 34px;
+    height: 64px;
+  }
+
+  /* Summary Card on Mobile */
+  .summary-card {
+    padding: 12px 16px;
+    border-radius: 18px;
+    gap: 10px;
+  }
+
+  .summary-text {
+    font-size: 13px;
+  }
+
+  .summary-sparkle-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Forecast Card on Mobile */
+  .forecast-card {
+    padding: 16px 14px;
+    border-radius: 20px;
+  }
+
+  .card-header-bar {
+    margin-bottom: 12px;
+  }
+
+  /* Widgets Grid Stacking on Mobile */
   .widgets-dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-  .insight-widget, .sun-cycle-widget {
-    grid-column: span 1;
+
+  .widget-card {
+    border-radius: 20px;
+    padding: 16px 18px;
+    min-height: 135px;
+  }
+
+  .insight-widget,
+  .sun-cycle-widget {
+    grid-column: span 1 !important;
+  }
+
+  .metric-main-value {
+    font-size: 24px;
+  }
+
+  .sun-arc-svg {
+    max-width: 190px;
+  }
+}
+
+/* --- EXTRA SMALL SCREENS (<= 360px) --- */
+@media (max-width: 360px) {
+  .welcome-title {
+    font-size: 28px;
+  }
+
+  .main-temperature {
+    font-size: 54px;
+  }
+
+  .hero-scenery-card {
+    height: 290px;
+    padding: 16px 12px;
+  }
+
+  .character-silhouette {
+    display: none; /* Hide figure on tiny screens to give text maximum room */
   }
 }
 
