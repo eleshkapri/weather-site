@@ -1,0 +1,18 @@
+﻿<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+  <defs>
+    <linearGradient id='sun' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#FFF066'/>
+      <stop offset='100%' stop-color='#FF9900'/>
+    </linearGradient>
+    <linearGradient id='cloud' x1='0%' y1='0%' x2='0%' y2='100%'>
+      <stop offset='0%' stop-color='#FFFFFF'/>
+      <stop offset='100%' stop-color='#D4E7FE'/>
+    </linearGradient>
+    <filter id='glow'>
+      <feDropShadow dx='0' dy='3' stdDeviation='3' flood-color='#FFB800' flood-opacity='0.5'/>
+    </filter>
+  </defs>
+  <circle cx='26' cy='24' r='14' fill='url(#sun)' filter='url(#glow)'/>
+  <path d='M26 4 L26 8 M26 40 L26 44 M6 24 L10 24 M42 24 L46 24 M12 10 L15 13 M37 35 L40 38 M12 38 L15 35 M37 13 L40 10' stroke='#FFAA00' stroke-width='2.5' stroke-linecap='round'/>
+  <path d='M24 50 C18 50 14 46 14 40 C14 35 18 31 23 31 C25 24 33 21 39 25 C43 23 48 26 50 30 C55 31 58 35 58 40 C58 45.5 53.5 50 48 50 Z' fill='url(#cloud)' filter='drop-shadow(0 4px 6px rgba(0,0,0,0.25))'/>
+</svg>
