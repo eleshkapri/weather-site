@@ -19,14 +19,12 @@
   --radius-sm: 14px;
 }
 
-/* --- THEME PALETTES --- */
-body.theme-night {
-  --bg-gradient: linear-gradient(180deg, #040a17 0%, #0a1733 45%, #0d224d 100%);
-  --card-bg: rgba(14, 26, 52, 0.55);
-}
+/* --- THEME PALETTES (DAY / NIGHT x WEATHER TYPE) --- */
 
-body.theme-day {
-  --bg-gradient: linear-gradient(180deg, #257ae7 0%, #4696f5 35%, #72b8fd 70%, #a4d8fd 100%);
+/* 1. Clear Day */
+body.theme-day,
+body.theme-day-clear {
+  --bg-gradient: linear-gradient(180deg, #1d74e8 0%, #3e91f5 35%, #72b7fd 70%, #a2d7fd 100%);
   --card-bg: rgba(255, 255, 255, 0.78);
   --card-bg-hover: rgba(255, 255, 255, 0.88);
   --card-border: rgba(255, 255, 255, 0.95);
@@ -37,25 +35,81 @@ body.theme-day {
   --primary-accent: #d97706;
 }
 
-body.theme-day .ambient-bg {
+/* 2. Cloudy / Overcast Day */
+body.theme-day-cloudy {
+  --bg-gradient: linear-gradient(180deg, #37474f 0%, #546e7a 35%, #78909c 70%, #b0bec5 100%);
+  --card-bg: rgba(255, 255, 255, 0.82);
+  --card-bg-hover: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 14px 34px rgba(15, 30, 50, 0.18), 0 2px 6px rgba(15, 30, 50, 0.06);
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #64748b;
+  --primary-accent: #0284c7;
+}
+
+/* 3. Rainy Day */
+body.theme-day-rain {
+  --bg-gradient: linear-gradient(180deg, #1e293b 0%, #334155 45%, #475569 80%, #64748b 100%);
+  --card-bg: rgba(255, 255, 255, 0.82);
+  --card-bg-hover: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 14px 34px rgba(10, 25, 45, 0.22);
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #64748b;
+  --primary-accent: #0284c7;
+}
+
+/* 4. Clear Night */
+body.theme-night,
+body.theme-night-clear {
+  --bg-gradient: linear-gradient(180deg, #040916 0%, #0a1936 50%, #0f244c 100%);
+  --card-bg: rgba(14, 26, 52, 0.55);
+  --card-bg-hover: rgba(255, 255, 255, 0.11);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.72);
+  --text-dim: rgba(255, 255, 255, 0.45);
+  --primary-accent: #ffd700;
+}
+
+/* 5. Cloudy Night */
+body.theme-night-cloudy {
+  --bg-gradient: linear-gradient(180deg, #070e1a 0%, #101c2e 50%, #1b2a40 100%);
+  --card-bg: rgba(15, 23, 42, 0.65);
+  --card-bg-hover: rgba(255, 255, 255, 0.11);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.72);
+  --text-dim: rgba(255, 255, 255, 0.45);
+  --primary-accent: #38bdf8;
+}
+
+/* 6. Rainy Night / Thunderstorm */
+body.theme-night-rain,
+body.theme-thunderstorm {
+  --bg-gradient: linear-gradient(180deg, #020617 0%, #090e1a 45%, #0f172a 100%);
+  --card-bg: rgba(15, 23, 42, 0.75);
+  --card-bg-hover: rgba(255, 255, 255, 0.11);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.72);
+  --text-dim: rgba(255, 255, 255, 0.45);
+  --primary-accent: #38bdf8;
+}
+
+body[class*="theme-day"] .ambient-bg {
   background: radial-gradient(circle at 80% 12%, rgba(255, 248, 214, 0.4) 0%, rgba(255, 220, 110, 0.12) 35%, transparent 70%);
 }
 
-body.theme-day .summary-card,
-body.theme-day .forecast-card,
-body.theme-day .widget-card {
-  box-shadow: 0 14px 34px rgba(12, 45, 95, 0.15);
+body[class*="theme-day"] .summary-card,
+body[class*="theme-day"] .forecast-card,
+body[class*="theme-day"] .widget-card {
   color: var(--text-main);
-}
-
-body.theme-sunset {
-  --bg-gradient: linear-gradient(180deg, #1e1b4b 0%, #7c2d12 40%, #c2410c 75%, #f97316 100%);
-  --card-bg: rgba(45, 20, 30, 0.55);
-}
-
-body.theme-rain {
-  --bg-gradient: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  --card-bg: rgba(30, 41, 59, 0.6);
 }
 
 * {
@@ -577,13 +631,38 @@ input[type="text"]:focus {
   transition: all 0.6s ease;
 }
 
-body.theme-day .hero-scenery-card {
+/* --- HERO CARD SCENERY BACKGROUNDS PER THEME --- */
+body.theme-day,
+body.theme-day-clear .hero-scenery-card {
   background: linear-gradient(180deg, #1967d2 0%, #3b8cf0 38%, #6cb4fd 72%, #9ad3fd 100%);
   border: 1px solid rgba(255, 255, 255, 0.45);
 }
 
-body.theme-night .hero-scenery-card {
+body.theme-day-cloudy .hero-scenery-card {
+  background: linear-gradient(180deg, #37474f 0%, #455a64 35%, #607d8b 70%, #90a4ae 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+body.theme-day-rain .hero-scenery-card {
+  background: linear-gradient(180deg, #1e293b 0%, #334155 40%, #475569 75%, #64748b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+body.theme-night,
+body.theme-night-clear .hero-scenery-card {
   background: linear-gradient(180deg, #040916 0%, #0a1936 50%, #0f244c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+body.theme-night-cloudy .hero-scenery-card {
+  background: linear-gradient(180deg, #070e1a 0%, #101c2e 50%, #1b2a40 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.theme-night-rain .hero-scenery-card,
+body.theme-thunderstorm .hero-scenery-card {
+  background: linear-gradient(180deg, #02050f 0%, #080f1e 50%, #111d33 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .scenery-canvas {
@@ -722,8 +801,25 @@ body.theme-night .hero-scenery-card {
   z-index: 2;
 }
 
-body.theme-day .mist-layer {
+body[class*="theme-day"] .mist-layer {
   background: linear-gradient(180deg, transparent 45%, rgba(180, 220, 255, 0.15) 80%, rgba(255, 255, 255, 0.25) 100%);
+}
+
+/* Lightning flash for thunderstorms */
+.lightning-flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(235, 245, 255, 0.85);
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  animation: lightningBolt 8s ease-in-out infinite;
+}
+
+@keyframes lightningBolt {
+  0%, 92%, 94%, 96%, 100% { opacity: 0; }
+  93% { opacity: 0.7; }
+  95% { opacity: 0.9; }
 }
 
 /* Landscape hill & silhouette */
@@ -759,32 +855,87 @@ body.theme-day .mist-layer {
   transition: fill 1s ease;
 }
 
-body.theme-day .mountain-back {
+/* Landscape per-theme coloring */
+body.theme-day,
+body.theme-day-clear .mountain-back {
   fill: url(#distantMountainGrad);
   opacity: 0.65;
 }
 
-body.theme-day .mountain-mid {
+body.theme-day,
+body.theme-day-clear .mountain-mid {
   fill: url(#midHillGrad);
   opacity: 0.9;
 }
 
-body.theme-day .hill-front {
+body.theme-day,
+body.theme-day-clear .hill-front {
   fill: url(#frontHillGrad);
 }
 
-body.theme-night .mountain-back {
+body.theme-day-cloudy .mountain-back {
+  fill: #4b626e;
+  opacity: 0.75;
+}
+
+body.theme-day-cloudy .mountain-mid {
+  fill: #3c5443;
+  opacity: 0.9;
+}
+
+body.theme-day-cloudy .hill-front {
+  fill: #2c4432;
+}
+
+body.theme-day-rain .mountain-back {
+  fill: #223440;
+  opacity: 0.8;
+}
+
+body.theme-day-rain .mountain-mid {
+  fill: #1a3324;
+  opacity: 0.92;
+}
+
+body.theme-day-rain .hill-front {
+  fill: #14281c;
+}
+
+body.theme-night,
+body.theme-night-clear .mountain-back {
   fill: #08162f;
   opacity: 0.55;
 }
 
-body.theme-night .mountain-mid {
+body.theme-night,
+body.theme-night-clear .mountain-mid {
   fill: #091a38;
   opacity: 0.85;
 }
 
-body.theme-night .hill-front {
+body.theme-night,
+body.theme-night-clear .hill-front {
   fill: #0c1f44;
+}
+
+body.theme-night-cloudy .mountain-back,
+body.theme-night-rain .mountain-back,
+body.theme-thunderstorm .mountain-back {
+  fill: #060e1d;
+  opacity: 0.65;
+}
+
+body.theme-night-cloudy .mountain-mid,
+body.theme-night-rain .mountain-mid,
+body.theme-thunderstorm .mountain-mid {
+  fill: #081224;
+  opacity: 0.88;
+}
+
+body.theme-night-cloudy .hill-front,
+body.theme-night-rain .hill-front,
+body.theme-thunderstorm .hill-front {
+  fill: #0a172e;
 }
 
 /* Character figure standing on hill */
@@ -1310,124 +1461,124 @@ body.theme-day .insight-chip {
 }
 
 /* =========================================================
-   DAYTIME HIGH-CONTRAST OVERRIDES
+   DAYTIME HIGH-CONTRAST OVERRIDES (ALL DAY THEMES)
    ========================================================= */
-body.theme-day .card-title-group,
-body.theme-day .card-header-bar,
-body.theme-day .widget-header,
-body.theme-day .summary-text,
-body.theme-day .metric-caption,
-body.theme-day .wind-direction-row,
-body.theme-day .sun-footer-text {
+body[class*="theme-day"] .card-title-group,
+body[class*="theme-day"] .card-header-bar,
+body[class*="theme-day"] .widget-header,
+body[class*="theme-day"] .summary-text,
+body[class*="theme-day"] .metric-caption,
+body[class*="theme-day"] .wind-direction-row,
+body[class*="theme-day"] .sun-footer-text {
   color: var(--text-muted);
 }
 
-body.theme-day .card-title-group svg,
-body.theme-day .widget-header svg {
+body[class*="theme-day"] .card-title-group svg,
+body[class*="theme-day"] .widget-header svg {
   stroke: var(--primary-accent);
 }
 
-body.theme-day .hourly-graph-path {
+body[class*="theme-day"] .hourly-graph-path {
   stroke: #0284c7;
   stroke-width: 2.6;
 }
 
-body.theme-day .hourly-temp-label {
+body[class*="theme-day"] .hourly-temp-label {
   fill: #0f172a;
 }
 
-body.theme-day .hourly-temp-dot {
+body[class*="theme-day"] .hourly-temp-dot {
   fill: #0284c7;
   stroke: #ffffff;
   stroke-width: 3;
 }
 
-body.theme-day .hourly-time {
+body[class*="theme-day"] .hourly-time {
   color: #475569;
   font-weight: 500;
 }
 
-body.theme-day .hourly-pop {
+body[class*="theme-day"] .hourly-pop {
   color: #0284c7;
 }
 
-body.theme-day #sun-trajectory-path {
+body[class*="theme-day"] #sun-trajectory-path {
   stroke: rgba(217, 119, 6, 0.4);
 }
 
-body.theme-day .sun-arc-svg text {
+body[class*="theme-day"] .sun-arc-svg text {
   fill: #475569;
 }
 
-body.theme-day .sun-arc-svg line {
+body[class*="theme-day"] .sun-arc-svg line {
   stroke: rgba(0, 0, 0, 0.15);
 }
 
-body.theme-day .metric-sub-bar {
+body[class*="theme-day"] .metric-sub-bar {
   background: rgba(0, 0, 0, 0.08);
 }
 
-body.theme-day .search-dropdown {
+body[class*="theme-day"] .search-dropdown {
   background: rgba(255, 255, 255, 0.98);
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.16);
 }
 
-body.theme-day .dropdown-primary-text {
+body[class*="theme-day"] .dropdown-primary-text {
   color: #0f172a;
 }
 
-body.theme-day .dropdown-secondary-text {
+body[class*="theme-day"] .dropdown-secondary-text {
   color: #64748b;
 }
 
-body.theme-day .dropdown-item:hover,
-body.theme-day .dropdown-item.active-item {
+body[class*="theme-day"] .dropdown-item:hover,
+body[class*="theme-day"] .dropdown-item.active-item {
   background: rgba(0, 0, 0, 0.05);
 }
 
-body.theme-day input[type="text"] {
+body[class*="theme-day"] input[type="text"] {
   background: rgba(255, 255, 255, 0.88);
   color: #0f172a;
   border: 1px solid rgba(255, 255, 255, 0.95);
 }
 
-body.theme-day input[type="text"]::placeholder {
+body[class*="theme-day"] input[type="text"]::placeholder {
   color: #64748b;
 }
 
-body.theme-day .search-btn {
+body[class*="theme-day"] .search-btn {
   background: #0284c7;
   color: #ffffff;
   border: none;
 }
 
-body.theme-day .search-btn:hover {
+body[class*="theme-day"] .search-btn:hover {
   background: #0369a1;
 }
 
-body.theme-day .brand-title {
+body[class*="theme-day"] .brand-title {
   background: linear-gradient(135deg, #0f172a 40%, #0284c7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-body.theme-day .brand-icon {
+body[class*="theme-day"] .brand-icon {
   stroke: #0284c7;
   filter: drop-shadow(0 2px 6px rgba(2, 132, 199, 0.3));
 }
 
-body.theme-day .summary-sparkle-icon {
+body[class*="theme-day"] .summary-sparkle-icon {
   stroke: #d97706;
 }
 
-body.theme-day .city-pill {
+body[class*="theme-day"] .city-pill {
   background: rgba(255, 255, 255, 0.75);
   color: #334155;
   border-color: rgba(255, 255, 255, 0.9);
 }
 
-body.theme-day .city-pill:hover {
+body[class*="theme-day"] .city-pill:hover {
   background: #ffffff;
   color: #0284c7;
   border-color: #0284c7;

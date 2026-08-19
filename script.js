@@ -600,15 +600,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Animated 3D Scenery & Theme Engine ---
   function updateSceneryAndTheme(isDay, conditionMain) {
     const isNight = isDay === 0;
+    const isRain = conditionMain === "Rain" || conditionMain === "Drizzle";
+    const isStorm = conditionMain === "Thunderstorm";
+    const isCloudy = conditionMain === "Clouds" || conditionMain === "Mist";
 
-    // Switch body theme class
+    // Switch body theme class based on Day/Night x Weather Condition
     document.body.className = "";
-    if (conditionMain === "Rain" || conditionMain === "Drizzle" || conditionMain === "Thunderstorm") {
-      document.body.classList.add("theme-rain");
-    } else if (isNight) {
-      document.body.classList.add("theme-night");
+
+    if (isStorm) {
+      document.body.classList.add("theme-thunderstorm");
+    } else if (isRain) {
+      document.body.classList.add(isNight ? "theme-night-rain" : "theme-day-rain");
+    } else if (isCloudy) {
+      document.body.classList.add(isNight ? "theme-night-cloudy" : "theme-day-cloudy");
     } else {
-      document.body.classList.add("theme-day");
+      // Clear
+      document.body.classList.add(isNight ? "theme-night-clear" : "theme-day-clear");
     }
 
     // Clear ambient sky canvas so moon/stars don't bleed into daytime background!
@@ -631,8 +638,9 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       skyElements.appendChild(moon3d);
 
-      // Starfield particles
-      for (let i = 0; i < 35; i++) {
+      // Starfield particles (adjusted count based on cloud cover)
+      const starCount = isCloudy ? 15 : isRain || isStorm ? 6 : 38;
+      for (let i = 0; i < starCount; i++) {
         const star = document.createElement("div");
         star.className = "star-particle";
         star.style.top = `${Math.random() * 60}%`;
@@ -651,52 +659,77 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="sun-corona"></div>
         <div class="sun-core"></div>
       `;
+      if (isCloudy || isRain) {
+        sun3d.style.opacity = isRain ? "0.35" : "0.75";
+      }
       skyElements.appendChild(sun3d);
 
       // Soft ambient background clouds in daytime
-      if (ambientSkyCanvas) {
-        for (let i = 0; i < 3; i++) {
+      if (ambientSkyCanvas && !isRain && !isStorm) {
+        const bgCloudCount = isCloudy ? 5 : 3;
+        for (let i = 0; i < bgCloudCount; i++) {
           const bgCloud = document.createElement("div");
           bgCloud.className = "cloud-layer";
-          bgCloud.style.top = `${6 + i * 20}%`;
-          bgCloud.style.left = `${-180 + i * 360}px`;
-          bgCloud.style.width = `${380 + i * 140}px`;
-          bgCloud.style.height = `${130 + i * 40}px`;
-          bgCloud.style.opacity = "0.4";
-          bgCloud.style.animationDuration = `${55 + i * 18}s`;
+          bgCloud.style.top = `${5 + i * 16}%`;
+          bgCloud.style.left = `${-180 + i * 280}px`;
+          bgCloud.style.width = `${380 + i * 120}px`;
+          bgCloud.style.height = `${120 + i * 30}px`;
+          bgCloud.style.opacity = isCloudy ? "0.55" : "0.35";
+          bgCloud.style.animationDuration = `${50 + i * 16}s`;
           ambientSkyCanvas.appendChild(bgCloud);
         }
       }
     }
 
     // 3D Volumetric Fluffy Clouds
-    if (conditionMain === "Clouds" || conditionMain === "Rain" || conditionMain === "Mist" || conditionMain === "Clear") {
-      const cloudConfigs = [
-        { top: "14%", left: "-60px", scale: 1.15, dur: "42s", delay: "0s" },
-        { top: "26%", left: "160px", scale: 0.85, dur: "52s", delay: "-12s" },
-        { top: "8%", left: "380px", scale: 0.95, dur: "48s", delay: "-24s" },
-        { top: "20%", left: "620px", scale: 0.75, dur: "58s", delay: "-6s" },
+    let cloudConfigs = [];
+    if (isCloudy) {
+      cloudConfigs = [
+        { top: "10%", left: "-40px", scale: 1.2, dur: "38s", delay: "0s" },
+        { top: "24%", left: "140px", scale: 0.95, dur: "48s", delay: "-10s" },
+        { top: "6%", left: "360px", scale: 1.1, dur: "44s", delay: "-20s" },
+        { top: "18%", left: "580px", scale: 0.85, dur: "54s", delay: "-5s" },
+        { top: "28%", left: "780px", scale: 1.05, dur: "42s", delay: "-15s" },
       ];
-
-      const count = conditionMain === "Clear" ? 2 : cloudConfigs.length;
-      for (let i = 0; i < count; i++) {
-        const cfg = cloudConfigs[i];
-        const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
-        skyElements.appendChild(cloud);
-      }
+    } else if (isRain || isStorm) {
+      cloudConfigs = [
+        { top: "8%", left: "-30px", scale: 1.25, dur: "32s", delay: "0s" },
+        { top: "20%", left: "200px", scale: 1.1, dur: "40s", delay: "-8s" },
+        { top: "12%", left: "480px", scale: 1.2, dur: "36s", delay: "-16s" },
+        { top: "22%", left: "720px", scale: 1.0, dur: "45s", delay: "-4s" },
+      ];
+    } else {
+      // Clear
+      cloudConfigs = [
+        { top: "14%", left: "-60px", scale: 1.0, dur: "48s", delay: "0s" },
+        { top: "24%", left: "420px", scale: 0.8, dur: "56s", delay: "-18s" },
+      ];
     }
 
-    // Rain Streaks in rainy conditions
-    if (conditionMain === "Rain" || conditionMain === "Drizzle" || conditionMain === "Thunderstorm") {
-      for (let i = 0; i < 40; i++) {
+    cloudConfigs.forEach((cfg) => {
+      const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
+      skyElements.appendChild(cloud);
+    });
+
+    // Rain Streaks in rainy or stormy conditions
+    if (isRain || isStorm) {
+      const rainCount = isStorm ? 60 : 45;
+      for (let i = 0; i < rainCount; i++) {
         const rain = document.createElement("div");
         rain.className = "rain-streak";
         rain.style.left = `${Math.random() * 100}%`;
-        rain.style.top = `${Math.random() * 50}%`;
+        rain.style.top = `${Math.random() * 55}%`;
         rain.style.animationDelay = `${Math.random() * 1.5}s`;
-        rain.style.animationDuration = `${0.6 + Math.random() * 0.4}s`;
+        rain.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
         skyElements.appendChild(rain);
       }
+    }
+
+    // Thunderstorm Lightning Flash Overlay
+    if (isStorm) {
+      const flash = document.createElement("div");
+      flash.className = "lightning-flash-overlay";
+      skyElements.appendChild(flash);
     }
   }
 
