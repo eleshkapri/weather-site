@@ -1,4 +1,4 @@
-﻿# Operating System Files
+# Operating System Files
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -12,3 +12,9 @@ desktop.ini
 # Node / Scratch (if any)
 node_modules/
 *.log
+
+# AI Skills & Local Rules (Keep GitHub Repo Clean)
+.agents/
+skills-lock.json
+GEMINI.md
+AGENTS.md
