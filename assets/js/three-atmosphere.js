@@ -68,9 +68,10 @@ class ThreeAtmosphere {
   // --- 3D Holographic Weather Globe (High-Tech Earth/Atmosphere Mesh) ---
   initHolographicGlobe() {
     this.globeGroup = new THREE.Group();
-    // Positioned elegantly in 3D space (floating slightly to the right on desktop)
+    // Positioned to the right on desktop, centered on mobile.
+    // x=26 keeps the full globe (radius 22) safely inside the ~58-unit world half-width at this camera depth.
     const isMobile = window.innerWidth < 768;
-    this.globeGroup.position.set(isMobile ? 0 : 36, isMobile ? 12 : 8, -15);
+    this.globeGroup.position.set(isMobile ? 0 : 26, isMobile ? 8 : 2, -15);
     this.globeGroup.scale.set(1, 1, 1);
 
     const radius = 22;
@@ -352,6 +353,65 @@ class ThreeAtmosphere {
     }
   }
 
+  // --- View-aware Globe Repositioning ---
+
+  /** Call when showing the hero/welcome screen. Globe slides into right-side position. */
+  repositionForWelcome() {
+    if (!this.globeGroup) return;
+    const isMobile = window.innerWidth < 768;
+    const targetX = isMobile ? 0 : 26;
+    const targetY = isMobile ? 8 : 2;
+
+    if (typeof gsap !== 'undefined') {
+      gsap.to(this.globeGroup.position, {
+        x: targetX, y: targetY,
+        duration: 0.9,
+        ease: 'power3.out'
+      });
+      gsap.to(this.globeGroup.scale, {
+        x: 1, y: 1, z: 1,
+        duration: 0.9,
+        ease: 'power3.out'
+      });
+      // Restore dot/wire visibility
+      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.55, duration: 0.8 });
+      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.18, duration: 0.8 });
+      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.35, duration: 0.8 });
+      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.25, duration: 0.8 });
+    } else {
+      this.globeGroup.position.set(targetX, targetY, -15);
+      this.globeGroup.scale.set(1, 1, 1);
+    }
+  }
+
+  /** Call when showing the weather dashboard. Globe retreats off-right and fades. */
+  repositionForDashboard() {
+    if (!this.globeGroup) return;
+    const isMobile = window.innerWidth < 768;
+
+    if (typeof gsap !== 'undefined') {
+      // On desktop: push globe far right and shrink; on mobile: push down-right
+      gsap.to(this.globeGroup.position, {
+        x: isMobile ? 0 : 62,
+        y: isMobile ? -40 : -26,
+        duration: 1.0,
+        ease: 'power3.inOut'
+      });
+      gsap.to(this.globeGroup.scale, {
+        x: 0.7, y: 0.7, z: 0.7,
+        duration: 1.0,
+        ease: 'power3.inOut'
+      });
+      // Dim globe elements so they don't fight the content
+      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.18, duration: 0.8 });
+      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.06, duration: 0.8 });
+      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.12, duration: 0.8 });
+      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.08, duration: 0.8 });
+    } else {
+      this.globeGroup.position.set(isMobile ? 0 : 62, isMobile ? -40 : -26, -15);
+    }
+  }
+
   // --- Interactive Pointer & Window Events ---
   bindEvents() {
     window.addEventListener('pointermove', (e) => {
@@ -367,7 +427,7 @@ class ThreeAtmosphere {
       // Reposition globe based on viewport width
       const isMobile = window.innerWidth < 768;
       if (this.globeGroup) {
-        this.globeGroup.position.set(isMobile ? 0 : 36, isMobile ? 12 : 8, -15);
+        this.globeGroup.position.set(isMobile ? 0 : 26, isMobile ? 8 : 2, -15);
       }
     });
   }

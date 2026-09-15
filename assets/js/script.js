@@ -130,17 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Global telemetry marquee ribbon click handler
-  document.querySelectorAll(".ticker-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      const city = item.getAttribute("data-city");
-      cityInput.value = city;
-      clearInputBtn.classList.remove("hidden");
-      closeDropdown();
-      handleSearch(city);
-    });
-  });
-
   // Click Atmosphere Brand / Logo to return to Home Welcome Screen
   if (brandHomeBtn) {
     brandHomeBtn.addEventListener("click", returnToHomeScreen);
@@ -162,6 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     weatherDashboard.classList.remove("hidden");
 
+    // Globe retreats off-right so it doesn't compete with data content
+    if (window.threeAtmosphere) {
+      window.threeAtmosphere.repositionForDashboard();
+    }
+
     // GSAP Cinematic Entrance Animation
     if (window.motionEngine) {
       window.motionEngine.animateDashboardEntrance();
@@ -181,6 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window.threeAtmosphere) {
       window.threeAtmosphere.setWeatherTheme(0, "Clear");
+      // Globe slides back to hero position
+      window.threeAtmosphere.repositionForWelcome();
     }
   }
 

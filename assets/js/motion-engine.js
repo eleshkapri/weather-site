@@ -54,10 +54,10 @@ class MotionEngine {
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-    // 1. Top Navigation & Live Telemetry Marquee
-    tl.fromTo('#top-nav, .telemetry-ticker-section',
+    // 1. Top Navigation
+    tl.fromTo('#top-nav',
       { y: -20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }
+      { y: 0, opacity: 1, duration: 0.6 }
     );
 
     // 2. View Mode Tabs Pill Bar
