@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atmosphere • Live Weather</title>
+    <title>Atmosphere • Live Weather Intelligence</title>
     <!-- Favicon Logo -->
     <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='sun' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FFF066'/%3E%3Cstop offset='100%25' stop-color='%23FF9900'/%3E%3C/linearGradient%3E%3ClinearGradient id='cloud' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FFFFFF'/%3E%3Cstop offset='100%25' stop-color='%23D4E7FE'/%3E%3C/linearGradient%3E%3Cfilter id='glow'%3E%3CfeDropShadow dx='0' dy='3' stdDeviation='3' flood-color='%23FFB800' flood-opacity='0.5'/%3E%3C/filter%3E%3C/defs%3E%3Ccircle cx='26' cy='24' r='14' fill='url(%23sun)' filter='url(%23glow)'/%3E%3Cpath d='M26 4 L26 8 M26 40 L26 44 M6 24 L10 24 M42 24 L46 24 M12 10 L15 13 M37 35 L40 38 M12 38 L15 35 M37 13 L40 10' stroke='%23FFAA00' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M24 50 C18 50 14 46 14 40 C14 35 18 31 23 31 C25 24 33 21 39 25 C43 23 48 26 50 30 C55 31 58 35 58 40 C58 45.5 53.5 50 48 50 Z' fill='url(%23cloud)' filter='drop-shadow(0 4px 6px rgba(0,0,0,0.25))'/%3E%3C/svg%3E" />
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Plus Jakarta Sans & Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/styles.css" />
@@ -20,19 +20,100 @@
     <!-- Dynamic Ambient Backdrop & Animated Celestial Sky -->
     <div id="ambient-bg" class="ambient-bg"></div>
     <div class="ambient-sky-canvas" id="ambient-sky-canvas">
-      <!-- Three.js WebGL 3D Atmospheric Particle Canvas -->
+      <!-- Three.js WebGL 3D Atmospheric Holographic Globe & Particle Canvas -->
       <canvas id="webgl-atmosphere-canvas"></canvas>
     </div>
+
+    <!-- Global Telemetry Marquee Ribbon (Infinite Ticker across World Cities) -->
+    <section class="telemetry-ticker-section" id="telemetry-ticker-section">
+      <div class="ticker-mask">
+        <div class="ticker-track" id="ticker-track">
+          <!-- Populated dynamically and statically with world metropolises -->
+          <div class="ticker-item" data-city="Tokyo">
+            <span class="ticker-city">Tokyo</span>
+            <span class="ticker-cond">☀ 19°C</span>
+          </div>
+          <div class="ticker-item" data-city="New York">
+            <span class="ticker-city">New York</span>
+            <span class="ticker-cond">⛅ 23°C</span>
+          </div>
+          <div class="ticker-item" data-city="London">
+            <span class="ticker-city">London</span>
+            <span class="ticker-cond">🌧 18°C</span>
+          </div>
+          <div class="ticker-item" data-city="Paris">
+            <span class="ticker-city">Paris</span>
+            <span class="ticker-cond">🌙 20°C</span>
+          </div>
+          <div class="ticker-item" data-city="Dubai">
+            <span class="ticker-city">Dubai</span>
+            <span class="ticker-cond">⚡ 36°C</span>
+          </div>
+          <div class="ticker-item" data-city="Singapore">
+            <span class="ticker-city">Singapore</span>
+            <span class="ticker-cond">⛈ 30°C</span>
+          </div>
+          <div class="ticker-item" data-city="Sydney">
+            <span class="ticker-city">Sydney</span>
+            <span class="ticker-cond">💨 17°C</span>
+          </div>
+          <div class="ticker-item" data-city="Reykjavik">
+            <span class="ticker-city">Reykjavik</span>
+            <span class="ticker-cond">❄ 4°C</span>
+          </div>
+          <!-- Duplicate for seamless infinite loop -->
+          <div class="ticker-item" data-city="Tokyo">
+            <span class="ticker-city">Tokyo</span>
+            <span class="ticker-cond">☀ 19°C</span>
+          </div>
+          <div class="ticker-item" data-city="New York">
+            <span class="ticker-city">New York</span>
+            <span class="ticker-cond">⛅ 23°C</span>
+          </div>
+          <div class="ticker-item" data-city="London">
+            <span class="ticker-city">London</span>
+            <span class="ticker-cond">🌧 18°C</span>
+          </div>
+          <div class="ticker-item" data-city="Paris">
+            <span class="ticker-city">Paris</span>
+            <span class="ticker-cond">🌙 20°C</span>
+          </div>
+          <div class="ticker-item" data-city="Dubai">
+            <span class="ticker-city">Dubai</span>
+            <span class="ticker-cond">⚡ 36°C</span>
+          </div>
+          <div class="ticker-item" data-city="Singapore">
+            <span class="ticker-city">Singapore</span>
+            <span class="ticker-cond">⛈ 30°C</span>
+          </div>
+          <div class="ticker-item" data-city="Sydney">
+            <span class="ticker-city">Sydney</span>
+            <span class="ticker-cond">💨 17°C</span>
+          </div>
+          <div class="ticker-item" data-city="Reykjavik">
+            <span class="ticker-city">Reykjavik</span>
+            <span class="ticker-cond">❄ 4°C</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="app-layout" id="app-layout">
       <!-- Welcome Center Screen (Shown on initial load before search) -->
       <section class="welcome-screen" id="welcome-screen">
         <div class="welcome-brand">
-          <svg class="welcome-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
-          </svg>
-          <h1 class="welcome-title">Atmosphere</h1>
-          <p class="welcome-subtitle">Experience real-time weather with live atmospheric forecasts</p>
+          <div class="pearl-badge">
+            <span class="pulse-beacon"></span>
+            <span>OPEN-METEO SATELLITE MESH · REAL-TIME TELEMETRY</span>
+          </div>
+
+          <div class="welcome-title-wrap">
+            <svg class="welcome-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+            </svg>
+            <h1 class="welcome-title">Atmosphere<span class="tech-accent">Live</span></h1>
+          </div>
+          <p class="welcome-subtitle">Hyper-accurate 1-hour Catmull-Rom spline curves, live orbital telemetry & celestial simulations</p>
         </div>
 
         <!-- Prominent Center Search Box -->
@@ -46,7 +127,7 @@
               <input
                 type="text"
                 id="city-input"
-                placeholder="Search any city, state or country..."
+                placeholder="Search any global city, coordinates or airport..."
                 autocomplete="off"
                 autocorrect="off"
                 autocapitalize="off"
@@ -60,6 +141,9 @@
             </div>
             <button id="get-weather-btn" class="search-btn">
               <span>Search</span>
+              <div class="btn-arrow-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
             </button>
 
             <!-- Dynamic Autocomplete & Search History Dropdown -->
@@ -68,7 +152,7 @@
 
           <!-- Quick Search City Pills -->
           <div class="quick-cities-row">
-            <span class="quick-label">Popular:</span>
+            <span class="quick-label">Telemetry:</span>
             <button class="city-pill" data-city="London">London</button>
             <button class="city-pill" data-city="New York">New York</button>
             <button class="city-pill" data-city="Tokyo">Tokyo</button>
@@ -84,7 +168,8 @@
           <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
           </svg>
-          <span class="brand-title">Atmosphere</span>
+          <span class="brand-title">Atmosphere<span class="tech-accent">Live</span></span>
+          <span class="nav-live-pill"><span class="pulse-beacon-sm"></span> LIVE</span>
         </div>
 
         <div class="nav-search-container" id="nav-search-mount">
@@ -96,8 +181,8 @@
       <div id="error-message" class="error-banner hidden" role="alert">
         <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
-          <line x1="12" x2="12" y1="8" y2="12"/>
-          <line x1="12" x2="12.01" y1="16" y2="16"/>
+          <line x1="12" y1="8" y2="12"/>
+          <line x1="12.01" y1="16" y2="16"/>
         </svg>
         <span id="error-text"></span>
       </div>
@@ -105,12 +190,33 @@
       <!-- Loading Spinner -->
       <div id="loading-spinner" class="spinner-container hidden">
         <div class="pulse-loader"></div>
-        <p class="loading-text">Loading forecast data...</p>
+        <p class="loading-text">Connecting orbital sensors...</p>
       </div>
 
       <!-- Main Weather Dashboard (Hidden on initial load) -->
       <main id="weather-dashboard" class="weather-dashboard hidden">
-        <!-- 1. Hero Atmospheric Scenery Section -->
+        <!-- Interactive View Mode Tabs (SalesHookAI Inspired) -->
+        <div class="dashboard-tabs-bar" id="dashboard-tabs-bar">
+          <div class="tab-slider-pill"></div>
+          <button class="view-tab-btn active" data-view="all">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+            <span>Overview</span>
+          </button>
+          <button class="view-tab-btn" data-view="spline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            <span>24h Spline</span>
+          </button>
+          <button class="view-tab-btn" data-view="solar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg>
+            <span>Sun & Horizon</span>
+          </button>
+          <button class="view-tab-btn" data-view="telemetry">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span>Atmosphere Grid</span>
+          </button>
+        </div>
+
+        <!-- 1. Hero Atmospheric Scenery Section (Double-Bezel Architecture) -->
         <section class="hero-scenery-card">
           <!-- Dynamic Animated Artwork Backdrop -->
           <div class="scenery-canvas" id="scenery-canvas">
@@ -172,6 +278,15 @@
 
           <!-- Hero Weather Information (Overlaid on Scenery) -->
           <div class="hero-overlay-content">
+            <!-- Telemetry HUD Coordinates Header -->
+            <div class="telemetry-hud-badge">
+              <span class="hud-item"><span class="hud-label">COORDS</span> <span id="hud-coords">--° N, --° W</span></span>
+              <span class="hud-sep">·</span>
+              <span class="hud-item"><span class="hud-label">ELEVATION</span> <span id="hud-elev">--m</span></span>
+              <span class="hud-sep">·</span>
+              <span class="hud-item"><span class="pulse-beacon-sm"></span> <span id="hud-status">SATELLITE SYNC</span></span>
+            </div>
+
             <div class="hero-header-meta">
               <div class="city-location-badge">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -215,7 +330,7 @@
               </svg>
               <span>Hourly Forecast</span>
             </div>
-            <span class="forecast-hint">24-Hour Outlook</span>
+            <span class="forecast-hint">24-Hour Continuous Spline</span>
           </div>
 
           <div class="hourly-forecast-scroll-wrapper" id="hourly-scroll-container">
@@ -225,7 +340,7 @@
           </div>
         </section>
 
-        <!-- 4. Detailed Modular Widgets Grid -->
+        <!-- 4. Detailed Modular Widgets Grid (Double-Bezel Architecture) -->
         <section class="widgets-dashboard-grid">
           <!-- Sun Cycle Widget with Interactive Arc -->
           <div class="widget-card sun-cycle-widget">
@@ -244,8 +359,8 @@
                 <path id="sun-trajectory-path" d="M 25 105 A 95 95 0 0 1 215 105" fill="none" stroke="rgba(255, 215, 0, 0.3)" stroke-width="3" stroke-linecap="round"/>
                 <!-- Sun Position Indicator (Glow Circle) -->
                 <circle id="sun-glow-circle" cx="120" cy="10" r="8" fill="#ffd700" filter="drop-shadow(0 0 6px #ffd700)"/>
-                <text x="25" y="118" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Poppins" id="arc-sunrise-text">05:43</text>
-                <text x="215" y="118" fill="rgba(255,255,255,0.6)" font-size="11" text-anchor="end" font-family="Poppins" id="arc-sunset-text">18:51</text>
+                <text x="25" y="118" fill="rgba(255,255,255,0.6)" font-size="11" font-family="Plus Jakarta Sans, sans-serif" id="arc-sunrise-text">05:43</text>
+                <text x="215" y="118" fill="rgba(255,255,255,0.6)" font-size="11" text-anchor="end" font-family="Plus Jakarta Sans, sans-serif" id="arc-sunset-text">18:51</text>
               </svg>
             </div>
             <p class="sun-footer-text" id="sun-footer-text">Sunrise at --</p>
@@ -261,7 +376,7 @@
                   <line x1="16" y1="13" x2="8" y2="13"/>
                   <line x1="16" y1="17" x2="8" y2="17"/>
                 </svg>
-                <span>Weather Insight</span>
+                <span>Atmospheric Insight</span>
               </div>
               <span class="insight-badge" id="insight-badge">Tomorrow's Outlook</span>
             </div>
@@ -297,13 +412,13 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
               </svg>
-              <span>Humidity</span>
+              <span>Relative Humidity</span>
             </div>
             <div class="metric-main-value" id="humidity">--%</div>
             <div class="metric-sub-bar">
               <div class="progress-fill" id="humidity-bar" style="width: 50%;"></div>
             </div>
-            <span class="metric-caption" id="humidity-status">Normal</span>
+            <span class="metric-caption" id="humidity-status">Optimal comfort</span>
           </div>
 
           <!-- Wind Speed & Direction Card -->
@@ -314,7 +429,7 @@
                 <path d="M9.6 4.6A2 2 0 1 1 11 8H2"/>
                 <path d="M12.6 19.4A2 2 0 1 0 14 16H2"/>
               </svg>
-              <span>Wind</span>
+              <span>Wind Velocity</span>
             </div>
             <div class="metric-main-value" id="wind-speed">-- m/s</div>
             <div class="wind-direction-row">
@@ -331,7 +446,7 @@
                 <path d="m14 14-4-4 4-4"/>
                 <path d="M12 2a10 10 0 0 1 10 10"/>
               </svg>
-              <span>Pressure</span>
+              <span>Barometric Pressure</span>
             </div>
             <div class="metric-main-value" id="pressure">-- hPa</div>
             <span class="metric-caption" id="pressure-status">Standard atmospheric level</span>
@@ -344,7 +459,7 @@
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
                 <circle cx="12" cy="12" r="3"/>
               </svg>
-              <span>Visibility</span>
+              <span>Surface Visibility</span>
             </div>
             <div class="metric-main-value" id="visibility">-- km</div>
             <span class="metric-caption" id="visibility-status">Clear view</span>

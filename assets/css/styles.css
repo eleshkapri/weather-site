@@ -174,39 +174,351 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
-/* 3D Magnetic Card Tilt & Cursor Spotlight */
+/* 3D Magnetic Card Tilt & Double-Bezel Cursor Spotlight */
 .widget-card,
 .forecast-card,
-.summary-card {
+.summary-card,
+.hero-scenery-card {
   position: relative;
   transform-style: preserve-3d;
   will-change: transform;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.14), var(--card-shadow);
 }
 
 .widget-card::before,
 .forecast-card::before,
-.summary-card::before {
+.summary-card::before,
+.hero-scenery-card::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(420px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(255, 255, 255, 0.12), transparent 45%);
+  background: radial-gradient(450px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(255, 255, 255, 0.12), transparent 50%);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.4s ease;
   z-index: 2;
 }
 
+body[class*="theme-day"] .widget-card,
+body[class*="theme-day"] .forecast-card,
+body[class*="theme-day"] .summary-card,
+body[class*="theme-day"] .hero-scenery-card {
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.95), var(--card-shadow);
+}
+
 body[class*="theme-day"] .widget-card::before,
 body[class*="theme-day"] .forecast-card::before,
-body[class*="theme-day"] .summary-card::before {
-  background: radial-gradient(420px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(2, 132, 199, 0.1), transparent 45%);
+body[class*="theme-day"] .summary-card::before,
+body[class*="theme-day"] .hero-scenery-card::before {
+  background: radial-gradient(450px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(2, 132, 199, 0.1), transparent 50%);
 }
 
 .widget-card:hover::before,
 .forecast-card:hover::before,
-.summary-card:hover::before {
+.summary-card:hover::before,
+.hero-scenery-card:hover::before {
   opacity: 1;
+}
+
+/* --- SALESHOOKAI-INSPIRED PEARL BADGES & PULSE BEACONS --- */
+.pearl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin-bottom: 4px;
+}
+
+body[class*="theme-day"] .pearl-badge {
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #1e293b;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.pulse-beacon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+  animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.pulse-beacon-sm {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  display: inline-block;
+  animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes beacon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.5;
+  }
+}
+
+.tech-accent {
+  background: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+/* Button-in-Button Trailing Arrow Wrapper */
+.btn-arrow-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+  margin-left: 4px;
+}
+
+.search-btn:hover .btn-arrow-icon {
+  transform: translateX(3px);
+}
+
+/* --- TELEMETRY MARQUEE TICKER (INFINITE RIBBON) --- */
+.telemetry-ticker-section {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  z-index: 8;
+  margin-top: -10px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.ticker-mask {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  animation: tickerScroll 42s linear infinite;
+  padding: 4px 10px;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.ticker-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.ticker-city {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.ticker-cond {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--accent-blue);
+}
+
+body[class*="theme-day"] .ticker-item {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: #334155;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+body[class*="theme-day"] .ticker-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(15, 23, 42, 0.16);
+  color: #0f172a;
+}
+
+/* --- DASHBOARD VIEW TABS (SALESHOOKAI INSPIRED) --- */
+.dashboard-tabs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+body[class*="theme-day"] .dashboard-tabs-bar {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+}
+
+.tab-slider-pill {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: calc(100% - 10px);
+  background: rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(129, 140, 248, 0.4);
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body[class*="theme-day"] .tab-slider-pill {
+  background: rgba(2, 132, 199, 0.12);
+  border-color: rgba(2, 132, 199, 0.3);
+}
+
+.view-tab-btn {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  white-space: nowrap;
+}
+
+.view-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.view-tab-btn.active {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* --- TELEMETRY HUD BADGE ON HERO SCENERY CARD --- */
+.telemetry-hud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.telemetry-hud-badge .hud-label {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.telemetry-hud-badge .hud-sep {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- KINETIC TEXT SPLIT STYLING --- */
+.split-text-wrapper {
+  display: inline-block;
+  perspective: 600px;
+}
+
+.split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.split-char {
+  display: inline-block;
+  will-change: transform, opacity;
 }
 
 /* --- MAIN APP CONTAINER --- */
@@ -248,6 +560,14 @@ body[class*="theme-day"] .summary-card::before {
   stroke: var(--primary-accent);
   filter: drop-shadow(0 4px 18px var(--accent-glow));
   animation: floatLogo 4s ease-in-out infinite alternate;
+}
+
+.welcome-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .welcome-title {

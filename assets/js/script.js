@@ -130,6 +130,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Global telemetry marquee ribbon click handler
+  document.querySelectorAll(".ticker-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const city = item.getAttribute("data-city");
+      cityInput.value = city;
+      clearInputBtn.classList.remove("hidden");
+      closeDropdown();
+      handleSearch(city);
+    });
+  });
+
   // Click Atmosphere Brand / Logo to return to Home Welcome Screen
   if (brandHomeBtn) {
     brandHomeBtn.addEventListener("click", returnToHomeScreen);
@@ -576,9 +587,27 @@ document.addEventListener("DOMContentLoaded", () => {
       iconNight: "01n",
     };
 
-    // 1. Header & Location Meta
-    cityNameDisplay.textContent = name;
+    // 1. Header & Location Meta with GSAP Kinetic Text Split
+    if (window.motionEngine && window.motionEngine.animateTextSplit) {
+      window.motionEngine.animateTextSplit(cityNameDisplay, name);
+      window.motionEngine.animateTextSplit(descriptionDisplay, wmoInfo.desc);
+    } else {
+      cityNameDisplay.textContent = name;
+      descriptionDisplay.textContent = wmoInfo.desc;
+    }
     localTimeDisplay.textContent = formatCurrentLocalTime(utc_offset_seconds, timezone);
+
+    // Populate Telemetry HUD Coordinates & Elevation
+    const hudCoords = document.getElementById("hud-coords");
+    const hudElev = document.getElementById("hud-elev");
+    if (hudCoords && data.latitude !== undefined) {
+      const latStr = `${Math.abs(data.latitude).toFixed(2)}° ${data.latitude >= 0 ? "N" : "S"}`;
+      const lonStr = `${Math.abs(data.longitude).toFixed(2)}° ${data.longitude >= 0 ? "E" : "W"}`;
+      hudCoords.textContent = `${latStr}, ${lonStr}`;
+    }
+    if (hudElev) {
+      hudElev.textContent = `${Math.round(data.elevation || 15)}m`;
+    }
 
     // 2. Hero Weather Readings with GSAP animated counter
     if (window.motionEngine) {
@@ -586,7 +615,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       temperatureDisplay.textContent = Math.round(current.temperature_2m);
     }
-    descriptionDisplay.textContent = wmoInfo.desc;
     tempMaxDisplay.textContent = `${Math.round(daily.temperature_2m_max[0])}°`;
     tempMinDisplay.textContent = `${Math.round(daily.temperature_2m_min[0])}°`;
     feelsLikeDisplay.textContent = `${Math.round(current.apparent_temperature)}°`;
