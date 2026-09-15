@@ -149,6 +149,66 @@ body {
   overflow: hidden;
 }
 
+/* Three.js WebGL Interactive Atmosphere Canvas */
+#webgl-atmosphere-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* Lenis Smooth Inertia Scroll System */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* 3D Magnetic Card Tilt & Cursor Spotlight */
+.widget-card,
+.forecast-card,
+.summary-card {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.widget-card::before,
+.forecast-card::before,
+.summary-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(255, 255, 255, 0.12), transparent 45%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+}
+
+body[class*="theme-day"] .widget-card::before,
+body[class*="theme-day"] .forecast-card::before,
+body[class*="theme-day"] .summary-card::before {
+  background: radial-gradient(420px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(2, 132, 199, 0.1), transparent 45%);
+}
+
+.widget-card:hover::before,
+.forecast-card:hover::before,
+.summary-card:hover::before {
+  opacity: 1;
+}
+
 /* --- MAIN APP CONTAINER --- */
 .app-layout {
   width: 100%;

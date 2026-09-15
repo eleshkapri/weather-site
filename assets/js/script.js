@@ -150,6 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
       navSearchMount.appendChild(searchBoxWrapper);
     }
     weatherDashboard.classList.remove("hidden");
+
+    // GSAP Cinematic Entrance Animation
+    if (window.motionEngine) {
+      window.motionEngine.animateDashboardEntrance();
+    }
   }
 
   function returnToHomeScreen() {
@@ -162,12 +167,18 @@ document.addEventListener("DOMContentLoaded", () => {
     clearInputBtn.classList.add("hidden");
     document.body.className = "theme-night";
     initAmbientSky();
+
+    if (window.threeAtmosphere) {
+      window.threeAtmosphere.setWeatherTheme(0, "Clear");
+    }
   }
 
   // --- Ambient Background Generator ---
   function initAmbientSky() {
     if (!ambientSkyCanvas) return;
-    ambientSkyCanvas.innerHTML = "";
+    // Remove only non-canvas elements to preserve Three.js WebGL canvas!
+    const nonCanvas = ambientSkyCanvas.querySelectorAll(":not(#webgl-atmosphere-canvas)");
+    nonCanvas.forEach((el) => el.remove());
 
     // Glowing Ambient Moon
     const moon = document.createElement("div");
@@ -569,8 +580,12 @@ document.addEventListener("DOMContentLoaded", () => {
     cityNameDisplay.textContent = name;
     localTimeDisplay.textContent = formatCurrentLocalTime(utc_offset_seconds, timezone);
 
-    // 2. Hero Weather Readings
-    temperatureDisplay.textContent = Math.round(current.temperature_2m);
+    // 2. Hero Weather Readings with GSAP animated counter
+    if (window.motionEngine) {
+      window.motionEngine.animateCounter(temperatureDisplay, Math.round(current.temperature_2m), 0.9, 0);
+    } else {
+      temperatureDisplay.textContent = Math.round(current.temperature_2m);
+    }
     descriptionDisplay.textContent = wmoInfo.desc;
     tempMaxDisplay.textContent = `${Math.round(daily.temperature_2m_max[0])}°`;
     tempMinDisplay.textContent = `${Math.round(daily.temperature_2m_min[0])}°`;
@@ -593,6 +608,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 8. Metrics Grid
     renderMetricCards(current, hourly);
+
+    // Initialize 3D card tilt & spotlight physics on all cards
+    if (window.motionEngine) {
+      window.motionEngine.initCardPhysics();
+    }
 
     errorMessage.classList.add("hidden");
   }
@@ -618,8 +638,16 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add(isNight ? "theme-night-clear" : "theme-day-clear");
     }
 
-    // Clear ambient sky canvas so moon/stars don't bleed into daytime background!
-    if (ambientSkyCanvas) ambientSkyCanvas.innerHTML = "";
+    // Clear ambient sky canvas non-canvas elements to preserve Three.js WebGL canvas!
+    if (ambientSkyCanvas) {
+      const nonCanvas = ambientSkyCanvas.querySelectorAll(":not(#webgl-atmosphere-canvas)");
+      nonCanvas.forEach((el) => el.remove());
+    }
+
+    // Sync Three.js WebGL 3D atmosphere
+    if (window.threeAtmosphere) {
+      window.threeAtmosphere.setWeatherTheme(isDay, conditionMain);
+    }
 
     // Build sky elements inside hero scenery card
     skyElements.innerHTML = "";
@@ -959,27 +987,43 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Detailed Metrics Grid ---
   function renderMetricCards(current, hourly) {
     // Humidity
-    humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+    if (window.motionEngine) {
+      window.motionEngine.animateCounter(humidityDisplay, current.relative_humidity_2m, 0.8, 0, "%");
+    } else {
+      humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+    }
     humidityBar.style.width = `${current.relative_humidity_2m}%`;
     if (current.relative_humidity_2m < 40) humidityStatus.textContent = "Dry air";
     else if (current.relative_humidity_2m <= 70) humidityStatus.textContent = "Comfortable level";
     else humidityStatus.textContent = "High humidity";
 
     // Wind
-    windSpeedDisplay.textContent = `${(current.wind_speed_10m / 3.6).toFixed(1)} m/s`;
-    windDirection.textContent = getWindDirectionText(current.wind_direction_10m);
     const speedMs = current.wind_speed_10m / 3.6;
+    if (window.motionEngine) {
+      window.motionEngine.animateCounter(windSpeedDisplay, speedMs, 0.8, 1, " m/s");
+    } else {
+      windSpeedDisplay.textContent = `${speedMs.toFixed(1)} m/s`;
+    }
+    windDirection.textContent = getWindDirectionText(current.wind_direction_10m);
     if (speedMs < 3) windCaption.textContent = "Light air";
     else if (speedMs < 8) windCaption.textContent = "Gentle breeze";
     else windCaption.textContent = "Strong breeze";
 
     // Pressure
-    pressureDisplay.textContent = `${Math.round(current.surface_pressure)} hPa`;
+    if (window.motionEngine) {
+      window.motionEngine.animateCounter(pressureDisplay, Math.round(current.surface_pressure), 0.8, 0, " hPa");
+    } else {
+      pressureDisplay.textContent = `${Math.round(current.surface_pressure)} hPa`;
+    }
 
     // Visibility
     const visMeters = hourly && hourly.visibility ? hourly.visibility[0] : 10000;
-    const visKm = (visMeters / 1000).toFixed(1);
-    visibilityDisplay.textContent = `${visKm} km`;
+    const visKm = visMeters / 1000;
+    if (window.motionEngine) {
+      window.motionEngine.animateCounter(visibilityDisplay, visKm, 0.8, 1, " km");
+    } else {
+      visibilityDisplay.textContent = `${visKm.toFixed(1)} km`;
+    }
     if (visMeters >= 9000) visibilityStatus.textContent = "Clear visibility";
     else if (visMeters >= 4000) visibilityStatus.textContent = "Moderate haze";
     else visibilityStatus.textContent = "Low visibility";

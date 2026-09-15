@@ -20,7 +20,8 @@
     <!-- Dynamic Ambient Backdrop & Animated Celestial Sky -->
     <div id="ambient-bg" class="ambient-bg"></div>
     <div class="ambient-sky-canvas" id="ambient-sky-canvas">
-      <!-- Stars, glowing moon/sun, soft clouds -->
+      <!-- Three.js WebGL 3D Atmospheric Particle Canvas -->
+      <canvas id="webgl-atmosphere-canvas"></canvas>
     </div>
 
     <div class="app-layout" id="app-layout">
@@ -352,6 +353,15 @@
       </main>
     </div>
 
+    <!-- Core 3D & Motion Libraries: Three.js (WebGL), GSAP, ScrollTrigger, Lenis -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+
+    <!-- Atmospheric 3D & GSAP Motion Engines -->
+    <script src="assets/js/three-atmosphere.js"></script>
+    <script src="assets/js/motion-engine.js"></script>
     <script src="assets/js/script.js"></script>
   </body>
 </html>
