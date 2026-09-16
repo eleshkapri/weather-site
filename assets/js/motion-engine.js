@@ -16,6 +16,7 @@ class MotionEngine {
     this.initNavbarScrollMotion();
     this.initCardPhysics();
     this.initDashboardTabs();
+    this.initHeroScrollStackingAnimation();
   }
 
   // --- Lenis Inertial Smooth Scroll ---
@@ -474,6 +475,167 @@ class MotionEngine {
         }
       });
     });
+  }
+
+  // --- 3D Hero-to-Dashboard Card Stacking & Scroll Engine ---
+  initHeroScrollStackingAnimation() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    const hero = document.querySelector('#hero-section') || document.querySelector('.cinematic-hero-section');
+    const dashboard = document.querySelector('#dashboard-section') || document.querySelector('.cinematic-frame-outer');
+
+    if (!hero || !dashboard) return;
+
+    const isMobile = window.innerWidth < 768;
+    const heroRotate = isMobile ? -2 : -4;
+    const dashRotate = isMobile ? 2 : 4;
+
+    // 1. Hero Section (Section 1): scales down [1 -> 0.85] and rotates [0 -> -4deg] as scrolled
+    ScrollTrigger.create({
+      trigger: hero,
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 0.8,
+      onUpdate: (self) => {
+        const p = self.progress;
+        const scale = 1 - p * 0.15;
+        const rotate = p * heroRotate;
+        const opacity = 1 - p * 0.35;
+
+        gsap.set(hero, {
+          scale: scale,
+          rotationZ: rotate,
+          opacity: opacity,
+          transformOrigin: 'center top',
+          force3D: true
+        });
+      }
+    });
+
+    // 2. Weather Dashboard (Section 2): scales up [0.88 -> 1] and straightens [4deg -> 0] as it enters
+    ScrollTrigger.create({
+      trigger: dashboard,
+      start: 'top bottom',
+      end: 'top 15%',
+      scrub: 0.8,
+      onUpdate: (self) => {
+        const p = self.progress;
+        const scale = 0.88 + p * 0.12;
+        const rotate = (1 - p) * dashRotate;
+
+        gsap.set(dashboard, {
+          scale: scale,
+          rotationZ: rotate,
+          transformOrigin: 'center top',
+          force3D: true
+        });
+      }
+    });
+  }
+
+  // --- Programmatic Transition when User Searches a City ---
+  animateSearchTransitionToDashboard(onComplete) {
+    const hero = document.querySelector('#hero-section') || document.querySelector('.cinematic-hero-section');
+    const dashboard = document.querySelector('#dashboard-section') || document.querySelector('.cinematic-frame-outer');
+
+    if (!dashboard) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    if (typeof gsap === 'undefined') {
+      dashboard.scrollIntoView({ behavior: 'smooth' });
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const isMobile = window.innerWidth < 768;
+    const heroRotate = isMobile ? -2 : -4;
+    const dashRotate = isMobile ? 2 : 4;
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      onComplete: () => {
+        if (onComplete) onComplete();
+      }
+    });
+
+    // Animate Hero (Section 1) receding into 3D background space
+    if (hero) {
+      tl.to(hero, {
+        scale: 0.85,
+        rotationZ: heroRotate,
+        opacity: 0.7,
+        duration: 0.85,
+        transformOrigin: 'center top',
+        force3D: true
+      }, 0);
+    }
+
+    // Animate Dashboard Card (Section 2) scaling up and emerging into crisp foreground focus
+    tl.fromTo(dashboard, {
+      scale: 0.88,
+      rotationZ: dashRotate,
+      opacity: 0.6,
+      y: 40
+    }, {
+      scale: 1,
+      rotationZ: 0,
+      opacity: 1,
+      y: 0,
+      duration: 0.95,
+      transformOrigin: 'center top',
+      force3D: true,
+      clearProps: 'y'
+    }, 0.08);
+
+    // Smooth camera glide to dashboard card
+    if (this.lenis) {
+      this.lenis.scrollTo(dashboard, {
+        offset: -76,
+        duration: 1.1,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+      });
+    } else {
+      dashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // --- Programmatic Return to Hero on Brand Click ---
+  animateReturnToHero() {
+    const hero = document.querySelector('#hero-section') || document.querySelector('.cinematic-hero-section');
+    const dashboard = document.querySelector('#dashboard-section') || document.querySelector('.cinematic-frame-outer');
+
+    if (typeof gsap === 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (hero) {
+      gsap.to(hero, {
+        scale: 1,
+        rotationZ: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power3.out',
+        clearProps: 'transform,opacity'
+      });
+    }
+
+    if (dashboard) {
+      gsap.to(dashboard, {
+        scale: 0.92,
+        rotationZ: 2,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+    }
+
+    if (this.lenis) {
+      this.lenis.scrollTo(0, { duration: 1.0 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
 

@@ -3647,24 +3647,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     switchView(viewName) {
       const isDashboard = viewName === "dashboard";
-      if (this.#elements.welcomeScreen) {
-        if (isDashboard) {
-          this.#elements.welcomeScreen.classList.add("hidden");
-        } else {
-          this.#elements.welcomeScreen.classList.remove("hidden");
-        }
-      }
       if (this.#elements.weatherDashboard) {
-        if (isDashboard) {
-          this.#elements.weatherDashboard.classList.remove("hidden");
-        } else {
-          this.#elements.weatherDashboard.classList.add("hidden");
-        }
+        this.#elements.weatherDashboard.classList.remove("hidden");
       }
 
       if (isDashboard && window.motionEngine) {
+        window.motionEngine.animateSearchTransitionToDashboard();
         window.motionEngine.animateDashboardEntrance();
         window.motionEngine.resetTabIndicator();
+      } else if (!isDashboard && window.motionEngine) {
+        window.motionEngine.animateReturnToHero();
       }
     }
 

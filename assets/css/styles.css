@@ -310,6 +310,8 @@ html.lenis, html.lenis body {
   position: relative;
   z-index: 10;
   margin: 0 auto;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
 /* =========================================================
@@ -2539,6 +2541,8 @@ body.cinematic-dark-mode .app-layout {
   padding: 104px 16px 20px;
   position: relative;
   z-index: 10;
+  transform-origin: center top;
+  will-change: transform, opacity;
 }
 
 .cinematic-hero-title {
@@ -2743,6 +2747,8 @@ body.cinematic-dark-mode .app-layout {
   margin-bottom: 72px;
   z-index: 20;
   scroll-margin-top: 88px;
+  transform-origin: center top;
+  will-change: transform, opacity;
 }
 
 .cinematic-frame-inner {
