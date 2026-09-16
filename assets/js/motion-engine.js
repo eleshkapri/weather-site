@@ -48,51 +48,44 @@ class MotionEngine {
     }
   }
 
-  // --- T3 Cinematic Welcome Screen Reveal ---
+  // --- Cinematic Welcome Screen Reveal ---
   animateWelcomeEntrance() {
     if (typeof gsap === 'undefined') return;
 
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-    // Horizon aurora glow
-    tl.fromTo('.cinematic-horizon-container',
-      { opacity: 0, scale: 1.04 },
-      { opacity: 0.9, scale: 1, duration: 1.2, ease: 'power2.out' }
-    );
-
     // Pearl telemetry pill badge
     tl.fromTo('.welcome-brand .pearl-badge',
-      { y: -16, opacity: 0, filter: 'blur(8px)' },
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, clearProps: 'transform,filter' },
-      '-=0.9'
+      { y: -14, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' }
     );
 
-    // Cinematic giant hero title
+    // Hero title
     tl.fromTo('.welcome-title',
-      { y: 28, opacity: 0, filter: 'blur(12px)', scale: 0.97 },
-      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.85, clearProps: 'transform,filter' },
-      '-=0.5'
+      { y: 18, opacity: 0, scale: 0.98 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.6, clearProps: 'all' },
+      '-=0.3'
     );
 
     // Subtitle
     tl.fromTo('.welcome-subtitle',
-      { y: 16, opacity: 0, filter: 'blur(6px)' },
-      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, clearProps: 'transform,filter' },
-      '-=0.6'
+      { y: 14, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' },
+      '-=0.35'
     );
 
     // Tactile command bar
     tl.fromTo('.welcome-search-wrapper .search-box-wrapper',
-      { y: 22, opacity: 0, filter: 'blur(8px)', scale: 0.98 },
-      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.7, clearProps: 'transform,filter' },
-      '-=0.45'
+      { y: 16, opacity: 0, scale: 0.98 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.55, clearProps: 'all' },
+      '-=0.35'
     );
 
     // Quick telemetry city pills
     tl.fromTo('.city-pill',
-      { y: 12, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.45, stagger: 0.04, clearProps: 'transform' },
-      '-=0.35'
+      { y: 10, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, stagger: 0.04, clearProps: 'all' },
+      '-=0.25'
     );
   }
 
