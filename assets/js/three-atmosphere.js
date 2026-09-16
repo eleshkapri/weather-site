@@ -71,13 +71,13 @@ class ThreeAtmosphere {
     // Positioned in the upper-right quadrant on desktop, elevated on mobile.
     // This ensures it never overlaps with the center title, search bar, or pills!
     const isMobile = window.innerWidth < 768;
-    const initialX = isMobile ? 0 : 54;
-    const initialY = isMobile ? 36 : 22;
-    const initialZ = isMobile ? -30 : -20;
+    const initialX = isMobile ? 0 : 78;
+    const initialY = isMobile ? 36 : 34;
+    const initialZ = isMobile ? -40 : -45;
     this.globeGroup.position.set(initialX, initialY, initialZ);
-    this.globeGroup.scale.set(isMobile ? 0.75 : 0.9, isMobile ? 0.75 : 0.9, isMobile ? 0.75 : 0.9);
+    this.globeGroup.scale.set(isMobile ? 0.65 : 0.70, isMobile ? 0.65 : 0.70, isMobile ? 0.65 : 0.70);
 
-    const radius = 19;
+    const radius = 16;
 
     // 1. Dotted Matrix Sphere
     const sphereGeo = new THREE.IcosahedronGeometry(radius, 4);
@@ -362,10 +362,10 @@ class ThreeAtmosphere {
   repositionForWelcome() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 54;
-    const targetY = isMobile ? 36 : 22;
-    const targetZ = isMobile ? -30 : -20;
-    const targetScale = isMobile ? 0.75 : 0.9;
+    const targetX = isMobile ? 0 : 78;
+    const targetY = isMobile ? 36 : 34;
+    const targetZ = isMobile ? -40 : -45;
+    const targetScale = isMobile ? 0.65 : 0.70;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {
@@ -393,10 +393,10 @@ class ThreeAtmosphere {
   repositionForDashboard() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 58;
-    const targetY = isMobile ? -35 : 20;
-    const targetZ = -25;
-    const targetScale = isMobile ? 0.55 : 0.7;
+    const targetX = isMobile ? 0 : 82;
+    const targetY = isMobile ? -35 : 22;
+    const targetZ = -50;
+    const targetScale = isMobile ? 0.50 : 0.55;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {
