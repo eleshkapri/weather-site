@@ -18,3 +18,9 @@ node_modules/
 skills-lock.json
 GEMINI.md
 AGENTS.md
+
+# Secrets & Local Configuration (Never committed to GitHub)
+assets/js/config.js
+.env
+.env.*
+.env.local

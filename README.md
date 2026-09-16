@@ -56,15 +56,19 @@ The entire site backdrop, card materials, and scenery dynamically transform base
 weather-site/
 ├── assets/
 │   ├── css/
-│   │   └── styles.css       # Design system, glassmorphism, 3D scenery, theme palettes, media queries
+│   │   └── styles.css          # Design system, glassmorphism, 3D scenery, theme palettes, media queries
 │   ├── js/
-│   │   └── script.js        # View switching, Open-Meteo APIs, SVG spline math, sun cycle tracker
+│   │   ├── config.example.js   # Public configuration template (committed to Git)
+│   │   ├── config.js           # Private credentials (strictly gitignored, never uploaded to GitHub)
+│   │   ├── motion-engine.js    # GSAP kinetic text, physics, Lenis smooth scrolling
+│   │   ├── three-atmosphere.js # Three.js WebGL 3D holographic globe
+│   │   └── script.js           # Geocoding cascade, weather engine, spline curves, astronomical arc
 │   └── icons/
-│       └── favicon.svg      # Official Atmosphere Sun & Cloud vector icon
-├── .gitignore               # System & editor ignore rules
-├── index.html               # Semantic HTML5 layout, SVG scenery defs, modular widget grid
-├── LICENSE                  # MIT Open-source License
-└── README.md                # Comprehensive documentation
+│       └── favicon.svg         # Official Atmosphere Sun & Cloud vector icon
+├── .gitignore                  # System, editor, and private secrets ignore rules
+├── index.html                  # Cinematic dark SaaS landing page & interactive weather showcase
+├── LICENSE                     # MIT Open-source License
+└── README.md                   # Comprehensive documentation
 ```
 
 ---
@@ -86,6 +90,26 @@ No package manager or build tools required. Open directly in your browser:
      python -m http.server 5500
      `
    * Or open index.html directly in your browser.
+
+---
+
+## 🔒 API Key Security & GitHub Protection
+
+Atmosphere implements a **Zero-Leak Credential Architecture** ensuring private API keys are never exposed, committed, or flagged by GitHub Secret Scanning:
+
+1. **Strict `.gitignore` Protection**:
+   * Your private API key resides in `assets/js/config.js`.
+   * `assets/js/config.js` is explicitly listed in `.gitignore`, preventing Git from ever tracking or uploading it to GitHub.
+2. **Tracked Template (`config.example.js`)**:
+   * A safe template file `assets/js/config.example.js` is included in the repository with an empty placeholder.
+   * Anyone cloning the repo can copy `config.example.js` to `config.js` and add their own key.
+3. **Browser LocalStorage Support**:
+   * When deployed on GitHub Pages or static hosts, you can also store an API key directly in your personal browser without touching code:
+     ```javascript
+     AtmosphereConfig.setKey("YOUR_API_KEY");
+     ```
+4. **Resilient Multi-Provider Fallback**:
+   * If a custom key is pending activation on OpenWeatherMap (which can take 15–60 minutes for new keys) or if no key is configured, Atmosphere automatically cascades through **Open-Meteo**, **Photon (OSM)**, and an **offline catalog of 300+ global hubs**, guaranteeing zero downtime and 100% search uptime.
 
 ---
 

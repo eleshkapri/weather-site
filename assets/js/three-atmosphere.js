@@ -68,14 +68,13 @@ class ThreeAtmosphere {
   // --- 3D Holographic Weather Globe (High-Tech Earth/Atmosphere Mesh) ---
   initHolographicGlobe() {
     this.globeGroup = new THREE.Group();
-    // Positioned in the upper-right quadrant on desktop, elevated on mobile.
-    // This ensures it never overlaps with the center title, search bar, or pills!
+    // Positioned in the upper-right quadrant matching reference screenshot
     const isMobile = window.innerWidth < 768;
-    const initialX = isMobile ? 0 : 76;
-    const initialY = isMobile ? 36 : 32;
-    const initialZ = isMobile ? -35 : -40;
+    const initialX = isMobile ? 0 : 90;
+    const initialY = isMobile ? 38 : 42;
+    const initialZ = isMobile ? -35 : -38;
     this.globeGroup.position.set(initialX, initialY, initialZ);
-    this.globeGroup.scale.set(isMobile ? 0.38 : 0.46, isMobile ? 0.38 : 0.46, isMobile ? 0.38 : 0.46);
+    this.globeGroup.scale.set(isMobile ? 0.32 : 0.42, isMobile ? 0.32 : 0.42, isMobile ? 0.32 : 0.42);
 
     const radius = 13;
 
@@ -83,9 +82,9 @@ class ThreeAtmosphere {
     const sphereGeo = new THREE.IcosahedronGeometry(radius, 4);
     const sphereMat = new THREE.PointsMaterial({
       size: 1.6,
-      color: 0x818cf8,
+      color: 0x93c5fd,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending
     });
     this.globeDots = new THREE.Points(sphereGeo, sphereMat);
@@ -94,10 +93,10 @@ class ThreeAtmosphere {
     // 2. Geometric Wireframe Lattice
     const wireGeo = new THREE.IcosahedronGeometry(radius, 2);
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0x4f46e5,
+      color: 0x6366f1,
       wireframe: true,
       transparent: true,
-      opacity: 0.18
+      opacity: 0.24
     });
     this.globeWire = new THREE.Mesh(wireGeo, wireMat);
     this.globeGroup.add(this.globeWire);
@@ -108,7 +107,7 @@ class ThreeAtmosphere {
       color: 0x38bdf8,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.35
+      opacity: 0.42
     });
     this.globeRing = new THREE.Mesh(ringGeo, ringMat);
     this.globeRing.rotation.x = Math.PI * 0.45;
@@ -121,7 +120,7 @@ class ThreeAtmosphere {
       color: 0xa855f7,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.25
+      opacity: 0.32
     });
     this.globeRing2 = new THREE.Mesh(ring2Geo, ring2Mat);
     this.globeRing2.rotation.x = -Math.PI * 0.3;
@@ -129,7 +128,7 @@ class ThreeAtmosphere {
     this.globeGroup.add(this.globeRing2);
 
     // 4. Orbiting Satellite Telemetry Beacon
-    const satGeo = new THREE.SphereGeometry(0.8, 12, 12);
+    const satGeo = new THREE.SphereGeometry(0.85, 12, 12);
     const satMat = new THREE.MeshBasicMaterial({
       color: 0x34d399,
       wireframe: false
@@ -358,14 +357,14 @@ class ThreeAtmosphere {
 
   // --- View-aware Globe Repositioning ---
 
-  /** Call when showing the hero/welcome screen. Globe rests in upper-right quadrant. */
+  /** Call when showing the hero/welcome screen. Globe rests in upper right quadrant. */
   repositionForWelcome() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 76;
-    const targetY = isMobile ? 36 : 32;
-    const targetZ = isMobile ? -35 : -40;
-    const targetScale = isMobile ? 0.38 : 0.46;
+    const targetX = isMobile ? 0 : 90;
+    const targetY = isMobile ? 38 : 42;
+    const targetZ = isMobile ? -35 : -38;
+    const targetScale = isMobile ? 0.32 : 0.42;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {
@@ -378,25 +377,25 @@ class ThreeAtmosphere {
         duration: 0.9,
         ease: 'power3.out'
       });
-      // Restore dot/wire visibility
-      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.55, duration: 0.8 });
-      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.18, duration: 0.8 });
-      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.35, duration: 0.8 });
-      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.25, duration: 0.8 });
+      // Restore dot/wire visibility with clean opacities
+      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.65, duration: 0.8 });
+      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.24, duration: 0.8 });
+      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.42, duration: 0.8 });
+      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.32, duration: 0.8 });
     } else {
       this.globeGroup.position.set(targetX, targetY, targetZ);
       this.globeGroup.scale.set(targetScale, targetScale, targetScale);
     }
   }
 
-  /** Call when showing the weather dashboard. Globe stays subtle in the background. */
+  /** Call when showing the weather dashboard. Globe stays visible in the upper right. */
   repositionForDashboard() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 80;
-    const targetY = isMobile ? -35 : 22;
-    const targetZ = -45;
-    const targetScale = isMobile ? 0.30 : 0.36;
+    const targetX = isMobile ? 0 : 90;
+    const targetY = isMobile ? 38 : 42;
+    const targetZ = isMobile ? -35 : -38;
+    const targetScale = isMobile ? 0.30 : 0.38;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {
@@ -411,11 +410,10 @@ class ThreeAtmosphere {
         duration: 1.0,
         ease: 'power3.inOut'
       });
-      // Dim globe elements so they don't fight the content
-      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.25, duration: 0.8 });
-      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.08, duration: 0.8 });
-      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.16, duration: 0.8 });
-      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.1, duration: 0.8 });
+      if (this.globeDots) gsap.to(this.globeDots.material, { opacity: 0.55, duration: 0.8 });
+      if (this.globeWire) gsap.to(this.globeWire.material, { opacity: 0.20, duration: 0.8 });
+      if (this.globeRing) gsap.to(this.globeRing.material, { opacity: 0.35, duration: 0.8 });
+      if (this.globeRing2) gsap.to(this.globeRing2.material, { opacity: 0.25, duration: 0.8 });
     } else {
       this.globeGroup.position.set(targetX, targetY, targetZ);
       this.globeGroup.scale.set(targetScale, targetScale, targetScale);

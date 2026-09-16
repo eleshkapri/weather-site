@@ -13,6 +13,7 @@ class MotionEngine {
   constructor() {
     this.lenis = null;
     this.initSmoothScroll();
+    this.initNavbarScrollMotion();
     this.initCardPhysics();
     this.initDashboardTabs();
   }
@@ -46,6 +47,124 @@ class MotionEngine {
         requestAnimationFrame(raf);
       }
     }
+  }
+
+  // --- Smart Capsule Navbar Scroll Motion & ScrollSpy ---
+  initNavbarScrollMotion() {
+    const nav = document.querySelector('.cinematic-top-nav') || document.querySelector('#cinematic-nav');
+    if (!nav) return;
+
+    let lastScrollY = window.scrollY || window.pageYOffset || 0;
+    let isTicking = false;
+    const scrollThreshold = 25;
+    const hideThreshold = 120;
+
+    const updateNavbarState = () => {
+      const currentScrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+      const deltaY = currentScrollY - lastScrollY;
+
+      // 1. Scrolled state: Apply high-contrast frosted glass when past top
+      if (currentScrollY > scrollThreshold) {
+        nav.classList.add('is-scrolled');
+      } else {
+        nav.classList.remove('is-scrolled');
+        nav.classList.remove('is-hidden');
+      }
+
+      // 2. Directional Hide / Reveal:
+      // Scrolling down past threshold hides navbar; scrolling up reveals it instantly
+      if (currentScrollY > hideThreshold) {
+        if (deltaY > 6) {
+          // Scrolling down
+          nav.classList.add('is-hidden');
+        } else if (deltaY < -4) {
+          // Scrolling up
+          nav.classList.remove('is-hidden');
+        }
+      } else {
+        nav.classList.remove('is-hidden');
+      }
+
+      // 3. ScrollSpy: Update active nav link based on section in view
+      const sections = [
+        { id: 'dashboard-section', selector: 'a[href="#dashboard-section"]' },
+        { id: 'orbital-radar-section', selector: 'a[href="#orbital-radar-section"]' },
+        { id: 'cta-section', selector: 'a[href="#cta-section"]' }
+      ];
+
+      const navLinks = nav.querySelectorAll('.nav-link');
+      let currentActive = null;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sec = document.getElementById(sections[i].id);
+        if (sec) {
+          const rect = sec.getBoundingClientRect();
+          if (rect.top <= window.innerHeight * 0.45) {
+            currentActive = sections[i].selector;
+            break;
+          }
+        }
+      }
+
+      if (currentActive) {
+        navLinks.forEach(link => {
+          if (link.matches(currentActive)) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      } else if (currentScrollY < 350) {
+        navLinks.forEach((link, idx) => {
+          if (idx === 0) link.classList.add('active');
+          else link.classList.remove('active');
+        });
+      }
+
+      lastScrollY = currentScrollY;
+      isTicking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!isTicking) {
+        window.requestAnimationFrame(updateNavbarState);
+        isTicking = true;
+      }
+    }, { passive: true });
+
+    if (this.lenis) {
+      this.lenis.on('scroll', () => {
+        if (!isTicking) {
+          window.requestAnimationFrame(updateNavbarState);
+          isTicking = true;
+        }
+      });
+    }
+
+    // Smooth scroll for nav anchor links with instant reveal
+    const anchorLinks = nav.querySelectorAll('a[href^="#"]');
+    anchorLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('href');
+        if (targetId === '#') {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          nav.classList.remove('is-hidden');
+          return;
+        }
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          nav.classList.remove('is-hidden');
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          anchorLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Run initial update
+    updateNavbarState();
   }
 
   // --- Cinematic Welcome Screen Reveal ---
@@ -114,6 +233,15 @@ class MotionEngine {
       { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.8, clearProps: 'transform,filter' },
       '-=0.35'
     );
+
+    // 3b. Character Companion Gentle Spring Entrance
+    if (document.querySelector('#character-figure')) {
+      tl.fromTo('#character-figure',
+        { scale: 0.7, opacity: 0, y: 15 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.7, ease: 'back.out(1.8)', clearProps: 'opacity,filter' },
+        '-=0.45'
+      );
+    }
 
     // 4. Condition Summary Ribbon
     tl.fromTo('.summary-card',
