@@ -41,12 +41,23 @@ The entire site backdrop, card materials, and scenery dynamically transform base
 * **Population-Ranked Geocoding**: Searching world cities (London, New York, Tokyo, Paris, Delhi, etc.) immediately prioritizes primary major cities with accurate State/Province, Country, and localized IANA timezones.
 * **Live Suggestions & Search History**: Keyboard-navigable autocomplete dropdown with localStorage search history and one-click quick search chips.
 
-### 6. ⚡ Rich Weather Insight Split Dashboard
-* Header trend badge (e.g., +1° Warmer, -2° Cooler, Steady Temp).
-* Tomorrow's projected **High / Low Range**, **Rain Chance (☂ %)**, and **Condition Outlook**.
+#### 6. 🛰️ Planetary Orbital Satellite Telemetry Inspector
+* **Live Geostationary Constellations**: Interactive orbital radar visualizing NOAA GOES-18, EUMETSAT Meteosat-11, JMA Himawari-9, ECMWF IFS, and Open-Meteo API Mesh.
+* **Telemetry HUD**: Detailed instrument payload specifications, spatial resolution (0.5 km visible / 2.0 km IR), and orbital altitudes (35,786 km GEO).
+* **Clickable Regional Streamers**: Instant 1-click weather streaming from major stations across the Americas, EMEA, and Asia-Pacific.
+* **Effortless Radar Controls**: Hover-to-pause orbital rotation with active target reticles and quick GPS detection via the central beacon.
 
-### 7. 📱 Universal Responsive Design
+### 7. ⌨️ Global Command Palette Search (⌘K / Ctrl+K)
+* Instant modal command palette accessible via keyboard shortcut (`⌘K` / `Ctrl+K`) or the top navigation bar.
+* Live prefix-prioritized city search, quick-trending global destinations, and full keyboard navigation.
+
+### 8. 🕒 Recent Observations Management
+* Instant recall of recent search history with localized caching.
+* Built-in **Clear All** and single-city **Remove (`✕`)** controls directly within the search dropdown.
+
+### 9. 📱 Universal Responsive Design
 * Handcrafted responsive breakpoints for **Mobile (320px–580px)**, **Tablets (768px–1024px)**, and **Desktops/Laptops (1025px+)**.
+* 44×44px minimum touch targets and mobile-optimized smooth scrolling.
 
 ---
 
@@ -60,9 +71,9 @@ weather-site/
 │   ├── js/
 │   │   ├── config.example.js   # Public configuration template (committed to Git)
 │   │   ├── config.js           # Private credentials (strictly gitignored, never uploaded to GitHub)
-│   │   ├── motion-engine.js    # GSAP kinetic text, physics, Lenis smooth scrolling
-│   │   ├── three-atmosphere.js # Three.js WebGL 3D holographic globe
-│   │   └── script.js           # Geocoding cascade, weather engine, spline curves, astronomical arc
+│   │   ├── motion-engine.js    # GSAP kinetic text, physics, Lenis smooth scrolling, card stacking
+│   │   ├── three-atmosphere.js # Three.js WebGL 3D celestial atmospheric canvas
+│   │   └── script.js           # OOP telemetry orchestrator, geocoding cascade, spline curves, satellite HUD
 │   └── icons/
 │       └── favicon.svg         # Official Atmosphere Sun & Cloud vector icon
 ├── .gitignore                  # System, editor, and private secrets ignore rules
@@ -78,18 +89,18 @@ weather-site/
 No package manager or build tools required. Open directly in your browser:
 
 1. **Clone the repository**:
-   `ash
+   ```bash
    git clone https://github.com/eleshkapri/weather-site.git
    cd weather-site
-   `
+   ```
 
 2. **Launch with any local HTTP server**:
-   * Using VS Code **Live Server** extension: right-click index.html → Open with Live Server.
+   * Using VS Code **Live Server** extension: right-click `index.html` → Open with Live Server.
    * Or using Python:
-     `ash
+     ```bash
      python -m http.server 5500
-     `
-   * Or open index.html directly in your browser.
+     ```
+   * Or open `index.html` directly in your browser.
 
 ---
 
@@ -106,10 +117,10 @@ Atmosphere implements a **Zero-Leak Credential Architecture** ensuring private A
 3. **Browser LocalStorage Support**:
    * When deployed on GitHub Pages or static hosts, you can also store an API key directly in your personal browser without touching code:
      ```javascript
-     AtmosphereConfig.setKey("YOUR_API_KEY");
+     Atmosphere.setKey("YOUR_API_KEY");
      ```
 4. **Resilient Multi-Provider Fallback**:
-   * If a custom key is pending activation on OpenWeatherMap (which can take 15–60 minutes for new keys) or if no key is configured, Atmosphere automatically cascades through **Open-Meteo**, **Photon (OSM)**, and an **offline catalog of 300+ global hubs**, guaranteeing zero downtime and 100% search uptime.
+   * If a custom key is pending activation on OpenWeatherMap (which can take 1–2 hours for new keys) or if no key is configured, Atmosphere automatically cascades through **Open-Meteo**, **Photon (OSM)**, and an **offline catalog of global hubs**, guaranteeing zero downtime and 100% search uptime.
 
 ---
 
