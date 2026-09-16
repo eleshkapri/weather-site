@@ -17,19 +17,8 @@
     <link rel="stylesheet" href="assets/css/styles.css?v=2.3" />
   </head>
   <body class="theme-night cinematic-dark-mode">
-    <!-- Cinematic Top Blur Mask -->
-    <div class="cinematic-top-blur-mask" aria-hidden="true"></div>
-
-    <!-- 0. COSMIC SPACE BACKGROUND & HORIZON SYSTEM (Matches user reference) -->
-    <div class="cosmic-horizon-system" aria-hidden="true">
-      <!-- Curved Planetary Atmosphere Arc -->
-      <div class="atmospheric-horizon-glow">
-        <div class="horizon-arc-core"></div>
-        <div class="horizon-arc-cyan"></div>
-        <div class="horizon-arc-violet"></div>
-        <div class="horizon-arc-occlusion"></div>
-      </div>
-    </div>
+    <!-- 0. COSMIC SPACE BACKGROUND -->
+    <div class="cosmic-horizon-system" aria-hidden="true"></div>
 
     <!-- Dynamic Ambient Backdrop & 3D Celestial WebGL Canvas -->
     <div id="ambient-bg" class="ambient-bg"></div>
@@ -539,8 +528,10 @@
                 </div>
                 <span class="forecast-resolution-badge">1-HOUR INTERVALS</span>
               </div>
-              <div class="spline-chart-container" id="spline-chart-container">
-                <div class="chart-loading-placeholder">Computing Catmull-Rom spline curves...</div>
+              <div class="hourly-forecast-scroll-wrapper">
+                <div class="spline-chart-container hourly-timeline-container" id="spline-chart-container">
+                  <div class="chart-loading-placeholder">Computing Catmull-Rom spline curves...</div>
+                </div>
               </div>
             </section>
 

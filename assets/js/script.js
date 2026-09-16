@@ -2962,8 +2962,61 @@ document.addEventListener("DOMContentLoaded", () => {
     86: { main: "Snow", desc: "Heavy Snow Showers", iconDay: "13d", iconNight: "13n" },
     95: { main: "Thunderstorm", desc: "Thunderstorm", iconDay: "11d", iconNight: "11n" },
     96: { main: "Thunderstorm", desc: "Thunderstorm with Hail", iconDay: "11d", iconNight: "11n" },
-    99: { main: "Thunderstorm", desc: "Heavy Thunderstorm with Hail", iconDay: "11d", iconNight: "11n" },
   };
+
+  // Inline Vector Weather Icon Generator (Zero Network Latency, Dark SaaS Theme Optimized)
+  function getWeatherConditionSvg(code, isDayHour = true) {
+    const svgOpen = '<svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">';
+    const svgClose = '</svg>';
+
+    // 1. Clear Sky (Sun or Moon)
+    if (code === 0 || code === 1) {
+      if (isDayHour) {
+        return `${svgOpen}<circle cx="16" cy="16" r="6.5" fill="#f59e0b" filter="drop-shadow(0 0 6px rgba(245, 158, 11, 0.7))"/><circle cx="16" cy="16" r="4.5" fill="#fbbf24"/><path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.8 6.8l2.1 2.1M23.1 23.1l2.1 2.1M6.8 25.2l2.1-2.1M23.1 8.9l2.1-2.1" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>${svgClose}`;
+      } else {
+        return `${svgOpen}<path d="M22.5 16.5A9.5 9.5 0 1 1 12 6a7.5 7.5 0 0 0 10.5 10.5z" fill="#fde047" filter="drop-shadow(0 0 6px rgba(253, 224, 71, 0.6))"/><circle cx="21" cy="7" r="1" fill="#ffffff"/><circle cx="25" cy="11" r="0.75" fill="#ffffff"/>${svgClose}`;
+      }
+    }
+
+    // 2. Partly Cloudy
+    if (code === 2) {
+      if (isDayHour) {
+        return `${svgOpen}<circle cx="12" cy="12" r="5" fill="#fbbf24" filter="drop-shadow(0 0 4px rgba(251, 191, 36, 0.6))"/><path d="M10 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 10 24z" fill="#e2e8f0" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
+      } else {
+        return `${svgOpen}<path d="M18 10a6 6 0 0 1-5-5 5 5 0 1 0 6.8 6.8c-.6-.6-1.2-1.2-1.8-1.8z" fill="#fde047"/><path d="M9 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 9 24z" fill="#cbd5e1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
+      }
+    }
+
+    // 3. Overcast
+    if (code === 3) {
+      return `${svgOpen}<path d="M14 18h11a4 4 0 0 0 1-7.9 5.5 5.5 0 0 0-10.7-1A3.5 3.5 0 0 0 14 18z" fill="#94a3b8" opacity="0.6"/><path d="M8 25h14a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 8 25z" fill="#e2e8f0" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.45))"/>${svgClose}`;
+    }
+
+    // 4. Fog / Mist
+    if (code === 45 || code === 48) {
+      return `${svgOpen}<line x1="6" y1="12" x2="26" y2="12" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/><line x1="4" y1="16" x2="28" y2="16" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round"/><line x1="7" y1="20" x2="25" y2="20" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>${svgClose}`;
+    }
+
+    // 5. Rain / Drizzle / Showers
+    if ([51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(code)) {
+      return `${svgOpen}<path d="M8 19h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 9a4 4 0 0 0-2.3 10z" fill="#94a3b8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/><line x1="10" y1="22" x2="8.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="22" x2="13.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="22" x2="18.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>${svgClose}`;
+    }
+
+    // 6. Snow / Freezing Rain
+    if ([66, 67, 71, 73, 75, 77, 85, 86].includes(code)) {
+      return `${svgOpen}<path d="M8 18h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 8a4 4 0 0 0-2.3 10z" fill="#cbd5e1"/><circle cx="10" cy="23" r="1.4" fill="#93c5fd"/><circle cx="15" cy="24" r="1.4" fill="#93c5fd"/><circle cx="20" cy="23" r="1.4" fill="#93c5fd"/>${svgClose}`;
+    }
+
+    // 7. Thunderstorm
+    if (code === 95 || code === 96 || code === 99) {
+      return `${svgOpen}<path d="M7 17h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 9.3 7a4 4 0 0 0-2.3 10z" fill="#64748b"/><polygon points="15,16 11,22 14,22 13,27 18,20 15,20" fill="#facc15" filter="drop-shadow(0 0 4px rgba(250, 204, 21, 0.8))"/>${svgClose}`;
+    }
+
+    // Fallback (Sun / Moon)
+    return isDayHour
+      ? `${svgOpen}<circle cx="16" cy="16" r="6" fill="#fbbf24"/>${svgClose}`
+      : `${svgOpen}<path d="M22 16A8 8 0 1 1 12 6a6 6 0 0 0 10 10z" fill="#fde047"/>${svgClose}`;
+  }
 
   // State
   let debounceTimeout = null;
@@ -4680,18 +4733,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const colWidth = 82;
     const totalWidth = sliceIndices.length * colWidth;
-    const graphHeight = 90;
-    const graphTopPadding = 26;
+    const graphHeight = 120;
+    const graphTopPadding = 32;
+    const graphUsableHeight = 55;
 
     // Calculate curve points
     const points = sliceIndices.map((itemIdx, seqIdx) => {
       const x = seqIdx * colWidth + colWidth / 2;
       const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
-      const y = graphTopPadding + (1 - normalized) * (graphHeight - 40);
+      const y = graphTopPadding + (1 - normalized) * graphUsableHeight;
       return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
     });
 
     const svgPath = createSmoothSplinePath(points);
+    const areaPath = createSplineAreaPath(points, graphHeight);
 
     let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
 
@@ -4699,20 +4754,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const timeIso = hourly.time[itemIdx];
       const hourStr = seqIdx === 0 ? "Now" : formatIsoHour(timeIso);
       const code = hourly.weather_code[itemIdx];
-      const wmo = WMO_WEATHER_MAP[code] || { iconDay: "01d", iconNight: "01n", desc: "Clear" };
       const hourVal = parseInt(timeIso.split("T")[1].split(":")[0], 10);
       const isDayHour = hourVal >= 6 && hourVal < 20;
-      const iconCode = isDayHour ? wmo.iconDay : wmo.iconNight;
+      const iconSvg = getWeatherConditionSvg(code, isDayHour);
       const popPercent = Math.round(hourly.precipitation_probability[itemIdx] || 0);
-      const popDisplay = popPercent > 0 ? `☂ ${popPercent}%` : "";
+      const popHtml = popPercent > 0
+        ? `<svg class="pop-drop-icon" viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M6 1.5 C6 1.5 2.5 5.5 2.5 7.8 A3.5 3.5 0 0 0 9.5 7.8 C9.5 5.5 6 1.5 6 1.5 Z" fill="#38bdf8"/></svg>${popPercent}%`
+        : `<span class="pop-dry">—</span>`;
 
       html += `
         <div class="hourly-col" style="width: ${colWidth}px;">
           <span class="hourly-time">${hourStr}</span>
           <div class="hourly-icon-box">
-            <img src="https://openweathermap.org/img/wn/${iconCode}.png" alt="${wmo.desc}"/>
+            ${iconSvg}
           </div>
-          <span class="hourly-pop">${popDisplay}</span>
+          <span class="hourly-pop">${popHtml}</span>
         </div>
       `;
     });
@@ -4720,13 +4776,24 @@ document.addEventListener("DOMContentLoaded", () => {
     html += `</div>`;
 
     let svgOverlay = `
-      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px;">
-        <path d="${svgPath}" class="hourly-graph-path"/>
+      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${graphHeight}px;">
+        <defs>
+          <linearGradient id="hourlySplineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.30" />
+            <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.08" />
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+          </linearGradient>
+          <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#38bdf8" flood-opacity="0.5" />
+          </filter>
+        </defs>
+        <path d="${areaPath}" fill="url(#hourlySplineGrad)" class="hourly-graph-area"/>
+        <path d="${svgPath}" class="hourly-graph-path" filter="url(#splineGlow)"/>
     `;
 
     points.forEach((pt) => {
       svgOverlay += `
-        <text x="${pt.x}" y="${pt.y - 10}" class="hourly-temp-label">${pt.temp}°</text>
+        <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label">${pt.temp}°</text>
         <circle cx="${pt.x}" cy="${pt.y}" r="4.5" class="hourly-temp-dot"/>
       `;
     });
@@ -4750,9 +4817,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const cp2x = p2.x - (p3.x - p1.x) / 6;
       const cp2y = p2.y - (p3.y - p1.y) / 6;
 
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
     return d;
+  }
+
+  function createSplineAreaPath(points, bottomY) {
+    if (points.length === 0) return "";
+    const first = points[0];
+    const last = points[points.length - 1];
+    const curveD = createSmoothSplinePath(points);
+    return `${curveD} L ${last.x.toFixed(1)} ${bottomY} L ${first.x.toFixed(1)} ${bottomY} Z`;
   }
 
   // --- Sun Cycle Arc Renderer ---
@@ -5173,7 +5248,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const colWidth = 82;
     const hoursCount = 12;
     const totalWidth = hoursCount * colWidth;
-    const graphHeight = 90;
+    const graphHeight = 120;
+    const graphTopPadding = 32;
 
     const points = [];
     let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
@@ -5181,32 +5257,42 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < hoursCount; i++) {
       const hourStr = i === 0 ? "Now" : `+${i}h`;
       const x = i * colWidth + colWidth / 2;
-      const y = 45 + Math.sin(i * 0.55) * 15;
+      const y = graphTopPadding + 28 + Math.sin(i * 0.55) * 16;
       points.push({ x, y, temp: "--" });
+
+      const iconSvg = getWeatherConditionSvg(i % 3, i < 6);
 
       html += `
         <div class="hourly-col" style="width: ${colWidth}px;">
           <span class="hourly-time">${hourStr}</span>
           <div class="hourly-icon-box">
-            <span style="font-size: 18px; opacity: 0.5;">🛰️</span>
+            ${iconSvg}
           </div>
-          <span class="hourly-pop">--</span>
+          <span class="hourly-pop"><span class="pop-dry">—</span></span>
         </div>
       `;
     }
     html += `</div>`;
 
     const svgPath = createSmoothSplinePath(points);
+    const areaPath = createSplineAreaPath(points, graphHeight);
 
     let svgOverlay = `
-      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px;">
-        <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 4 4; opacity: 0.45; stroke: #38bdf8;"/>
+      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${graphHeight}px;">
+        <defs>
+          <linearGradient id="standbySplineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+        <path d="${areaPath}" fill="url(#standbySplineGrad)" class="hourly-graph-area"/>
+        <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 4 4; opacity: 0.55; stroke: #38bdf8;"/>
     `;
 
     points.forEach((pt) => {
       svgOverlay += `
-        <text x="${pt.x}" y="${pt.y - 10}" class="hourly-temp-label" style="opacity: 0.5;">${pt.temp}</text>
-        <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.5; fill: #38bdf8; stroke: #ffffff;"/>
+        <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label" style="opacity: 0.5;">${pt.temp}</text>
+        <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.5; fill: #0b1329; stroke: #38bdf8;"/>
       `;
     });
 
