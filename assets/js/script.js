@@ -3377,16 +3377,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const apiKey = getApiKey();
     const hasKey = Boolean(apiKey);
-    const keyPreview = apiKey ? `${apiKey.slice(0, 5)}...${apiKey.slice(-4)}` : "";
     const hasOwm = suggestions.some((s) => s.source === "openweathermap");
 
     let headerTitle = "Global Satellite Telemetry";
     let indicatorText = "LIVE API";
     if (hasOwm) {
-      headerTitle = `OpenWeather Geocoding Direct (${keyPreview})`;
+      headerTitle = "OpenWeather Geocoding · Direct Match";
       indicatorText = "OWM VERIFIED";
     } else if (hasKey) {
-      headerTitle = `OpenWeather API Engine (${keyPreview})`;
+      headerTitle = "OpenWeather API Engine · Active";
       indicatorText = "OWM ACTIVE";
     }
 
@@ -3479,7 +3478,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cleanLower = query.toLowerCase();
     const apiKey = getApiKey();
-    const keyPreview = apiKey ? `${apiKey.slice(0, 5)}...${apiKey.slice(-4)}` : "";
 
     // 1. Instant 0ms local catalog preview
     const instantMatches = GLOBAL_CITY_CATALOG.filter((c) =>
@@ -3495,7 +3493,7 @@ document.addEventListener("DOMContentLoaded", () => {
       searchDropdown.innerHTML = `
         <div class="dropdown-header">
           <span class="dropdown-title">
-            <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API (' + keyPreview + ')' : 'Satellite Mesh'}...
+            <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API' : 'Satellite Mesh'}...
           </span>
           <span class="dropdown-api-indicator">● ${apiKey ? 'OWM SEARCH' : 'QUERYING'}</span>
         </div>
@@ -3789,11 +3787,10 @@ document.addEventListener("DOMContentLoaded", () => {
         renderSuggestionsList(dashboardSearchDropdown, currentDashSuggestions, query, applySelectedLocation);
       } else {
         const apiKey = getApiKey();
-        const keyPreview = apiKey ? `${apiKey.slice(0, 5)}...${apiKey.slice(-4)}` : "";
         dashboardSearchDropdown.innerHTML = `
           <div class="dropdown-header">
             <span class="dropdown-title">
-              <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API (' + keyPreview + ')' : 'Satellite Mesh'}...
+              <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API' : 'Satellite Mesh'}...
             </span>
             <span class="dropdown-api-indicator">● ${apiKey ? 'OWM SEARCH' : 'QUERYING'}</span>
           </div>
@@ -5221,7 +5218,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.motionEngine.initCardPhysics();
     }
 
-    // 9. Sync API Key Indicators if Key is Present
+    // 9. Sync API Status Indicators if Key is Present (NEVER expose key fragments)
     const apiKey = getApiKey();
     if (apiKey) {
       const heroEyebrowText = document.getElementById("hero-eyebrow-text");
@@ -5233,12 +5230,12 @@ document.addEventListener("DOMContentLoaded", () => {
         heroSubtitle.textContent = "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models.";
       }
       const apiStatusLabel = document.getElementById("api-status-label");
-      const apiKeyChip = document.getElementById("api-key-chip");
+      const apiStatusBadge = document.getElementById("api-status-badge");
       if (apiStatusLabel) {
         apiStatusLabel.textContent = "OpenWeather API Active · Direct City Search";
       }
-      if (apiKeyChip) {
-        apiKeyChip.textContent = `${apiKey.slice(0, 5)}...${apiKey.slice(-4)}`;
+      if (apiStatusBadge) {
+        apiStatusBadge.textContent = "CONNECTED";
       }
     }
   }
