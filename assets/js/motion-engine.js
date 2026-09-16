@@ -179,17 +179,23 @@ class MotionEngine {
     const tabs = tabsContainer.querySelectorAll('.view-tab-btn');
     const indicator = tabsContainer.querySelector('.tab-slider-pill');
 
-    const updateIndicator = (activeTab) => {
+    const updateIndicator = (activeTab, instant = false) => {
       if (!indicator || !activeTab) return;
-      const rect = activeTab.getBoundingClientRect();
-      const parentRect = tabsContainer.getBoundingClientRect();
 
-      gsap.to(indicator, {
-        left: activeTab.offsetLeft,
-        width: activeTab.offsetWidth,
-        duration: 0.35,
-        ease: 'power2.out'
-      });
+      if (instant) {
+        // Snap immediately without animation (used on first-show when GSAP would tween from 0)
+        gsap.set(indicator, {
+          left: activeTab.offsetLeft,
+          width: activeTab.offsetWidth
+        });
+      } else {
+        gsap.to(indicator, {
+          left: activeTab.offsetLeft,
+          width: activeTab.offsetWidth,
+          duration: 0.35,
+          ease: 'power2.out'
+        });
+      }
     };
 
     tabs.forEach((tab) => {
@@ -203,12 +209,32 @@ class MotionEngine {
       });
     });
 
-    // Set initial position on active tab
+    // Store reference so resetTabIndicator() can call it after dashboard is visible
+    this._updateTabIndicator = updateIndicator;
+    this._tabsContainer = tabsContainer;
+
+    // Attempt initial position (may be a no-op if bar is still hidden)
     const currentActive = tabsContainer.querySelector('.view-tab-btn.active') || tabs[0];
     if (currentActive) {
       setTimeout(() => updateIndicator(currentActive), 50);
     }
   }
+
+  /** Call this after the dashboard becomes visible so the pill snaps to the active tab. */
+  resetTabIndicator() {
+    const tabsContainer = this._tabsContainer || document.querySelector('.dashboard-tabs-bar');
+    if (!tabsContainer) return;
+    const active = tabsContainer.querySelector('.view-tab-btn.active') || tabsContainer.querySelector('.view-tab-btn');
+    if (active && this._updateTabIndicator) {
+      // requestAnimationFrame ensures the browser has painted the layout before we measure
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this._updateTabIndicator(active, true);
+        });
+      });
+    }
+  }
+
 
   filterDashboardView(viewKey) {
     const heroCard = document.querySelector('.hero-scenery-card');
