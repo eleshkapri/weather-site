@@ -2889,21 +2889,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.isKeyWorking()) {
         return {
           active: true,
-          label: "OpenWeather Geocoding Engine · Direct Match Active",
+          label: "OpenWeather Direct Engine · Verified Active",
           badge: "CONNECTED"
-        };
-      }
-      if (this.hasKey() && !this.#isKeyWorking) {
-        return {
-          active: true,
-          label: "OpenWeather Key Registered (~2h edge propagation) · Open Satellite Mesh Active",
-          badge: "KEY PENDING (OWM)"
         };
       }
       return {
         active: true,
-        label: "Satellite Geocoding Engine · Global Mesh Active",
-        badge: "ACTIVE"
+        label: "Global High-Speed Satellite Mesh · 100% Operational (Open-Meteo)",
+        badge: "ONLINE"
       };
     }
 
@@ -2967,8 +2960,23 @@ document.addEventListener("DOMContentLoaded", () => {
       this.#catalog = catalog;
     }
 
-    async searchSuggestions(query, signal) {
-      const cleanLower = query.trim().toLowerCase();
+    #getRelevance(item, cleanLower) {
+      const name = (item.name || "").toLowerCase();
+      if (name === cleanLower) return 100;
+      if (name.startsWith(cleanLower)) {
+        return 80 + Math.min(15, (cleanLower.length / name.length) * 15);
+      }
+      if (new RegExp(`\\b${cleanLower}`, "i").test(name)) return 65;
+      if (name.includes(cleanLower)) return 40;
+      const admin = (item.admin1 || "").toLowerCase();
+      if (admin.startsWith(cleanLower)) return 30;
+      const country = (item.country || "").toLowerCase();
+      if (country.startsWith(cleanLower)) return 20;
+      return 10;
+    }
+
+    getInstantSuggestions(query) {
+      const cleanLower = (query || "").trim().toLowerCase();
       if (!cleanLower) return [];
 
       const cacheKey = `sug_${cleanLower}`;
@@ -2976,22 +2984,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return this.#cache.get(cacheKey);
       }
 
-      const getRelevance = (item) => {
-        const name = (item.name || "").toLowerCase();
-        if (name === cleanLower) return 100;
-        if (name.startsWith(cleanLower)) {
-          return 80 + Math.min(15, (cleanLower.length / name.length) * 15);
-        }
-        if (new RegExp(`\\b${cleanLower}`, "i").test(name)) return 65;
-        if (name.includes(cleanLower)) return 40;
-        const admin = (item.admin1 || "").toLowerCase();
-        if (admin.startsWith(cleanLower)) return 30;
-        const country = (item.country || "").toLowerCase();
-        if (country.startsWith(cleanLower)) return 20;
-        return 10;
-      };
-
-      // 1. Instant Offline Catalog Matches
       const catalogMatches = this.#catalog
         .filter((c) =>
           c.name.toLowerCase().includes(cleanLower) ||
@@ -2999,16 +2991,49 @@ document.addEventListener("DOMContentLoaded", () => {
           (c.country && c.country.toLowerCase().includes(cleanLower))
         )
         .map((c) => ({ ...c, source: "catalog" }))
-        .sort((a, b) => getRelevance(b) - getRelevance(a));
+        .sort((a, b) => this.#getRelevance(b, cleanLower) - this.#getRelevance(a, cleanLower));
 
-      // 2. Parallel Live Providers (OpenWeather, Open-Meteo, Photon OSM)
-      const fetchOwm = this.#security.hasKey()
-        ? fetch(
+      const hasStrongPrefix = catalogMatches.some((item) => this.#getRelevance(item, cleanLower) >= 65);
+      const filtered = hasStrongPrefix
+        ? catalogMatches.filter((item) => this.#getRelevance(item, cleanLower) >= 60)
+        : catalogMatches;
+
+      return filtered.slice(0, 8);
+    }
+
+    async searchSuggestions(query, signal) {
+      const cleanLower = (query || "").trim().toLowerCase();
+      if (!cleanLower) return [];
+
+      const cacheKey = `sug_${cleanLower}`;
+      if (this.#cache.has(cacheKey)) {
+        return this.#cache.get(cacheKey);
+      }
+
+      // 1. Instant 0ms Offline Catalog Matches
+      const catalogMatches = this.getInstantSuggestions(query);
+
+      // Fast request wrapper with strict timeout
+      const fetchWithTimeout = async (url, opts = {}, ms = 1200) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), ms);
+        try {
+          const res = await fetch(url, { ...opts, signal: controller.signal });
+          return res;
+        } finally {
+          clearTimeout(timeoutId);
+        }
+      };
+
+      // 2. OpenWeather Direct Match (ONLY if key is confirmed working)
+      const fetchOwm = this.#security.isKeyWorking()
+        ? fetchWithTimeout(
             this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
               q: query.trim(),
               limit: 8
             }),
-            { signal }
+            {},
+            1200
           )
             .then((res) => (res.ok ? res.json() : []))
             .then((items) =>
@@ -3027,9 +3052,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(() => [])
         : Promise.resolve([]);
 
-      const fetchOm = fetch(
+      // 3. Open-Meteo High-Speed Geocoding API (Primary Live Engine)
+      const fetchOm = fetchWithTimeout(
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.trim())}&count=10&language=en&format=json`,
-        { signal }
+        {},
+        1400
       )
         .then((res) => (res.ok ? res.json() : {}))
         .then((data) =>
@@ -3048,14 +3075,24 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .catch(() => []);
 
-      const fetchPhoton = fetch(
-        `https://photon.komoot.io/api/?q=${encodeURIComponent(query.trim())}&limit=10`,
-        { signal }
-      )
-        .then((res) => (res.ok ? res.json() : {}))
-        .then((data) =>
-          Array.isArray(data.features)
-            ? data.features
+      const [owmResults = [], omResults = []] = await Promise.all([
+        fetchOwm,
+        fetchOm
+      ]);
+
+      // 4. Photon Fallback (ONLY if Open-Meteo & Catalog returned 0 results)
+      let photonResults = [];
+      if (omResults.length === 0 && catalogMatches.length === 0 && owmResults.length === 0) {
+        try {
+          const res = await fetchWithTimeout(
+            `https://photon.komoot.io/api/?q=${encodeURIComponent(query.trim())}&limit=8`,
+            {},
+            1200
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.features)) {
+              photonResults = data.features
                 .map((f) => {
                   const props = f.properties || {};
                   const [lon, lat] = f.geometry ? f.geometry.coordinates : [0, 0];
@@ -3069,46 +3106,38 @@ document.addEventListener("DOMContentLoaded", () => {
                     source: "photon"
                   };
                 })
-                .filter((item) => item.name && item.latitude && item.longitude)
-            : []
-        )
-        .catch(() => []);
-
-      const [owmResults = [], omResults = [], photonResults = []] = await Promise.all([
-        fetchOwm,
-        fetchOm,
-        fetchPhoton
-      ]);
+                .filter((item) => item.name && item.latitude && item.longitude);
+            }
+          }
+        } catch {}
+      }
 
       const combined = [];
       const seen = new Set();
 
       const addUnique = (item) => {
-        const key = `${item.name.toLowerCase()}-${(item.country || "").toLowerCase()}-${(item.admin1 || "").toLowerCase()}`;
+        const key = `${(item.name || "").toLowerCase()}-${(item.country || "").toLowerCase()}-${(item.admin1 || "").toLowerCase()}`;
         if (!seen.has(key)) {
           seen.add(key);
           combined.push(item);
         }
       };
 
-      // Add all candidates into pool
       owmResults.forEach(addUnique);
       omResults.forEach(addUnique);
       photonResults.forEach(addUnique);
       catalogMatches.forEach(addUnique);
 
-      // Sort entire pool by weighted match relevance (Prefix > Word-Boundary > Substring)
       combined.sort((a, b) => {
-        const scoreA = getRelevance(a);
-        const scoreB = getRelevance(b);
+        const scoreA = this.#getRelevance(a, cleanLower);
+        const scoreB = this.#getRelevance(b, cleanLower);
         if (scoreB !== scoreA) return scoreB - scoreA;
         return a.name.length - b.name.length;
       });
 
-      // If we have strong prefix matches (score >= 65), discard weak substring-in-the-middle items
-      const hasStrongPrefix = combined.some((item) => getRelevance(item) >= 65);
+      const hasStrongPrefix = combined.some((item) => this.#getRelevance(item, cleanLower) >= 65);
       const filtered = hasStrongPrefix
-        ? combined.filter((item) => getRelevance(item) >= 60)
+        ? combined.filter((item) => this.#getRelevance(item, cleanLower) >= 60)
         : combined;
 
       const result = filtered.slice(0, 8);
@@ -3148,14 +3177,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return { ...catalogMatch, source: "catalog" };
       }
 
-      // 2. OpenWeather Direct Geocode (if key present)
-      if (this.#security.hasKey()) {
+      // 2. Instant 0ms Geocoding Cache Match
+      const cached = this.#cache.get(`sug_${cleanLower}`);
+      if (cached && Array.isArray(cached) && cached.length > 0) {
+        const exactMatch = cached.find((c) => c.name.toLowerCase() === cleanLower) || cached[0];
+        if (exactMatch && exactMatch.latitude && exactMatch.longitude) {
+          return { ...exactMatch, source: "cache" };
+        }
+      }
+
+      // 3. OpenWeather Direct Geocode (ONLY if key is confirmed working)
+      if (this.#security.isKeyWorking()) {
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1200);
           const owmUrl = this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
             q: clean,
             limit: 1
           });
-          const res = await fetch(owmUrl);
+          const res = await fetch(owmUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
           if (res.ok) {
             const data = await res.json();
             if (Array.isArray(data) && data.length > 0) {
@@ -3177,10 +3218,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // 3. Open-Meteo Geocoding API
+      // 4. Open-Meteo High-Speed Geocoding API (Primary Global Live Engine)
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1800);
         const omUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(clean)}&count=1&language=en&format=json`;
-        const res = await fetch(omUrl);
+        const res = await fetch(omUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data.results && data.results.length > 0) {
@@ -3201,10 +3245,13 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("[Geocoding] Open-Meteo geocode fallback:", err);
       }
 
-      // 4. Photon OpenStreetMap Geocoder Fallback
+      // 5. Photon OpenStreetMap Geocoder Fallback
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1800);
         const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(clean)}&limit=1`;
-        const res = await fetch(photonUrl);
+        const res = await fetch(photonUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data.features && data.features.length > 0) {
@@ -3227,7 +3274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("[Geocoding] Photon geocode fallback:", err);
       }
 
-      // 5. Catalog partial match fallback
+      // 6. Catalog partial match fallback
       const partialMatch = this.#catalog.find((c) =>
         c.name.toLowerCase().includes(cleanLower)
       );
@@ -3970,11 +4017,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const idx = parseInt(el.getAttribute("data-index"), 10);
           const sel = suggestions[idx];
           if (sel) {
-            const label = sel.admin1 ? `${sel.name}, ${sel.admin1}` : `${sel.name}, ${sel.country || ""}`;
             dropdownEl.classList.add("hidden");
             const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
             if (capsule) capsule.classList.remove("dropdown-active");
-            onSelect(label.trim());
+            onSelect(sel);
           }
         });
       });
@@ -4855,13 +4901,24 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Step 1: Instant 0ms catalog/cache match
+      const instant = this.#app.getInstantSuggestions(query);
+      if (instant && instant.length > 0) {
+        this.renderSuggestionsList(this.#elements.searchDropdown, instant, query, (selection) => {
+          this.#app.executeSearch(selection);
+        });
+      }
+
+      // Step 2: Live remote background query
       clearTimeout(this.#debounceTimeout);
       this.#debounceTimeout = setTimeout(async () => {
         const suggestions = await this.#app.getGeocodingSuggestions(query);
-        this.renderSuggestionsList(this.#elements.searchDropdown, suggestions, query, (city) => {
-          this.#app.executeSearch(city);
-        });
-      }, 160);
+        if (this.#elements.cityInput && this.#elements.cityInput.value.trim().toLowerCase() === query.trim().toLowerCase()) {
+          this.renderSuggestionsList(this.#elements.searchDropdown, suggestions, query, (selection) => {
+            this.#app.executeSearch(selection);
+          });
+        }
+      }, 120);
     }
 
     #handleDashboardAutocomplete(query) {
@@ -4870,13 +4927,24 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Step 1: Instant 0ms catalog/cache match
+      const instant = this.#app.getInstantSuggestions(query);
+      if (instant && instant.length > 0) {
+        this.renderSuggestionsList(this.#elements.dashboardSearchDropdown, instant, query, (selection) => {
+          this.#app.executeSearch(selection);
+        });
+      }
+
+      // Step 2: Live remote background query
       clearTimeout(this.#dashDebounceTimeout);
       this.#dashDebounceTimeout = setTimeout(async () => {
         const suggestions = await this.#app.getGeocodingSuggestions(query);
-        this.renderSuggestionsList(this.#elements.dashboardSearchDropdown, suggestions, query, (city) => {
-          this.#app.executeSearch(city);
-        });
-      }, 160);
+        if (this.#elements.dashboardCityInput && this.#elements.dashboardCityInput.value.trim().toLowerCase() === query.trim().toLowerCase()) {
+          this.renderSuggestionsList(this.#elements.dashboardSearchDropdown, suggestions, query, (selection) => {
+            this.#app.executeSearch(selection);
+          });
+        }
+      }, 120);
     }
 
     #handleModalAutocomplete(query) {
@@ -4888,14 +4956,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // Step 1: Instant 0ms catalog/cache match
+      const instant = this.#app.getInstantSuggestions(query);
+      if (instant && instant.length > 0) {
+        this.renderSuggestionsList(this.#elements.modalSearchDropdown, instant, query, (selection) => {
+          this.closeSearchModal();
+          this.#app.executeSearch(selection);
+        });
+      }
+
+      // Step 2: Live remote background query
       clearTimeout(this.#modalDebounceTimeout);
       this.#modalDebounceTimeout = setTimeout(async () => {
         const suggestions = await this.#app.getGeocodingSuggestions(query);
-        this.renderSuggestionsList(this.#elements.modalSearchDropdown, suggestions, query, (city) => {
-          this.closeSearchModal();
-          this.#app.executeSearch(city);
-        });
-      }, 160);
+        if (this.#elements.modalSearchInput && this.#elements.modalSearchInput.value.trim().toLowerCase() === query.trim().toLowerCase()) {
+          this.renderSuggestionsList(this.#elements.modalSearchDropdown, suggestions, query, (selection) => {
+            this.closeSearchModal();
+            this.#app.executeSearch(selection);
+          });
+        }
+      }, 120);
     }
   }
 
@@ -4950,19 +5030,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return this.#weather.generateNarrative(daily, wmoInfo);
     }
 
+    getInstantSuggestions(query) {
+      return this.#geocoding.getInstantSuggestions(query);
+    }
+
     async getGeocodingSuggestions(query) {
       return this.#geocoding.searchSuggestions(query);
     }
 
-    async executeSearch(query) {
-      const clean = query.trim();
-      if (!clean) return;
-
+    async executeSearch(queryOrLocation) {
       this.#ui.hideError();
       this.#ui.showLoading(true);
 
       try {
-        const location = await this.#geocoding.resolveCoordinates(clean);
+        let location;
+        if (queryOrLocation && typeof queryOrLocation === "object" && queryOrLocation.latitude && queryOrLocation.longitude) {
+          location = queryOrLocation;
+        } else {
+          const clean = typeof queryOrLocation === "string" ? queryOrLocation.trim() : "";
+          if (!clean) return;
+          location = await this.#geocoding.resolveCoordinates(clean);
+        }
+
         const weatherData = await this.#weather.fetchForecast(location.latitude, location.longitude, location.timezone);
 
         const locationLabel = location.admin1
