@@ -3813,6 +3813,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       dropdownEl.innerHTML = html;
       dropdownEl.classList.remove("hidden");
+      if (dropdownEl.id === "search-dropdown") {
+        const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+        if (capsule) capsule.classList.add("dropdown-active");
+      }
 
       dropdownEl.querySelectorAll(".dropdown-item").forEach((el) => {
         el.addEventListener("click", () => {
@@ -3821,6 +3825,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (sel) {
             const label = sel.admin1 ? `${sel.name}, ${sel.admin1}` : `${sel.name}, ${sel.country || ""}`;
             dropdownEl.classList.add("hidden");
+            const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+            if (capsule) capsule.classList.remove("dropdown-active");
             onSelect(label.trim());
           }
         });
@@ -3829,8 +3835,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderRecentHistory(dropdownEl, onSelect) {
       if (!dropdownEl) return;
-      const history = this.#app.getRecentSearches();
-      if (!history || history.length === 0) {
+      const rawHistory = this.#app.getRecentSearches();
+      const history = (rawHistory || []).filter((c) => typeof c === "string" && c.trim());
+
+      if (history.length === 0) {
         dropdownEl.innerHTML = `
           <div class="dropdown-header">
             <span class="dropdown-title">Recent Observations</span>
@@ -3838,6 +3846,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="dropdown-empty-state">No recent searches yet. Search any global city above.</div>
         `;
         dropdownEl.classList.remove("hidden");
+        if (dropdownEl.id === "search-dropdown") {
+          const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+          if (capsule) capsule.classList.add("dropdown-active");
+        }
         return;
       }
 
@@ -3866,11 +3878,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       dropdownEl.innerHTML = html;
       dropdownEl.classList.remove("hidden");
+      if (dropdownEl.id === "search-dropdown") {
+        const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+        if (capsule) capsule.classList.add("dropdown-active");
+      }
 
       dropdownEl.querySelectorAll(".history-item").forEach((el) => {
         el.addEventListener("click", () => {
           const city = el.getAttribute("data-city");
           dropdownEl.classList.add("hidden");
+          const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+          if (capsule) capsule.classList.remove("dropdown-active");
           onSelect(city);
         });
       });
@@ -4550,6 +4568,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.#elements.searchDropdown) this.#elements.searchDropdown.classList.add("hidden");
       if (this.#elements.dashboardSearchDropdown) this.#elements.dashboardSearchDropdown.classList.add("hidden");
       if (this.#elements.modalSearchDropdown) this.#elements.modalSearchDropdown.classList.add("hidden");
+      const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
+      if (capsule) capsule.classList.remove("dropdown-active");
     }
 
     #handleHeroAutocomplete(query) {
@@ -4745,18 +4765,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const raw = localStorage.getItem(this.#historyKey);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) return parsed.slice(0, this.#maxHistory);
+          if (Array.isArray(parsed)) {
+            return parsed
+              .filter((c) => typeof c === "string" && c.trim())
+              .slice(0, this.#maxHistory);
+          }
         }
       } catch {}
       return [];
     }
 
     saveRecentSearch(cityName) {
-      if (!cityName) return;
+      if (!cityName || typeof cityName !== "string" || !cityName.trim()) return;
+      const clean = cityName.trim();
       try {
         let history = this.getRecentSearches();
-        history = history.filter((c) => c.toLowerCase() !== cityName.toLowerCase());
-        history.unshift(cityName);
+        history = history.filter((c) => c.toLowerCase() !== clean.toLowerCase());
+        history.unshift(clean);
         if (history.length > this.#maxHistory) {
           history = history.slice(0, this.#maxHistory);
         }

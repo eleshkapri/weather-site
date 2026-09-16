@@ -2846,6 +2846,7 @@ body.cinematic-dark-mode .app-layout {
 /* Search Box Wrapper & Dynamic Dropdown Positioning */
 .search-box-wrapper {
   position: relative;
+  z-index: 150;
   width: 100%;
   display: flex;
   align-items: center;
@@ -2967,14 +2968,15 @@ body.cinematic-dark-mode .app-layout {
   top: calc(100% + 10px);
   left: 0;
   right: 0;
-  z-index: 1200;
-  background: rgba(14, 17, 25, 0.96);
+  z-index: 9999;
+  background: #0d111d;
+  background: rgba(13, 17, 29, 0.98);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 18px;
   padding: 10px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 1px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
   max-height: 360px;
   overflow-y: auto;
   text-align: left;
@@ -2983,6 +2985,17 @@ body.cinematic-dark-mode .app-layout {
 .search-dropdown.hidden,
 .modal-search-dropdown.hidden {
   display: none !important;
+}
+
+/* Hide status indicator & quick pills when search dropdown is open to prevent any overlap */
+.cinematic-search-capsule-wrapper:has(.search-dropdown:not(.hidden)) .api-key-status-indicator,
+.cinematic-search-capsule-wrapper:has(.search-dropdown:not(.hidden)) .quick-cities-row,
+.cinematic-search-capsule-wrapper.dropdown-active .api-key-status-indicator,
+.cinematic-search-capsule-wrapper.dropdown-active .quick-cities-row {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(-6px);
 }
 
 .dropdown-header {
