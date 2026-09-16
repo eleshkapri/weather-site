@@ -498,6 +498,14 @@ class MotionEngine {
       scrub: 0.8,
       onUpdate: (self) => {
         const p = self.progress;
+        if (p <= 0.002) {
+          // When at the top, completely clear transform and force3D to ensure razor-sharp text antialiasing!
+          gsap.set(hero, {
+            clearProps: 'transform,opacity',
+            force3D: false
+          });
+          return;
+        }
         const scale = 1 - p * 0.15;
         const rotate = p * heroRotate;
         const opacity = 1 - p * 0.35;

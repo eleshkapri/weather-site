@@ -2893,6 +2893,13 @@ document.addEventListener("DOMContentLoaded", () => {
           badge: "CONNECTED"
         };
       }
+      if (this.hasKey() && !this.#isKeyWorking) {
+        return {
+          active: true,
+          label: "OpenWeather Key Registered (~2h edge propagation) · Open Satellite Mesh Active",
+          badge: "KEY PENDING (OWM)"
+        };
+      }
       return {
         active: true,
         label: "Satellite Geocoding Engine · Global Mesh Active",
@@ -2969,26 +2976,40 @@ document.addEventListener("DOMContentLoaded", () => {
         return this.#cache.get(cacheKey);
       }
 
-      // 1. Instant 0ms Offline Catalog Match
+      const getRelevance = (item) => {
+        const name = (item.name || "").toLowerCase();
+        if (name === cleanLower) return 100;
+        if (name.startsWith(cleanLower)) {
+          return 80 + Math.min(15, (cleanLower.length / name.length) * 15);
+        }
+        if (new RegExp(`\\b${cleanLower}`, "i").test(name)) return 65;
+        if (name.includes(cleanLower)) return 40;
+        const admin = (item.admin1 || "").toLowerCase();
+        if (admin.startsWith(cleanLower)) return 30;
+        const country = (item.country || "").toLowerCase();
+        if (country.startsWith(cleanLower)) return 20;
+        return 10;
+      };
+
+      // 1. Instant Offline Catalog Matches
       const catalogMatches = this.#catalog
         .filter((c) =>
           c.name.toLowerCase().includes(cleanLower) ||
           (c.admin1 && c.admin1.toLowerCase().includes(cleanLower)) ||
           (c.country && c.country.toLowerCase().includes(cleanLower))
         )
-        .slice(0, 6)
-        .map((c) => ({ ...c, source: "catalog" }));
+        .map((c) => ({ ...c, source: "catalog" }))
+        .sort((a, b) => getRelevance(b) - getRelevance(a));
 
-      // 2. Live API Providers
-      const apiPromises = [];
-
-      if (this.#security.hasKey()) {
-        const owmUrl = this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
-          q: query.trim(),
-          limit: 5
-        });
-        apiPromises.push(
-          fetch(owmUrl, { signal })
+      // 2. Parallel Live Providers (OpenWeather, Open-Meteo, Photon OSM)
+      const fetchOwm = this.#security.hasKey()
+        ? fetch(
+            this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
+              q: query.trim(),
+              limit: 8
+            }),
+            { signal }
+          )
             .then((res) => (res.ok ? res.json() : []))
             .then((items) =>
               Array.isArray(items)
@@ -3004,38 +3025,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 : []
             )
             .catch(() => [])
-        );
-      }
+        : Promise.resolve([]);
 
-      const omUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.trim())}&count=6&language=en&format=json`;
-      apiPromises.push(
-        fetch(omUrl, { signal })
-          .then((res) => (res.ok ? res.json() : {}))
-          .then((data) =>
-            Array.isArray(data.results)
-              ? data.results.map((item) => ({
-                  name: item.name,
-                  country: item.country,
-                  country_code: item.country_code,
-                  admin1: item.admin1 || "",
-                  latitude: item.latitude,
-                  longitude: item.longitude,
-                  timezone: item.timezone,
-                  source: "open-meteo"
-                }))
-              : []
-          )
-          .catch(() => [])
-      );
+      const fetchOm = fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.trim())}&count=10&language=en&format=json`,
+        { signal }
+      )
+        .then((res) => (res.ok ? res.json() : {}))
+        .then((data) =>
+          Array.isArray(data.results)
+            ? data.results.map((item) => ({
+                name: item.name,
+                country: item.country,
+                country_code: item.country_code,
+                admin1: item.admin1 || "",
+                latitude: item.latitude,
+                longitude: item.longitude,
+                timezone: item.timezone,
+                source: "open-meteo"
+              }))
+            : []
+        )
+        .catch(() => []);
 
-      // 3. Photon OpenStreetMap Geocoding (Global fallback)
-      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(query.trim())}&limit=6`;
-      apiPromises.push(
-        fetch(photonUrl, { signal })
-          .then((res) => (res.ok ? res.json() : {}))
-          .then((data) =>
-            Array.isArray(data.features)
-              ? data.features.map((f) => {
+      const fetchPhoton = fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query.trim())}&limit=10`,
+        { signal }
+      )
+        .then((res) => (res.ok ? res.json() : {}))
+        .then((data) =>
+          Array.isArray(data.features)
+            ? data.features
+                .map((f) => {
                   const props = f.properties || {};
                   const [lon, lat] = f.geometry ? f.geometry.coordinates : [0, 0];
                   return {
@@ -3047,13 +3068,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     longitude: lon,
                     source: "photon"
                   };
-                }).filter((item) => item.name && item.latitude && item.longitude)
-              : []
-          )
-          .catch(() => [])
-      );
+                })
+                .filter((item) => item.name && item.latitude && item.longitude)
+            : []
+        )
+        .catch(() => []);
 
-      const [owmResults = [], omResults = [], photonResults = []] = await Promise.all(apiPromises);
+      const [owmResults = [], omResults = [], photonResults = []] = await Promise.all([
+        fetchOwm,
+        fetchOm,
+        fetchPhoton
+      ]);
 
       const combined = [];
       const seen = new Set();
@@ -3066,12 +3091,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       };
 
-      catalogMatches.forEach(addUnique);
+      // Add all candidates into pool
       owmResults.forEach(addUnique);
       omResults.forEach(addUnique);
       photonResults.forEach(addUnique);
+      catalogMatches.forEach(addUnique);
 
-      const result = combined.slice(0, 8);
+      // Sort entire pool by weighted match relevance (Prefix > Word-Boundary > Substring)
+      combined.sort((a, b) => {
+        const scoreA = getRelevance(a);
+        const scoreB = getRelevance(b);
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return a.name.length - b.name.length;
+      });
+
+      // If we have strong prefix matches (score >= 65), discard weak substring-in-the-middle items
+      const hasStrongPrefix = combined.some((item) => getRelevance(item) >= 65);
+      const filtered = hasStrongPrefix
+        ? combined.filter((item) => getRelevance(item) >= 60)
+        : combined;
+
+      const result = filtered.slice(0, 8);
       this.#cache.set(cacheKey, result);
       return result;
     }
@@ -3871,10 +3911,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const hasOwm = suggestions.some((s) => s.source === "openweathermap");
+      const hasLive = suggestions.some((s) => s.source === "open-meteo" || s.source === "photon");
       const headerTitle = hasOwm
         ? "OpenWeather Geocoding · Direct Match"
         : "Global Satellite Telemetry";
-      const indicatorText = hasOwm ? "OWM VERIFIED" : "LIVE API";
+      const indicatorText = hasOwm
+        ? "OWM VERIFIED"
+        : (hasLive ? "LIVE SATELLITE MESH" : "0ms INSTANT TELEMETRY");
 
       let html = `
         <div class="dropdown-header">
@@ -3891,6 +3934,10 @@ document.addEventListener("DOMContentLoaded", () => {
         let sourceBadge = "";
         if (item.source === "openweathermap") {
           sourceBadge = '<span class="source-tag-owm">OWM</span>';
+        } else if (item.source === "open-meteo") {
+          sourceBadge = '<span class="source-tag-catalog" style="background:rgba(56,189,248,0.15);color:#38bdf8;border-color:rgba(56,189,248,0.3)">LIVE</span>';
+        } else if (item.source === "photon") {
+          sourceBadge = '<span class="source-tag-catalog" style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3)">OSM</span>';
         } else if (item.source === "catalog") {
           sourceBadge = '<span class="source-tag-catalog">0ms</span>';
         }
@@ -3956,6 +4003,15 @@ document.addEventListener("DOMContentLoaded", () => {
       let html = `
         <div class="dropdown-header">
           <span class="dropdown-title">Recent Observations</span>
+          <button class="clear-history-btn" title="Clear all recent observations" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="clear-history-icon">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+            <span>Clear All</span>
+          </button>
         </div>
       `;
 
@@ -3971,6 +4027,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="dropdown-item-right">
               <span class="history-badge">CACHED</span>
+              <button class="remove-history-item-btn" data-remove-city="${this.#app.sanitize(city)}" title="Remove this city" type="button">✕</button>
             </div>
           </div>
         `;
@@ -3983,8 +4040,30 @@ document.addEventListener("DOMContentLoaded", () => {
         if (capsule) capsule.classList.add("dropdown-active");
       }
 
+      // Handle Clear All Button
+      const clearBtn = dropdownEl.querySelector(".clear-history-btn");
+      if (clearBtn) {
+        clearBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.#app.clearRecentSearches();
+          this.renderRecentHistory(dropdownEl, onSelect);
+        });
+      }
+
+      // Handle Individual Item Removal
+      dropdownEl.querySelectorAll(".remove-history-item-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetCity = btn.getAttribute("data-remove-city");
+          this.#app.removeRecentSearch(targetCity);
+          this.renderRecentHistory(dropdownEl, onSelect);
+        });
+      });
+
+      // Handle Item Selection
       dropdownEl.querySelectorAll(".history-item").forEach((el) => {
-        el.addEventListener("click", () => {
+        el.addEventListener("click", (e) => {
+          if (e.target.closest(".remove-history-item-btn")) return;
           const city = el.getAttribute("data-city");
           dropdownEl.classList.add("hidden");
           const capsule = document.querySelector(".cinematic-search-capsule-wrapper");
@@ -4981,6 +5060,22 @@ document.addEventListener("DOMContentLoaded", () => {
         if (history.length > this.#maxHistory) {
           history = history.slice(0, this.#maxHistory);
         }
+        localStorage.setItem(this.#historyKey, JSON.stringify(history));
+      } catch {}
+    }
+
+    clearRecentSearches() {
+      try {
+        localStorage.removeItem(this.#historyKey);
+      } catch {}
+    }
+
+    removeRecentSearch(cityName) {
+      if (!cityName || typeof cityName !== "string") return;
+      const clean = cityName.trim().toLowerCase();
+      try {
+        let history = this.getRecentSearches();
+        history = history.filter((c) => c.toLowerCase() !== clean);
         localStorage.setItem(this.#historyKey, JSON.stringify(history));
       } catch {}
     }
