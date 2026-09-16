@@ -71,13 +71,13 @@ class ThreeAtmosphere {
     // Positioned in the upper-right quadrant on desktop, elevated on mobile.
     // This ensures it never overlaps with the center title, search bar, or pills!
     const isMobile = window.innerWidth < 768;
-    const initialX = isMobile ? 0 : 78;
-    const initialY = isMobile ? 36 : 34;
-    const initialZ = isMobile ? -40 : -45;
+    const initialX = isMobile ? 0 : 76;
+    const initialY = isMobile ? 36 : 32;
+    const initialZ = isMobile ? -35 : -40;
     this.globeGroup.position.set(initialX, initialY, initialZ);
-    this.globeGroup.scale.set(isMobile ? 0.65 : 0.70, isMobile ? 0.65 : 0.70, isMobile ? 0.65 : 0.70);
+    this.globeGroup.scale.set(isMobile ? 0.38 : 0.46, isMobile ? 0.38 : 0.46, isMobile ? 0.38 : 0.46);
 
-    const radius = 16;
+    const radius = 13;
 
     // 1. Dotted Matrix Sphere
     const sphereGeo = new THREE.IcosahedronGeometry(radius, 4);
@@ -362,10 +362,10 @@ class ThreeAtmosphere {
   repositionForWelcome() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 78;
-    const targetY = isMobile ? 36 : 34;
-    const targetZ = isMobile ? -40 : -45;
-    const targetScale = isMobile ? 0.65 : 0.70;
+    const targetX = isMobile ? 0 : 76;
+    const targetY = isMobile ? 36 : 32;
+    const targetZ = isMobile ? -35 : -40;
+    const targetScale = isMobile ? 0.38 : 0.46;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {
@@ -393,10 +393,10 @@ class ThreeAtmosphere {
   repositionForDashboard() {
     if (!this.globeGroup) return;
     const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? 0 : 82;
+    const targetX = isMobile ? 0 : 80;
     const targetY = isMobile ? -35 : 22;
-    const targetZ = -50;
-    const targetScale = isMobile ? 0.50 : 0.55;
+    const targetZ = -45;
+    const targetScale = isMobile ? 0.30 : 0.36;
 
     if (typeof gsap !== 'undefined') {
       gsap.to(this.globeGroup.position, {

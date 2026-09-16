@@ -180,10 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Globe slides back to hero position
       window.threeAtmosphere.repositionForWelcome();
     }
-
-    if (window.motionEngine && window.motionEngine.animateWelcomeEntrance) {
-      window.motionEngine.animateWelcomeEntrance();
-    }
   }
 
   // --- Ambient Background Generator ---
@@ -743,29 +739,29 @@ document.addEventListener("DOMContentLoaded", () => {
     let cloudConfigs = [];
     if (isCloudy) {
       cloudConfigs = [
-        { top: "8%",  left: "-60px",  scale: 1.25, dur: "36s", delay: "0s",   far: false },
-        { top: "20%", left: "160px",  scale: 0.9,  dur: "46s", delay: "-12s", far: true  },
-        { top: "5%",  left: "380px",  scale: 1.1,  dur: "42s", delay: "-22s", far: false },
-        { top: "16%", left: "600px",  scale: 0.85, dur: "52s", delay: "-6s",  far: true  },
-        { top: "26%", left: "800px",  scale: 1.05, dur: "40s", delay: "-18s", far: false },
+        { top: "10%", left: "-40px", scale: 1.2, dur: "38s", delay: "0s" },
+        { top: "24%", left: "140px", scale: 0.95, dur: "48s", delay: "-10s" },
+        { top: "6%", left: "360px", scale: 1.1, dur: "44s", delay: "-20s" },
+        { top: "18%", left: "580px", scale: 0.85, dur: "54s", delay: "-5s" },
+        { top: "28%", left: "780px", scale: 1.05, dur: "42s", delay: "-15s" },
       ];
     } else if (isRain || isStorm) {
       cloudConfigs = [
-        { top: "6%",  left: "-40px",  scale: 1.3,  dur: "30s", delay: "0s",   far: false },
-        { top: "18%", left: "220px",  scale: 1.1,  dur: "38s", delay: "-9s",  far: false },
-        { top: "10%", left: "490px",  scale: 1.2,  dur: "34s", delay: "-17s", far: false },
-        { top: "22%", left: "740px",  scale: 1.0,  dur: "43s", delay: "-5s",  far: true  },
+        { top: "8%", left: "-30px", scale: 1.25, dur: "32s", delay: "0s" },
+        { top: "20%", left: "200px", scale: 1.1, dur: "40s", delay: "-8s" },
+        { top: "12%", left: "480px", scale: 1.2, dur: "36s", delay: "-16s" },
+        { top: "22%", left: "720px", scale: 1.0, dur: "45s", delay: "-4s" },
       ];
     } else {
-      // Clear — one foreground cloud, one far background cloud for depth
+      // Clear
       cloudConfigs = [
-        { top: "12%", left: "-80px",  scale: 1.05, dur: "44s", delay: "0s",   far: false },
-        { top: "22%", left: "440px",  scale: 0.78, dur: "62s", delay: "-20s", far: true  },
+        { top: "14%", left: "-60px", scale: 1.0, dur: "48s", delay: "0s" },
+        { top: "24%", left: "420px", scale: 0.8, dur: "56s", delay: "-18s" },
       ];
     }
 
     cloudConfigs.forEach((cfg) => {
-      const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay, cfg.far);
+      const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
       skyElements.appendChild(cloud);
     });
 
@@ -791,55 +787,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Unique ID counter to avoid SVG gradient ID collisions between multiple cloud instances
-  let _cloudIdCounter = 0;
-
-  function create3DFluffyCloud(top, left, scale, duration, delay, isFar = false) {
+  function create3DFluffyCloud(top, left, scale, duration, delay) {
     const cloud = document.createElement("div");
-    const uid = ++_cloudIdCounter;
-    cloud.className = isFar ? "fluffy-cloud-3d cloud-far" : "fluffy-cloud-3d";
+    cloud.className = "fluffy-cloud-3d";
     cloud.style.top = top;
     cloud.style.left = left;
     cloud.style.transform = `scale(${scale})`;
     cloud.style.animationDuration = duration;
     cloud.style.animationDelay = delay;
 
-    // Respect prefers-reduced-motion
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      cloud.style.animationDuration = "0s";
-      cloud.style.animationPlayState = "paused";
-    }
-
-    // Each cloud gets unique SVG gradient IDs to avoid cross-cloud color bleeding
     cloud.innerHTML = `
-      <svg class="cloud-svg" viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+      <svg class="cloud-svg" viewBox="0 0 200 110">
         <defs>
-          <radialGradient id="cg${uid}" cx="36%" cy="22%" r="72%">
-            <stop offset="0%"   stop-color="#ffffff"/>
-            <stop offset="40%"  stop-color="#f5fbff"/>
-            <stop offset="72%"  stop-color="#deedfc"/>
-            <stop offset="100%" stop-color="#c2daf5"/>
+          <radialGradient id="cloudVolumetricGrad" cx="38%" cy="28%" r="72%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="55%" stop-color="#f2f8ff"/>
+            <stop offset="85%" stop-color="#d8ebfd"/>
+            <stop offset="100%" stop-color="#bddbf7"/>
           </radialGradient>
-          <radialGradient id="cs${uid}" cx="50%" cy="0%" r="100%">
-            <stop offset="0%"   stop-color="rgba(255,255,255,0.8)"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-          </radialGradient>
-          <filter id="cf${uid}" x="-15%" y="-15%" width="130%" height="150%">
-            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="rgba(10,40,90,0.18)"/>
+          <filter id="cloudDepthShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(15, 35, 75, 0.15)"/>
           </filter>
         </defs>
-        <g filter="url(#cf${uid})">
-          <!-- Base puff volumes -->
-          <circle cx="58"  cy="78" r="36" fill="url(#cg${uid})"/>
-          <circle cx="108" cy="54" r="50" fill="url(#cg${uid})"/>
-          <circle cx="162" cy="72" r="40" fill="url(#cg${uid})"/>
-          <circle cx="86"  cy="66" r="38" fill="url(#cg${uid})"/>
-          <circle cx="136" cy="58" r="34" fill="url(#cg${uid})"/>
-          <!-- Bottom fill to flatten cloud base -->
-          <rect x="54" y="72" width="112" height="38" rx="20" fill="url(#cg${uid})"/>
+        <g filter="url(#cloudDepthShadow)">
+          <circle cx="52" cy="66" r="32" fill="url(#cloudVolumetricGrad)"/>
+          <circle cx="98" cy="48" r="44" fill="url(#cloudVolumetricGrad)"/>
+          <circle cx="146" cy="62" r="36" fill="url(#cloudVolumetricGrad)"/>
+          <rect x="52" y="62" width="94" height="36" rx="18" fill="url(#cloudVolumetricGrad)"/>
         </g>
-        <!-- Specular highlight on top of dominant puff -->
-        <ellipse cx="108" cy="44" rx="28" ry="12" fill="url(#cs${uid})" opacity="0.7"/>
       </svg>
     `;
     return cloud;
@@ -1162,11 +1137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const hour12 = hour % 12 || 12;
     const paddedHour = hour12 < 10 ? `0${hour12}` : hour12;
     return `${paddedHour}:${min} ${ampm}`;
-  }
-
-  // --- Initial T3 Cinematic Welcome Entrance ---
-  if (window.motionEngine && window.motionEngine.animateWelcomeEntrance) {
-    window.motionEngine.animateWelcomeEntrance();
   }
 });
 
