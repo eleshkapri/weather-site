@@ -571,32 +571,74 @@
                 <div class="sun-footer-text" id="sun-footer-text">Daylight progression tracking</div>
               </div>
 
-              <!-- Atmospheric Insight Card (2 Columns) -->
+              <!-- Atmospheric Insight Card (3 Columns in Bento Grid) -->
               <div class="widget-card insight-widget" id="insight-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="16" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                  </svg>
-                  <span id="insight-title">Atmospheric Outlook</span>
-                  <span class="insight-pill" id="insight-badge">Next 24h</span>
+                <!-- Ambient Card Glow Mesh -->
+                <div class="insight-glow-mesh" aria-hidden="true"></div>
+
+                <!-- 1. Header with Icon Halo, Title, and Dynamic Status Pill -->
+                <div class="insight-header-row">
+                  <div class="insight-header-left">
+                    <div class="insight-icon-halo">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    </div>
+                    <span class="insight-header-title" id="insight-title">Tomorrow's Forecast</span>
+                  </div>
+                  <span class="insight-badge" id="insight-badge">Next 24h</span>
                 </div>
-                <p class="insight-description" id="insight-desc">
-                  Atmospheric model running 24-hour predictive simulations...
-                </p>
-                <div class="insight-grid">
-                  <div class="insight-cell">
-                    <span class="cell-label">Tomorrow Range</span>
-                    <span class="cell-val" id="insight-range-val">--° / --°</span>
+
+                <!-- 2. Hero Editorial Narrative -->
+                <div class="insight-narrative-box">
+                  <p class="insight-narrative-lead" id="insight-desc">
+                    Atmospheric model running 24-hour predictive simulations...
+                  </p>
+                </div>
+
+                <!-- 3. Glassmorphic Telemetry Chips Grid -->
+                <div class="insight-chips-container">
+                  <!-- Chip 1: Diurnal Temperature Range -->
+                  <div class="insight-chip insight-chip-range">
+                    <div class="insight-chip-header">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                      </svg>
+                      <span class="insight-chip-label">TEMP RANGE</span>
+                    </div>
+                    <div class="insight-chip-value" id="insight-range-val">--° / --°</div>
+                    <div class="insight-chip-bar">
+                      <div class="insight-chip-bar-fill range-bar-fill" id="insight-range-bar"></div>
+                    </div>
                   </div>
-                  <div class="insight-cell">
-                    <span class="cell-label">Rain Risk</span>
-                    <span class="cell-val" id="insight-rain-val">--%</span>
+
+                  <!-- Chip 2: Precipitation Risk -->
+                  <div class="insight-chip insight-chip-rain">
+                    <div class="insight-chip-header">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
+                        <path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/>
+                      </svg>
+                      <span class="insight-chip-label">RAIN RISK</span>
+                    </div>
+                    <div class="insight-chip-value" id="insight-rain-val">--%</div>
+                    <div class="insight-chip-bar">
+                      <div class="insight-chip-bar-fill rain-bar-fill" id="insight-rain-bar" style="width: 0%;"></div>
+                    </div>
                   </div>
-                  <div class="insight-cell">
-                    <span class="cell-label">Sky Condition</span>
-                    <span class="cell-val" id="insight-outlook-val">Clear</span>
+
+                  <!-- Chip 3: Sky Condition & Outlook -->
+                  <div class="insight-chip insight-chip-outlook">
+                    <div class="insight-chip-header">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                      </svg>
+                      <span class="insight-chip-label">SKY OUTLOOK</span>
+                    </div>
+                    <div class="insight-chip-value" id="insight-outlook-val">Clear Sky</div>
+                    <div class="insight-chip-status" id="insight-condition-status">Optimal</div>
                   </div>
                 </div>
               </div>

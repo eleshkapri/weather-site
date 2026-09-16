@@ -1756,89 +1756,298 @@ body[class*="theme-day"] .mist-layer {
   text-align: center;
 }
 
-/* Insight Widget */
+/* =========================================================
+   Atmospheric Insight Intelligence Card (Apple & Linear Tier)
+   ========================================================= */
 .insight-widget {
   grid-column: span 3;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 220px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-card);
+  padding: 22px 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
+.insight-widget:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Ambient Card Radial Glow Mesh */
+.insight-glow-mesh {
+  position: absolute;
+  top: -60px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(55px);
+  opacity: 0.22;
+  background: radial-gradient(circle, var(--accent-blue, #38bdf8) 0%, transparent 70%);
+  transition: opacity 0.5s ease;
+}
+
+/* Header Row */
 .insight-header-row {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
 
-.insight-badge {
-  font-size: 11.5px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(56, 189, 248, 0.15);
-  color: var(--primary-accent);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  letter-spacing: 0.2px;
-}
-
-/* insight-badge daytime override removed */
-
-.insight-body-split {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 20px;
+.insight-header-left {
+  display: flex;
   align-items: center;
-  margin-top: 10px;
-}
-
-.insight-narrative-block h3 {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 4px;
-}
-
-.insight-narrative-block p {
-  font-size: 13px;
-  color: var(--text-muted);
-  line-height: 1.45;
-}
-
-.insight-chips-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
-.insight-chip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 10px 12px;
+.insight-icon-halo {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  transition: background 0.2s ease, transform 0.2s ease;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.15);
+  flex-shrink: 0;
 }
 
-/* insight-chip daytime override removed */
-
-.insight-chip:hover {
-  background: rgba(255, 255, 255, 0.09);
-  transform: translateY(-1px);
+.insight-icon-halo svg {
+  width: 16px;
+  height: 16px;
+  stroke: #38bdf8;
 }
 
-.insight-chip-label {
-  font-size: 11px;
-  color: var(--text-dim);
-  font-weight: 500;
-}
-
-.insight-chip-value {
+.insight-header-title {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-main);
+  letter-spacing: 0.2px;
+}
+
+/* Dynamic Status Badge */
+.insight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  letter-spacing: 0.3px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.32);
+}
+
+.insight-badge .badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  flex-shrink: 0;
+}
+
+.insight-badge.badge-warmer {
+  background: rgba(249, 115, 22, 0.14);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.38);
+  box-shadow: 0 0 14px rgba(249, 115, 22, 0.25);
+}
+
+.insight-badge.badge-cooler {
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+.insight-badge.badge-neutral {
+  background: rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: none;
+}
+
+/* Hero Narrative Box */
+.insight-narrative-box {
+  position: relative;
+  z-index: 2;
+  margin: 12px 0 14px;
+}
+
+.insight-narrative-lead {
+  font-size: 14.5px;
+  line-height: 1.52;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 400;
+  letter-spacing: -0.1px;
+}
+
+.insight-narrative-lead .highlight-stat {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.insight-narrative-lead .highlight-stat.warmer {
+  color: #fb923c;
+  text-shadow: 0 0 12px rgba(251, 146, 60, 0.3);
+}
+
+.insight-narrative-lead .highlight-stat.cooler {
+  color: #38bdf8;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+/* Telemetry Chips Container */
+.insight-chips-container {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.insight-chip {
+  background: rgba(255, 255, 255, 0.038);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 76px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.insight-chip:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.065);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.insight-chip-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 2px;
+}
+
+.insight-chip-header svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--accent-blue, #38bdf8);
+  flex-shrink: 0;
+}
+
+.insight-chip-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+}
+
+.insight-chip-value {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insight-chip-value .val-hi {
+  color: #fb923c;
+}
+
+.insight-chip-value .val-sep {
+  color: var(--text-dim);
+  font-weight: 400;
+  margin: 0 2px;
+}
+
+.insight-chip-value .val-lo {
+  color: #38bdf8;
+}
+
+.insight-chip-bar {
+  width: 100%;
+  height: 3.5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.insight-chip-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.insight-chip-bar-fill.range-bar-fill {
+  background: linear-gradient(90deg, #38bdf8 0%, #fb923c 100%);
+  width: 75%;
+}
+
+.insight-chip-bar-fill.rain-bar-fill {
+  background: linear-gradient(90deg, #38bdf8 0%, #3b82f6 100%);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+.insight-chip-status {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.1px;
+}
+
+.insight-chip-status.status-optimal { color: #34d399; }
+.insight-chip-status.status-rain-high { color: #38bdf8; }
+.insight-chip-status.status-rain-mod { color: #818cf8; }
+.insight-chip-status.status-sunny { color: #fbbf24; }
+.insight-chip-status.status-cloudy { color: #94a3b8; }
+.insight-chip-status.status-snow { color: #a5f3fc; }
+
+@media (max-width: 520px) {
+  .insight-chips-container {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .insight-chip {
+    min-height: 56px;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 12px;
+  }
+  .insight-chip-bar {
+    display: none;
+  }
 }
 
 /* Metric Box Cards */

@@ -4108,41 +4108,84 @@ document.addEventListener("DOMContentLoaded", () => {
       const tomorrowMin = Math.round(daily.temperature_2m_min[1]);
       const delta = tomorrowMax - todayMax;
 
+      if (this.#elements.insightTitle) {
+        this.#elements.insightTitle.textContent = "Tomorrow's Forecast";
+      }
+
       if (this.#elements.insightBadge) {
+        this.#elements.insightBadge.classList.remove("badge-warmer", "badge-cooler", "badge-neutral");
         if (delta > 0) {
-          this.#elements.insightBadge.textContent = `+${delta}° Warmer`;
+          this.#elements.insightBadge.classList.add("badge-warmer");
+          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>+${delta}° Warmer`;
         } else if (delta < 0) {
-          this.#elements.insightBadge.textContent = `${delta}° Cooler`;
+          this.#elements.insightBadge.classList.add("badge-cooler");
+          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>${Math.abs(delta)}° Cooler`;
         } else {
-          this.#elements.insightBadge.textContent = "Similar Temp";
+          this.#elements.insightBadge.classList.add("badge-neutral");
+          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>Similar Temp`;
         }
       }
 
       if (this.#elements.insightDesc) {
         if (delta > 0) {
-          this.#elements.insightDesc.textContent = `Temperatures will be a little higher tomorrow (${delta}° warmer, high of ${tomorrowMax}°C).`;
+          this.#elements.insightDesc.innerHTML = `Temperatures will be around <span class="highlight-stat warmer">+${delta}° higher</span> than today with highs reaching <span class="highlight-stat">${tomorrowMax}°C</span>.`;
         } else if (delta < 0) {
-          this.#elements.insightDesc.textContent = `Temperatures will be a little lower than today (${Math.abs(delta)}° cooler, high of ${tomorrowMax}°C).`;
+          this.#elements.insightDesc.innerHTML = `Temperatures will track <span class="highlight-stat cooler">${Math.abs(delta)}° lower</span> than today with highs reaching <span class="highlight-stat">${tomorrowMax}°C</span>.`;
         } else {
-          this.#elements.insightDesc.textContent = `Tomorrow's temperatures will be about the same as today (high of ${tomorrowMax}°C).`;
+          this.#elements.insightDesc.innerHTML = `Temperatures will closely mirror today with highs hovering around <span class="highlight-stat">${tomorrowMax}°C</span>.`;
         }
       }
 
       if (this.#elements.insightRangeVal) {
-        this.#elements.insightRangeVal.textContent = `${tomorrowMax}° / ${tomorrowMin}°`;
+        this.#elements.insightRangeVal.innerHTML = `<span class="val-hi">${tomorrowMax}°</span><span class="val-sep">/</span><span class="val-lo">${tomorrowMin}°</span>`;
+      }
+      const rangeBar = document.getElementById("insight-range-bar");
+      if (rangeBar) {
+        const spread = Math.max(2, Math.min(25, tomorrowMax - tomorrowMin));
+        const spreadPct = Math.min(100, Math.max(30, Math.round((spread / 20) * 100)));
+        rangeBar.style.width = `${spreadPct}%`;
       }
 
-      const rainProb = daily.precipitation_probability_max && daily.precipitation_probability_max[1]
-        ? daily.precipitation_probability_max[1]
+      const rainProb = daily.precipitation_probability_max && daily.precipitation_probability_max[1] !== undefined
+        ? Math.round(daily.precipitation_probability_max[1])
         : 0;
       if (this.#elements.insightRainVal) {
-        this.#elements.insightRainVal.textContent = `☂ ${rainProb}%`;
+        this.#elements.insightRainVal.textContent = `${rainProb}%`;
+      }
+      const rainBar = document.getElementById("insight-rain-bar");
+      if (rainBar) {
+        rainBar.style.width = `${Math.min(100, Math.max(0, rainProb))}%`;
       }
 
+      const tomorrowCode = daily.weather_code && daily.weather_code[1] !== undefined
+        ? daily.weather_code[1]
+        : 0;
+      const tomorrowWmo = this.#app.getWmoInfo(tomorrowCode);
       if (this.#elements.insightOutlookVal) {
-        const tomorrowCode = daily.weather_code[1];
-        const tomorrowWmo = this.#app.getWmoInfo(tomorrowCode);
         this.#elements.insightOutlookVal.textContent = tomorrowWmo.desc;
+      }
+
+      const conditionStatus = document.getElementById("insight-condition-status");
+      if (conditionStatus) {
+        if (rainProb >= 60) {
+          conditionStatus.textContent = "Rain Expected";
+          conditionStatus.className = "insight-chip-status status-rain-high";
+        } else if (rainProb >= 30) {
+          conditionStatus.textContent = "Showers Likely";
+          conditionStatus.className = "insight-chip-status status-rain-mod";
+        } else if (tomorrowCode === 0) {
+          conditionStatus.textContent = "Sunny & Clear";
+          conditionStatus.className = "insight-chip-status status-sunny";
+        } else if (tomorrowCode <= 3) {
+          conditionStatus.textContent = "Partly Cloudy";
+          conditionStatus.className = "insight-chip-status status-cloudy";
+        } else if (tomorrowCode >= 71 && tomorrowCode <= 77) {
+          conditionStatus.textContent = "Snow Expected";
+          conditionStatus.className = "insight-chip-status status-snow";
+        } else {
+          conditionStatus.textContent = "Favorable";
+          conditionStatus.className = "insight-chip-status status-optimal";
+        }
       }
     }
 
