@@ -2852,17 +2852,51 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    #isValidated = false;
+    #isKeyWorking = false;
+
     hasKey() {
       return Boolean(this.#apiKey && this.#apiKey.length >= 16);
     }
 
+    async testKeyHealth() {
+      if (!this.hasKey()) {
+        this.#isValidated = true;
+        this.#isKeyWorking = false;
+        return false;
+      }
+      try {
+        const testUrl = this.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
+          q: "London",
+          limit: 1
+        });
+        const res = await fetch(testUrl);
+        this.#isValidated = true;
+        this.#isKeyWorking = res.ok;
+        return res.ok;
+      } catch {
+        this.#isValidated = true;
+        this.#isKeyWorking = false;
+        return false;
+      }
+    }
+
+    isKeyWorking() {
+      return Boolean(this.#isValidated && this.#isKeyWorking);
+    }
+
     getMaskedStatus() {
+      if (this.isKeyWorking()) {
+        return {
+          active: true,
+          label: "OpenWeather Geocoding Engine · Direct Match Active",
+          badge: "CONNECTED"
+        };
+      }
       return {
-        active: this.hasKey(),
-        label: this.hasKey()
-          ? "OpenWeather Geocoding Engine · Satellite Telemetry"
-          : "Open-Meteo High-Precision Satellite Telemetry",
-        badge: this.hasKey() ? "CONNECTED" : "ACTIVE"
+        active: true,
+        label: "Satellite Geocoding Engine · Global Mesh Active",
+        badge: "ACTIVE"
       };
     }
 
@@ -2994,7 +3028,32 @@ document.addEventListener("DOMContentLoaded", () => {
           .catch(() => [])
       );
 
-      const [owmResults = [], omResults = []] = await Promise.all(apiPromises);
+      // 3. Photon OpenStreetMap Geocoding (Global fallback)
+      const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(query.trim())}&limit=6`;
+      apiPromises.push(
+        fetch(photonUrl, { signal })
+          .then((res) => (res.ok ? res.json() : {}))
+          .then((data) =>
+            Array.isArray(data.features)
+              ? data.features.map((f) => {
+                  const props = f.properties || {};
+                  const [lon, lat] = f.geometry ? f.geometry.coordinates : [0, 0];
+                  return {
+                    name: props.name || "",
+                    country: props.country || "",
+                    country_code: props.countrycode || "",
+                    admin1: props.state || props.city || "",
+                    latitude: lat,
+                    longitude: lon,
+                    source: "photon"
+                  };
+                }).filter((item) => item.name && item.latitude && item.longitude)
+              : []
+          )
+          .catch(() => [])
+      );
+
+      const [owmResults = [], omResults = [], photonResults = []] = await Promise.all(apiPromises);
 
       const combined = [];
       const seen = new Set();
@@ -3010,6 +3069,7 @@ document.addEventListener("DOMContentLoaded", () => {
       catalogMatches.forEach(addUnique);
       owmResults.forEach(addUnique);
       omResults.forEach(addUnique);
+      photonResults.forEach(addUnique);
 
       const result = combined.slice(0, 8);
       this.#cache.set(cacheKey, result);
@@ -3866,19 +3926,22 @@ document.addEventListener("DOMContentLoaded", () => {
           "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
       }
 
-      if (status && status.active) {
+      if (status) {
         if (this.#elements.heroEyebrowText) {
-          this.#elements.heroEyebrowText.textContent = "OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH";
+          this.#elements.heroEyebrowText.textContent = status.badge === "CONNECTED"
+            ? "OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH"
+            : "HIGH-PRECISION SATELLITE TELEMETRY · GLOBAL SEARCH ACTIVE";
         }
         if (this.#elements.heroSubtitle) {
-          this.#elements.heroSubtitle.textContent =
-            "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models.";
+          this.#elements.heroSubtitle.textContent = status.badge === "CONNECTED"
+            ? "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models."
+            : "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by Open-Meteo & OpenStreetMap live satellite models.";
         }
         if (this.#elements.apiStatusLabel) {
-          this.#elements.apiStatusLabel.textContent = "OpenWeather API Active · Direct City Search";
+          this.#elements.apiStatusLabel.textContent = status.label;
         }
         if (this.#elements.apiStatusBadge) {
-          this.#elements.apiStatusBadge.textContent = "CONNECTED";
+          this.#elements.apiStatusBadge.textContent = status.badge;
         }
       }
 
@@ -4455,7 +4518,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // 10. Click outside to dismiss autocomplete dropdowns
+      // 10. Smooth Scroll for Navigation Anchor Links
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (href && href.startsWith("#")) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              document.querySelectorAll(".nav-link").forEach((l) => l.classList.remove("active"));
+              link.classList.add("active");
+              if (window.motionEngine && window.motionEngine.lenis) {
+                window.motionEngine.lenis.scrollTo(target, { offset: -70 });
+              } else {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            }
+          }
+        });
+      });
+
+      // 11. Click outside to dismiss autocomplete dropdowns
       document.addEventListener("click", (e) => {
         if (!e.target.closest(".search-box-wrapper") && !e.target.closest(".search-dropdown")) {
           this.#closeAllDropdowns();
@@ -4541,7 +4624,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.#ui = new AtmosphereUIController(this);
     }
 
-    init() {
+    async init() {
       this.#ui.bindEvents();
       this.#ui.initStandbyLandingState(this.#security.getMaskedStatus());
       this.#splineRenderer.renderStandby(this.#ui.getHourlyTimeline());
@@ -4552,6 +4635,12 @@ document.addEventListener("DOMContentLoaded", () => {
         setKey: (key) => this.#security.setCustomKey(key),
         clearKey: () => this.#security.clearKey()
       });
+
+      // Background health check for OpenWeather key
+      if (this.#security.hasKey()) {
+        await this.#security.testKeyHealth();
+        this.#ui.initStandbyLandingState(this.#security.getMaskedStatus());
+      }
     }
 
     sanitize(input) {
