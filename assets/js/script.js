@@ -180,6 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Globe slides back to hero position
       window.threeAtmosphere.repositionForWelcome();
     }
+
+    if (window.motionEngine && window.motionEngine.animateWelcomeEntrance) {
+      window.motionEngine.animateWelcomeEntrance();
+    }
   }
 
   // --- Ambient Background Generator ---
@@ -1158,6 +1162,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const hour12 = hour % 12 || 12;
     const paddedHour = hour12 < 10 ? `0${hour12}` : hour12;
     return `${paddedHour}:${min} ${ampm}`;
+  }
+
+  // --- Initial T3 Cinematic Welcome Entrance ---
+  if (window.motionEngine && window.motionEngine.animateWelcomeEntrance) {
+    window.motionEngine.animateWelcomeEntrance();
   }
 });
 

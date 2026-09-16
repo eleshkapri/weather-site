@@ -48,7 +48,55 @@ class MotionEngine {
     }
   }
 
-  // --- Staggered Cinematic Dashboard Reveal ---
+  // --- T3 Cinematic Welcome Screen Reveal ---
+  animateWelcomeEntrance() {
+    if (typeof gsap === 'undefined') return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    // Horizon aurora glow
+    tl.fromTo('.cinematic-horizon-container',
+      { opacity: 0, scale: 1.04 },
+      { opacity: 0.9, scale: 1, duration: 1.2, ease: 'power2.out' }
+    );
+
+    // Pearl telemetry pill badge
+    tl.fromTo('.welcome-brand .pearl-badge',
+      { y: -16, opacity: 0, filter: 'blur(8px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, clearProps: 'transform,filter' },
+      '-=0.9'
+    );
+
+    // Cinematic giant hero title
+    tl.fromTo('.welcome-title',
+      { y: 28, opacity: 0, filter: 'blur(12px)', scale: 0.97 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.85, clearProps: 'transform,filter' },
+      '-=0.5'
+    );
+
+    // Subtitle
+    tl.fromTo('.welcome-subtitle',
+      { y: 16, opacity: 0, filter: 'blur(6px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, clearProps: 'transform,filter' },
+      '-=0.6'
+    );
+
+    // Tactile command bar
+    tl.fromTo('.welcome-search-wrapper .search-box-wrapper',
+      { y: 22, opacity: 0, filter: 'blur(8px)', scale: 0.98 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.7, clearProps: 'transform,filter' },
+      '-=0.45'
+    );
+
+    // Quick telemetry city pills
+    tl.fromTo('.city-pill',
+      { y: 12, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.45, stagger: 0.04, clearProps: 'transform' },
+      '-=0.35'
+    );
+  }
+
+  // --- Staggered Cinematic Dashboard Reveal (T3 Blur-to-Focus) ---
   animateDashboardEntrance() {
     if (typeof gsap === 'undefined') return;
 
@@ -56,43 +104,43 @@ class MotionEngine {
 
     // 1. Top Navigation
     tl.fromTo('#top-nav',
-      { y: -20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6 }
+      { y: -20, opacity: 0, filter: 'blur(6px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.6, clearProps: 'transform,filter' }
     );
 
     // 2. View Mode Tabs Pill Bar
     tl.fromTo('.dashboard-tabs-bar',
-      { y: -12, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.5 },
-      '-=0.3'
+      { y: -12, opacity: 0, filter: 'blur(6px)', scale: 0.96 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.55, clearProps: 'transform,filter' },
+      '-=0.35'
     );
 
     // 3. Hero Scenery Double-Bezel Card
     tl.fromTo('.hero-scenery-card',
-      { y: 36, opacity: 0, scale: 0.98 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.8, clearProps: 'transform' },
-      '-=0.3'
+      { y: 32, opacity: 0, filter: 'blur(10px)', scale: 0.98 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.8, clearProps: 'transform,filter' },
+      '-=0.35'
     );
 
     // 4. Condition Summary Ribbon
     tl.fromTo('.summary-card',
-      { y: 25, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, clearProps: 'transform' },
-      '-=0.4'
+      { y: 22, opacity: 0, filter: 'blur(6px)' },
+      { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.6, clearProps: 'transform,filter' },
+      '-=0.45'
     );
 
     // 5. Hourly Forecast Spline Card
     tl.fromTo('.forecast-card',
-      { y: 30, opacity: 0, scale: 0.98 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.7, clearProps: 'transform' },
-      '-=0.4'
+      { y: 28, opacity: 0, filter: 'blur(8px)', scale: 0.98 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.7, clearProps: 'transform,filter' },
+      '-=0.45'
     );
 
     // 6. Insight Widget & Detailed Metric Bento Boxes
     tl.fromTo('.insight-widget, .metric-box',
-      { y: 28, opacity: 0, scale: 0.97 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, clearProps: 'transform' },
-      '-=0.4'
+      { y: 24, opacity: 0, filter: 'blur(6px)', scale: 0.97 },
+      { y: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.6, stagger: 0.05, clearProps: 'transform,filter' },
+      '-=0.45'
     );
   }
 
