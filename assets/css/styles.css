@@ -206,21 +206,6 @@ html.lenis, html.lenis body {
   -webkit-text-fill-color: transparent;
 }
 
-.nav-live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #34d399;
-}
-
 /* Button-in-Button Trailing Arrow Wrapper */
 .btn-arrow-icon {
   width: 22px;
@@ -299,34 +284,6 @@ html.lenis, html.lenis body {
   font-weight: 600;
 }
 
-/* --- TELEMETRY HUD BADGE ON HERO SCENERY CARD --- */
-.telemetry-hud-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 9999px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  color: #e2e8f0;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  margin-bottom: 8px;
-  width: fit-content;
-}
-
-.telemetry-hud-badge .hud-label {
-  color: #94a3b8;
-  font-weight: 600;
-}
-
-.telemetry-hud-badge .hud-sep {
-  color: rgba(255, 255, 255, 0.3);
-}
-
 /* --- KINETIC TEXT SPLIT STYLING --- */
 .split-text-wrapper {
   display: inline-block;
@@ -368,74 +325,6 @@ html.lenis, html.lenis body {
   gap: 36px;
   padding: 40px 20px;
   animation: welcomeFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.welcome-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.welcome-logo-icon {
-  width: 64px;
-  height: 64px;
-  stroke: var(--primary-accent);
-  filter: drop-shadow(0 4px 18px var(--accent-glow));
-  animation: floatLogo 4s ease-in-out infinite alternate;
-}
-
-.welcome-title-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.welcome-title {
-  font-size: 52px;
-  font-weight: 800;
-  letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #ffffff 40%, #ffd700 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.welcome-subtitle {
-  font-size: 16px;
-  color: var(--text-muted);
-  font-weight: 400;
-  max-width: 500px;
-  line-height: 1.5;
-}
-
-.welcome-search-wrapper {
-  width: 100%;
-  max-width: 580px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.welcome-search-wrapper input[type="text"] {
-  padding: 16px 42px 16px 48px;
-  font-size: 15.5px;
-  background: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.welcome-search-wrapper .search-icon {
-  width: 20px;
-  height: 20px;
-  left: 18px;
-}
-
-.welcome-search-wrapper .search-btn {
-  padding: 16px 28px;
-  font-size: 15px;
 }
 
 /* API Key Status Indicator Pill */
@@ -1204,148 +1093,8 @@ body[class*="theme-day"] .mist-layer {
   height: 100%;
 }
 
-.mountain-back {
-  fill: rgba(14, 28, 56, 0.45);
-  transition: fill 1s ease, opacity 1s ease;
-}
-
-.mountain-mid {
-  fill: rgba(10, 22, 45, 0.6);
-  transition: fill 1s ease, opacity 1s ease;
-}
-
-.hill-front {
-  fill: #0c1a36;
-  transition: fill 1s ease;
-}
-
 .hill-crest-glow {
   transition: stroke 1s ease;
-}
-
-/* Landscape per-theme coloring */
-.hero-scenery-card.theme-day .mountain-back,
-.hero-scenery-card.theme-day-clear .mountain-back,
-body.theme-day .mountain-back,
-body.theme-day-clear .mountain-back {
-  fill: url(#distantMountainGrad);
-  opacity: 0.7;
-}
-
-.hero-scenery-card.theme-day .mountain-mid,
-.hero-scenery-card.theme-day-clear .mountain-mid,
-body.theme-day .mountain-mid,
-body.theme-day-clear .mountain-mid {
-  fill: url(#midHillGrad);
-  opacity: 0.92;
-}
-
-.hero-scenery-card.theme-day .hill-front,
-.hero-scenery-card.theme-day-clear .hill-front,
-body.theme-day .hill-front,
-body.theme-day-clear .hill-front {
-  fill: url(#frontHillGrad);
-}
-
-.hero-scenery-card.theme-day .wild-grass-group,
-.hero-scenery-card.theme-day-clear .wild-grass-group,
-body.theme-day .wild-grass-group,
-body.theme-day-clear .wild-grass-group {
-  color: #86efac;
-}
-
-body.theme-day-cloudy .mountain-back {
-  fill: #4b626e;
-  opacity: 0.75;
-}
-
-body.theme-day-cloudy .mountain-mid {
-  fill: #3c5443;
-  opacity: 0.9;
-}
-
-body.theme-day-cloudy .hill-front {
-  fill: #2c4432;
-}
-
-body.theme-day-cloudy .wild-grass-group {
-  color: #4ade80;
-}
-
-body.theme-day-rain .mountain-back {
-  fill: #223440;
-  opacity: 0.8;
-}
-
-body.theme-day-rain .mountain-mid {
-  fill: #1a3324;
-  opacity: 0.92;
-}
-
-body.theme-day-rain .hill-front {
-  fill: #14281c;
-}
-
-body.theme-day-rain .wild-grass-group {
-  color: #22c55e;
-}
-
-.hero-scenery-card.theme-night .mountain-back,
-.hero-scenery-card.theme-night-clear .mountain-back,
-body.theme-night .mountain-back,
-body.theme-night-clear .mountain-back {
-  fill: #08162f;
-  opacity: 0.55;
-}
-
-.hero-scenery-card.theme-night .mountain-mid,
-.hero-scenery-card.theme-night-clear .mountain-mid,
-body.theme-night .mountain-mid,
-body.theme-night-clear .mountain-mid {
-  fill: #091a38;
-  opacity: 0.85;
-}
-
-.hero-scenery-card.theme-night .hill-front,
-.hero-scenery-card.theme-night-clear .hill-front,
-body.theme-night .hill-front,
-body.theme-night-clear .hill-front {
-  fill: #0c1f44;
-}
-
-.hero-scenery-card.theme-night .wild-grass-group,
-.hero-scenery-card.theme-night-clear .wild-grass-group,
-body.theme-night .wild-grass-group,
-body.theme-night-clear .wild-grass-group {
-  color: #38bdf8;
-  opacity: 0.6;
-}
-
-body.theme-night-cloudy .mountain-back,
-body.theme-night-rain .mountain-back,
-body.theme-thunderstorm .mountain-back {
-  fill: #060e1d;
-  opacity: 0.65;
-}
-
-body.theme-night-cloudy .mountain-mid,
-body.theme-night-rain .mountain-mid,
-body.theme-thunderstorm .mountain-mid {
-  fill: #081224;
-  opacity: 0.88;
-}
-
-body.theme-night-cloudy .hill-front,
-body.theme-night-rain .hill-front,
-body.theme-thunderstorm .hill-front {
-  fill: #0a172e;
-}
-
-body.theme-night-cloudy .wild-grass-group,
-body.theme-night-rain .wild-grass-group,
-body.theme-thunderstorm .wild-grass-group {
-  color: #0284c7;
-  opacity: 0.5;
 }
 
 /* --- Animated Wind-Blown Grass Blades --- */
@@ -1393,7 +1142,7 @@ body.theme-thunderstorm .wild-grass-group {
   transform: translateY(-4px) scale(1.05);
 }
 
-.person-svg {
+.char-vector-svg {
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -1469,34 +1218,6 @@ body.theme-thunderstorm .wild-grass-group {
 
 /* --- Contextual Outfits & Gear --- */
 
-/* 1. Umbrella Mechanics (Rain / Storm) */
-.char-umbrella-group {
-  transform-origin: 52px 82px;
-  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Default Sunny / Clear / Cloudy / Night -> Umbrella is hidden */
-.state-sunny .char-umbrella-group,
-.state-cloudy .char-umbrella-group,
-.state-night .char-umbrella-group {
-  opacity: 0;
-  transform: scale(0.6) translateY(25px);
-  pointer-events: none;
-}
-
-/* Rain / Storm -> Umbrella pops out and sways with wind */
-.state-rainy .char-umbrella-group,
-.state-stormy .char-umbrella-group {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  animation: umbrellaWindSway 3s ease-in-out infinite alternate;
-}
-
-@keyframes umbrellaWindSway {
-  0% { transform: rotate(-2deg); }
-  100% { transform: rotate(3deg); }
-}
-
 /* Raindrop impacts bouncing off umbrella canopy */
 .canopy-drop {
   opacity: 0.85;
@@ -1523,26 +1244,7 @@ body.theme-thunderstorm .wild-grass-group {
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.state-rainy .char-phone,
-.state-rainy .char-phone-screen,
-.state-stormy .char-phone,
-.state-stormy .char-phone-screen {
-  display: none;
-}
-
-/* 2. Sunglasses Sheen (Active on Sunny Days) */
-.char-shades {
-  transition: opacity 0.3s ease;
-}
-
-.state-rainy .char-shades,
-.state-stormy .char-shades,
-.state-cloudy .char-shades,
-.state-night .char-shades {
-  opacity: 0;
-}
-
-/* 3. Garment Coloring per Weather State */
+/* Garment Coloring per Weather State */
 .state-sunny .char-jacket {
   fill: #f59e0b; /* Bright golden honey hoodie */
 }
@@ -1582,7 +1284,7 @@ body.theme-thunderstorm .wild-grass-group {
   fill: #0f172a;
 }
 
-.state-night .person-svg {
+.state-night .char-vector-svg {
   filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.35)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
 }
 
@@ -2292,19 +1994,6 @@ body.theme-thunderstorm .wild-grass-group {
     padding: 24px 12px;
   }
 
-  .welcome-logo-icon {
-    width: 52px;
-    height: 52px;
-  }
-
-  .welcome-title {
-    font-size: 40px;
-  }
-
-  .welcome-subtitle {
-    font-size: 14.5px;
-  }
-
   .hero-scenery-card {
     height: 300px;
     padding: 24px 22px;
@@ -2359,62 +2048,17 @@ body.theme-thunderstorm .wild-grass-group {
     padding: 20px 8px;
   }
 
-  .welcome-logo-icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .welcome-title {
-    font-size: 32px;
-    letter-spacing: -1px;
-  }
-
-  .welcome-subtitle {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .welcome-search-wrapper {
-    gap: 14px;
-  }
-
-  .welcome-search-wrapper input[type="text"] {
-    padding: 13px 36px 13px 40px;
-    font-size: 13.5px;
-  }
-
-  .welcome-search-wrapper .search-btn {
-    padding: 13px 18px;
-    font-size: 13.5px;
-  }
-
   .quick-cities-row {
     gap: 6px;
   }
 
   .city-pill {
     font-size: 11px;
-    padding: 4px 10px;
-  }
-
-  /* Top Navigation on Mobile */
-  .top-nav {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .nav-brand {
+    padding: 6px 12px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-  }
-
-  .brand-title {
-    font-size: 20px;
-  }
-
-  .nav-search-container {
-    max-width: 100%;
-    width: 100%;
   }
 
   /* Hero Scenery Card on Mobile */
@@ -2520,7 +2164,7 @@ body.theme-thunderstorm .wild-grass-group {
 
 /* --- EXTRA SMALL SCREENS (<= 360px) --- */
 @media (max-width: 360px) {
-  .welcome-title {
+  .hero-title {
     font-size: 28px;
   }
 
@@ -2960,8 +2604,10 @@ body.cinematic-dark-mode .app-layout {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);

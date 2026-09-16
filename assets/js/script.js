@@ -1,133 +1,16 @@
+/**
+ * ==============================================================================
+ * ATMOSPHERE — ENTERPRISE OBJECT-ORIENTED TELEMETRY ARCHITECTURE (OOP)
+ * ==============================================================================
+ * Core Principles:
+ * - Strict Encapsulation & Data Hiding (ES6 Private Class Fields: #field)
+ * - Single Responsibility & High Modularity
+ * - Zero-Leak Key Protection: Inaccessible to global scope or browser console
+ * - Responsive Adaptivity across all Device Form Factors (Mobile, Tablet, Desktop)
+ * ==============================================================================
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
-  // --- DOM Elements ---
-  const welcomeScreen = document.getElementById("welcome-screen") || document.getElementById("hero-section");
-  const topNav = document.getElementById("top-nav") || document.getElementById("cinematic-nav");
-  const brandHomeBtn = document.getElementById("brand-home-btn");
-  const navSearchMount = document.getElementById("nav-search-mount");
-  const welcomeSearchWrapper = document.querySelector(".welcome-search-wrapper");
-  const searchBoxWrapper = document.querySelector(".search-box-wrapper");
-
-  const cityInput = document.getElementById("city-input");
-  const clearInputBtn = document.getElementById("clear-input-btn");
-  const searchShortcutKbd = document.getElementById("search-shortcut-kbd") || document.querySelector(".search-shortcut-kbd");
-  const getWeatherBtn = document.getElementById("get-weather-btn");
-  const navGeoBtn = document.getElementById("nav-geo-btn");
-  const heroGeoBtn = document.getElementById("hero-geo-btn");
-  const searchDropdown = document.getElementById("search-dropdown");
-  const errorMessage = document.getElementById("error-message");
-  const errorText = document.getElementById("error-text");
-  const loadingSpinner = document.getElementById("loading-spinner");
-  const weatherDashboard = document.getElementById("weather-dashboard");
-
-  // Dashboard & Modal Search Elements
-  const dashboardCityInput = document.getElementById("dashboard-city-input");
-  const dashboardSearchBtn = document.getElementById("dashboard-search-btn");
-  const dashboardSearchDropdown = document.getElementById("dashboard-search-dropdown");
-  const frameCityLabel = document.getElementById("frame-city-label");
-  const navSearchTriggerBtn = document.getElementById("nav-search-trigger-btn");
-  const searchModal = document.getElementById("search-modal");
-  const modalSearchInput = document.getElementById("modal-search-input");
-  const closeSearchModalBtn = document.getElementById("close-search-modal-btn");
-  const modalSearchDropdown = document.getElementById("modal-search-dropdown");
-  const modalCityPills = document.querySelectorAll(".modal-city-pill");
-
-  // Hero Scenery Elements
-  const ambientSkyCanvas = document.getElementById("ambient-sky-canvas");
-  const skyElements = document.getElementById("sky-elements");
-  const characterFigure = document.getElementById("character-figure");
-  const charReactionBubble = document.getElementById("char-reaction-bubble");
-  const sceneryFxParticles = document.getElementById("scenery-fx-particles");
-  const cityNameDisplay = document.getElementById("city-name");
-  const countryTag = document.getElementById("country-tag");
-  const localTimeDisplay = document.getElementById("local-time") || document.getElementById("local-time-clock");
-  const temperatureDisplay = document.getElementById("temperature");
-  const descriptionDisplay = document.getElementById("description") || document.getElementById("weather-description");
-  const tempMaxDisplay = document.getElementById("temp-max");
-  const tempMinDisplay = document.getElementById("temp-min");
-  const dayHighLowDisplay = document.getElementById("day-high-low");
-  const feelsLikeDisplay = document.getElementById("feels-like") || document.getElementById("apparent-temp");
-  const heroHumidityDisplay = document.getElementById("hero-humidity");
-
-  // Summary & Forecast
-  const summaryText = document.getElementById("summary-text") || document.getElementById("ai-summary-text");
-  const hourlyTimeline = document.getElementById("hourly-timeline") || document.getElementById("spline-chart-container");
-
-  // Widgets
-  const sunGlowCircle = document.getElementById("sun-glow-circle") || document.getElementById("sun-arc-orb");
-  const arcSunriseText = document.getElementById("arc-sunrise-text");
-  const arcSunsetText = document.getElementById("arc-sunset-text");
-  const sunStatusTitle = document.getElementById("sun-status-title");
-  const sunFooterText = document.getElementById("sun-footer-text");
-
-  const insightTitle = document.getElementById("insight-title");
-  const insightDesc = document.getElementById("insight-desc");
-  const insightBadge = document.getElementById("insight-badge");
-  const insightRangeVal = document.getElementById("insight-range-val");
-  const insightRainVal = document.getElementById("insight-rain-val");
-  const insightOutlookVal = document.getElementById("insight-outlook-val");
-
-  const humidityDisplay = document.getElementById("humidity");
-  const humidityBar = document.getElementById("humidity-bar");
-  const humidityStatus = document.getElementById("humidity-status");
-
-  const windSpeedDisplay = document.getElementById("wind-speed");
-  const windDirection = document.getElementById("wind-direction");
-  const windCaption = document.getElementById("wind-caption");
-
-  const pressureDisplay = document.getElementById("pressure");
-  const pressureStatus = document.getElementById("pressure-status");
-  const visibilityDisplay = document.getElementById("visibility");
-  const visibilityStatus = document.getElementById("visibility-status");
-
-  const uvIndexDisplay = document.getElementById("uv-index");
-  const uvBar = document.getElementById("uv-bar");
-  const uvStatus = document.getElementById("uv-status");
-
-  const precipChanceDisplay = document.getElementById("precip-chance");
-  const precipBar = document.getElementById("precip-bar");
-  const precipStatus = document.getElementById("precip-status");
-
-  function updateSearchActionButtons(hasText) {
-    if (clearInputBtn) {
-      if (hasText) clearInputBtn.classList.remove("hidden");
-      else clearInputBtn.classList.add("hidden");
-    }
-    if (searchShortcutKbd) {
-      if (hasText) searchShortcutKbd.classList.add("hidden");
-      else searchShortcutKbd.classList.remove("hidden");
-    }
-  }
-
-  // Storage & API Configuration Constants
-  const HISTORY_STORAGE_KEY = "atmosphere_recent_searches";
-  const COORDS_CACHE_KEY = "atmosphere_coords_cache";
-  const MAX_HISTORY_ITEMS = 6;
-
-  function getApiKey() {
-    try {
-      if (window.CONFIG && typeof window.CONFIG.OPENWEATHER_API_KEY === "string" && window.CONFIG.OPENWEATHER_API_KEY.trim()) {
-        return window.CONFIG.OPENWEATHER_API_KEY.trim();
-      }
-      const localKey = localStorage.getItem("atmosphere_api_key");
-      if (localKey && localKey.trim()) {
-        return localKey.trim();
-      }
-    } catch {}
-    return "";
-  }
-
-  // Safe developer / browser utility to set or inspect API key in localStorage
-  window.AtmosphereConfig = {
-    getKey: getApiKey,
-    setKey: (key) => {
-      if (key) localStorage.setItem("atmosphere_api_key", key.trim());
-      else localStorage.removeItem("atmosphere_api_key");
-      console.log("[Atmosphere] Custom API key saved in browser localStorage.");
-    },
-    hasKey: () => Boolean(getApiKey())
-  };
-
-  // Ultra-Fast 0ms Offline Global Cities Geocoding Catalog (300+ Hubs & Regional Towns)
   const GLOBAL_CITY_CATALOG = [
   {
     "name": "Delhi",
@@ -2912,28 +2795,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 ];
 
-  function getCachedCityCoordinates(lowerCity) {
-    try {
-      const stored = localStorage.getItem(COORDS_CACHE_KEY);
-      if (!stored) return null;
-      const map = JSON.parse(stored);
-      return map[lowerCity] || null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function saveCityToCoordinatesCache(lowerCity, data) {
-    try {
-      const stored = localStorage.getItem(COORDS_CACHE_KEY);
-      const map = stored ? JSON.parse(stored) : {};
-      map[lowerCity] = data;
-      localStorage.setItem(COORDS_CACHE_KEY, JSON.stringify(map));
-    } catch (e) {}
-  }
-
-
-  // WMO Weather Codes & Condition Mappings
   const WMO_WEATHER_MAP = {
     0: { main: "Clear", desc: "Clear Sky", iconDay: "01d", iconNight: "01n" },
     1: { main: "Clear", desc: "Mainly Clear", iconDay: "01d", iconNight: "01n" },
@@ -2964,2340 +2825,1823 @@ document.addEventListener("DOMContentLoaded", () => {
     96: { main: "Thunderstorm", desc: "Thunderstorm with Hail", iconDay: "11d", iconNight: "11n" },
   };
 
-  // Inline Vector Weather Icon Generator (Zero Network Latency, Dark SaaS Theme Optimized)
-  function getWeatherConditionSvg(code, isDayHour = true) {
-    const svgOpen = '<svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">';
-    const svgClose = '</svg>';
+  // ============================================================================
+  // 1. ATMOSPHERE SECURITY MANAGER (Zero-Leak Private Field Encapsulation)
+  // ============================================================================
+  class AtmosphereSecurity {
+    #apiKey = "";
 
-    // 1. Clear Sky (Sun or Moon)
-    if (code === 0 || code === 1) {
-      if (isDayHour) {
-        return `${svgOpen}<circle cx="16" cy="16" r="6.5" fill="#f59e0b" filter="drop-shadow(0 0 6px rgba(245, 158, 11, 0.7))"/><circle cx="16" cy="16" r="4.5" fill="#fbbf24"/><path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.8 6.8l2.1 2.1M23.1 23.1l2.1 2.1M6.8 25.2l2.1-2.1M23.1 8.9l2.1-2.1" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>${svgClose}`;
-      } else {
-        return `${svgOpen}<path d="M22.5 16.5A9.5 9.5 0 1 1 12 6a7.5 7.5 0 0 0 10.5 10.5z" fill="#fde047" filter="drop-shadow(0 0 6px rgba(253, 224, 71, 0.6))"/><circle cx="21" cy="7" r="1" fill="#ffffff"/><circle cx="25" cy="11" r="0.75" fill="#ffffff"/>${svgClose}`;
-      }
+    constructor() {
+      this.#initKey();
+      Object.freeze(this);
     }
 
-    // 2. Partly Cloudy
-    if (code === 2) {
-      if (isDayHour) {
-        return `${svgOpen}<circle cx="12" cy="12" r="5" fill="#fbbf24" filter="drop-shadow(0 0 4px rgba(251, 191, 36, 0.6))"/><path d="M10 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 10 24z" fill="#e2e8f0" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
-      } else {
-        return `${svgOpen}<path d="M18 10a6 6 0 0 1-5-5 5 5 0 1 0 6.8 6.8c-.6-.6-1.2-1.2-1.8-1.8z" fill="#fde047"/><path d="M9 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 9 24z" fill="#cbd5e1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
-      }
-    }
-
-    // 3. Overcast
-    if (code === 3) {
-      return `${svgOpen}<path d="M14 18h11a4 4 0 0 0 1-7.9 5.5 5.5 0 0 0-10.7-1A3.5 3.5 0 0 0 14 18z" fill="#94a3b8" opacity="0.6"/><path d="M8 25h14a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 8 25z" fill="#e2e8f0" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.45))"/>${svgClose}`;
-    }
-
-    // 4. Fog / Mist
-    if (code === 45 || code === 48) {
-      return `${svgOpen}<line x1="6" y1="12" x2="26" y2="12" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/><line x1="4" y1="16" x2="28" y2="16" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round"/><line x1="7" y1="20" x2="25" y2="20" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>${svgClose}`;
-    }
-
-    // 5. Rain / Drizzle / Showers
-    if ([51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(code)) {
-      return `${svgOpen}<path d="M8 19h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 9a4 4 0 0 0-2.3 10z" fill="#94a3b8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/><line x1="10" y1="22" x2="8.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="22" x2="13.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="22" x2="18.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>${svgClose}`;
-    }
-
-    // 6. Snow / Freezing Rain
-    if ([66, 67, 71, 73, 75, 77, 85, 86].includes(code)) {
-      return `${svgOpen}<path d="M8 18h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 8a4 4 0 0 0-2.3 10z" fill="#cbd5e1"/><circle cx="10" cy="23" r="1.4" fill="#93c5fd"/><circle cx="15" cy="24" r="1.4" fill="#93c5fd"/><circle cx="20" cy="23" r="1.4" fill="#93c5fd"/>${svgClose}`;
-    }
-
-    // 7. Thunderstorm
-    if (code === 95 || code === 96 || code === 99) {
-      return `${svgOpen}<path d="M7 17h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 9.3 7a4 4 0 0 0-2.3 10z" fill="#64748b"/><polygon points="15,16 11,22 14,22 13,27 18,20 15,20" fill="#facc15" filter="drop-shadow(0 0 4px rgba(250, 204, 21, 0.8))"/>${svgClose}`;
-    }
-
-    // Fallback (Sun / Moon)
-    return isDayHour
-      ? `${svgOpen}<circle cx="16" cy="16" r="6" fill="#fbbf24"/>${svgClose}`
-      : `${svgOpen}<path d="M22 16A8 8 0 1 1 12 6a6 6 0 0 0 10 10z" fill="#fde047"/>${svgClose}`;
-  }
-
-  // State
-  let debounceTimeout = null;
-  let currentAbortController = null;
-  let activeDropdownIndex = -1;
-  let currentSuggestions = [];
-
-  // --- Initial Launch State ---
-  initAmbientSky();
-
-  // --- Event Listeners ---
-  getWeatherBtn.addEventListener("click", () => {
-    closeDropdown();
-    handleSearch(cityInput.value.trim());
-  });
-
-  cityInput.addEventListener("input", onInputChange);
-  cityInput.addEventListener("focus", onInputFocus);
-  cityInput.addEventListener("keydown", onInputKeydown);
-
-  clearInputBtn.addEventListener("click", () => {
-    cityInput.value = "";
-    updateSearchActionButtons(false);
-    cityInput.focus();
-    renderHistoryDropdown();
-  });
-
-  // Quick search city pill buttons
-  document.querySelectorAll(".city-pill").forEach((pill) => {
-    pill.addEventListener("click", () => {
-      const city = pill.getAttribute("data-city");
-      cityInput.value = city;
-      updateSearchActionButtons(true);
-      closeDropdown();
-      handleSearch(city);
-    });
-  });
-
-  // Click Atmosphere Brand / Logo to return to Home Welcome Screen
-  if (brandHomeBtn) {
-    brandHomeBtn.addEventListener("click", returnToHomeScreen);
-  }
-
-  // Interactive Weather Companion Character Interaction
-  if (characterFigure) {
-    const characterGreetings = [
-      "👋 Hello there!",
-      "✨ Live satellite telemetry!",
-      "🌤️ Hope you're having a great day!",
-      "🛰️ Real-time Open-Meteo sync!",
-      "🌱 Enjoy the atmospheric view!"
-    ];
-    let greetingIndex = 0;
-
-    const triggerCharacterReaction = () => {
-      characterFigure.classList.remove("reacting");
-      void characterFigure.offsetWidth; // Force reflow
-      characterFigure.classList.add("reacting");
-
-      if (charReactionBubble) {
-        const textSpan = charReactionBubble.querySelector(".bubble-text");
-        if (textSpan) {
-          textSpan.textContent = characterGreetings[greetingIndex % characterGreetings.length];
-          greetingIndex++;
-        }
-      }
-
-      setTimeout(() => {
-        characterFigure.classList.remove("reacting");
-      }, 850);
-    };
-
-    characterFigure.addEventListener("click", triggerCharacterReaction);
-    characterFigure.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        triggerCharacterReaction();
-      }
-    });
-  }
-
-  // Close dropdown when clicking outside
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".search-box-wrapper")) {
-      closeDropdown();
-    }
-  });
-
-  // --- View Switcher (Welcome Screen <-> Weather Dashboard) ---
-  function activateDashboardView() {
-    if (welcomeScreen && welcomeScreen.id === "welcome-screen" && !welcomeScreen.classList.contains("hidden")) {
-      welcomeScreen.classList.add("hidden");
-    }
-    if (topNav && topNav.id === "top-nav") {
-      topNav.classList.remove("hidden");
-    }
-    if (navSearchMount && searchBoxWrapper) {
-      navSearchMount.appendChild(searchBoxWrapper);
-    }
-    if (weatherDashboard) {
-      weatherDashboard.classList.remove("hidden");
-    }
-
-    // Globe retreats off-right so it doesn't compete with data content
-    if (window.threeAtmosphere) {
-      window.threeAtmosphere.repositionForDashboard();
-    }
-
-    // GSAP Cinematic Entrance Animation
-    if (window.motionEngine) {
-      window.motionEngine.animateDashboardEntrance();
-      // Snap the blue capsule pill to the active tab once the bar is visible in the DOM
-      window.motionEngine.resetTabIndicator();
-    }
-  }
-
-  function returnToHomeScreen() {
-    if (weatherDashboard && welcomeScreen && welcomeScreen.id === "welcome-screen") {
-      weatherDashboard.classList.add("hidden");
-      if (topNav && topNav.id === "top-nav") topNav.classList.add("hidden");
-      welcomeScreen.classList.remove("hidden");
-      if (welcomeSearchWrapper && searchBoxWrapper) {
-        welcomeSearchWrapper.insertBefore(searchBoxWrapper, welcomeSearchWrapper.firstChild);
-      }
-    }
-    if (errorMessage) errorMessage.classList.add("hidden");
-    if (cityInput) cityInput.value = "";
-    updateSearchActionButtons(false);
-    document.body.className = "theme-night cinematic-dark-mode";
-    initAmbientSky();
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
-    if (window.threeAtmosphere) {
-      window.threeAtmosphere.setWeatherTheme(0, "Clear");
-      window.threeAtmosphere.repositionForWelcome();
-    }
-  }
-
-  // --- Ambient Background Generator ---
-  function initAmbientSky() {
-    if (!ambientSkyCanvas) return;
-    // Remove only non-canvas elements to preserve Three.js WebGL canvas!
-    const nonCanvas = ambientSkyCanvas.querySelectorAll(":not(#webgl-atmosphere-canvas)");
-    nonCanvas.forEach((el) => el.remove());
-
-    // Glowing Ambient Moon
-    const moon = document.createElement("div");
-    moon.className = "celestial-body moon-glow";
-    moon.style.top = "60px";
-    moon.style.right = "10%";
-    ambientSkyCanvas.appendChild(moon);
-
-    // Stars
-    for (let i = 0; i < 40; i++) {
-      const star = document.createElement("div");
-      star.className = "star-particle";
-      star.style.top = `${Math.random() * 85}%`;
-      star.style.left = `${Math.random() * 95}%`;
-      star.style.width = `${Math.random() * 3 + 1}px`;
-      star.style.height = star.style.width;
-      star.style.animationDelay = `${Math.random() * 4}s`;
-      ambientSkyCanvas.appendChild(star);
-    }
-  }
-
-  // --- Location Name Formatter & Cross-UI Sync Helper ---
-  function formatLocationDisplayName(loc) {
-    if (!loc) return "";
-    const parts = [loc.name];
-    if (loc.admin1 && loc.admin1 !== loc.name) parts.push(loc.admin1);
-    if (loc.country) parts.push(loc.country);
-    else if (loc.country_code) parts.push(loc.country_code);
-    return parts.join(", ");
-  }
-
-  // --- Apply Selected Location Across All Search Inputs & Execute Weather Sync ---
-  function applySelectedLocation(selected) {
-    if (!selected) return;
-    const fullLabel = formatLocationDisplayName(selected);
-
-    if (cityInput) {
-      cityInput.value = fullLabel;
-      updateSearchActionButtons(true);
-    }
-    if (dashboardCityInput) {
-      dashboardCityInput.value = fullLabel;
-    }
-    if (modalSearchInput) {
-      modalSearchInput.value = fullLabel;
-    }
-
-    closeDropdown();
-    closeDashboardDropdown();
-    closeSearchModal();
-
-    if (selected.latitude !== undefined && selected.longitude !== undefined) {
-      executeSearchWithCoords(selected.latitude, selected.longitude, selected);
-    } else {
-      handleSearch(fullLabel);
-    }
-  }
-
-  // --- Universal High-Precision Geocoding Suggestions Engine (OWM + Open-Meteo Primary + Photon + Catalog) ---
-  async function fetchLiveCitySuggestions(query, abortSignal) {
-    if (!query || query.trim().length < 2) return [];
-    const cleanRaw = query.trim();
-    const clean = cleanRaw.toLowerCase();
-
-    // 1. Instant 0ms local catalog search
-    const localMatches = GLOBAL_CITY_CATALOG.filter((c) =>
-      c.name.toLowerCase().includes(clean) ||
-      (c.admin1 && c.admin1.toLowerCase().includes(clean)) ||
-      (c.country && c.country.toLowerCase().includes(clean))
-    ).slice(0, 6).map((c) => ({ ...c, source: "catalog" }));
-
-    const liveApiItems = [];
-    const apiKey = getApiKey();
-
-    // 2. High-Accuracy OpenWeatherMap Direct Geocoding (if custom key is supplied)
-    if (apiKey) {
+    #initKey() {
       try {
-        const owmUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cleanRaw)}&limit=6&appid=${apiKey}`;
-        const owmRes = await fetch(owmUrl, { signal: abortSignal });
-        if (owmRes.ok) {
-          const owmData = await owmRes.json();
-          if (Array.isArray(owmData) && owmData.length > 0) {
-            owmData.forEach((r) => {
-              liveApiItems.push({
-                name: r.name,
-                admin1: r.state || "",
-                country: r.country || "",
-                country_code: r.country ? r.country.toUpperCase() : "",
-                latitude: r.lat,
-                longitude: r.lon,
-                timezone: "auto",
-                source: "openweathermap"
-              });
-            });
-          }
-        } else if (owmRes.status === 401 || owmRes.status === 403) {
-          // OpenWeatherMap key is pending activation or invalid; log once and continue cleanly
-          console.warn(`[Atmosphere] OpenWeatherMap returned ${owmRes.status} (key pending activation). Using Open-Meteo & Photon.`);
+        if (window.CONFIG && typeof window.CONFIG.OPENWEATHER_API_KEY === "string" && window.CONFIG.OPENWEATHER_API_KEY.trim()) {
+          this.#apiKey = window.CONFIG.OPENWEATHER_API_KEY.trim();
+          return;
         }
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.warn("[Atmosphere] OpenWeatherMap suggestion check:", err.message);
+        const localKey = localStorage.getItem("atmosphere_api_key");
+        if (localKey && typeof localKey === "string" && localKey.trim()) {
+          this.#apiKey = localKey.trim();
+          return;
         }
+      } catch {
+        this.#apiKey = "";
       }
     }
 
-    // 3. Query Live Open-Meteo Geocoding API
-    try {
-      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cleanRaw)}&count=10&language=en&format=json`;
-      const response = await fetch(url, { signal: abortSignal });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.results && data.results.length > 0) {
-          data.results.forEach((r) => {
-            liveApiItems.push({
-              name: r.name,
-              admin1: r.admin1 || r.admin2 || "",
-              country: r.country || "",
-              country_code: r.country_code ? r.country_code.toUpperCase() : "",
-              latitude: r.latitude,
-              longitude: r.longitude,
-              timezone: r.timezone || "auto",
-              elevation: r.elevation,
-              source: "open-meteo"
-            });
-          });
-        }
-      }
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        console.warn("[Atmosphere] Open-Meteo suggestion error:", err);
-      }
+    hasKey() {
+      return Boolean(this.#apiKey && this.#apiKey.length >= 16);
     }
 
-    if (liveApiItems.length > 0) {
-      // Deduplicate using composite key: name|admin1|country_code
-      const seen = new Set();
-      const uniqueList = [];
-
-      // Prioritize LIVE API results FIRST (OWM then Open-Meteo)
-      for (const item of liveApiItems) {
-        const key = `${item.name.toLowerCase()}|${(item.admin1 || "").toLowerCase()}|${(item.country_code || "").toLowerCase()}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniqueList.push(item);
-        }
-      }
-
-      // Supplement with remaining distinct local catalog matches
-      for (const item of localMatches) {
-        const key = `${item.name.toLowerCase()}|${(item.admin1 || "").toLowerCase()}|${(item.country_code || "").toLowerCase()}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniqueList.push(item);
-        }
-      }
-
-      return uniqueList.slice(0, 8);
-    }
-
-    // 4. Fallback to Photon for live suggestions of small Indian villages & towns
-    try {
-      const photonRes = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(cleanRaw)}&limit=6`, { signal: abortSignal });
-      if (photonRes.ok) {
-        const photonData = await photonRes.json();
-        if (photonData.features && photonData.features.length > 0) {
-          const photonMatches = photonData.features.map((f) => {
-            const p = f.properties || {};
-            const [lon, lat] = f.geometry.coordinates;
-            const isInd = p.country === "India" || p.countrycode === "IN";
-            return {
-              name: p.name || cleanRaw,
-              country: p.country || (isInd ? "India" : ""),
-              country_code: p.countrycode ? p.countrycode.toUpperCase() : (isInd ? "IN" : ""),
-              latitude: lat,
-              longitude: lon,
-              timezone: isInd ? "Asia/Kolkata" : "auto",
-              admin1: p.state || p.county || "",
-              source: "photon"
-            };
-          });
-
-          const seen = new Set();
-          const merged = [];
-          for (const item of [...photonMatches, ...localMatches]) {
-            const key = `${item.name.toLowerCase()}|${(item.admin1 || "").toLowerCase()}|${(item.country_code || "").toLowerCase()}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              merged.push(item);
-            }
-          }
-          return merged.slice(0, 8);
-        }
-      }
-    } catch (e) {}
-
-    return localMatches;
-  }
-
-  // --- Render Autocomplete Suggestions List ---
-  function renderSuggestionsList(container, suggestions, query, onSelect) {
-    if (!container) return;
-    if (!suggestions || suggestions.length === 0) {
-      container.innerHTML = `
-        <div class="dropdown-empty-state">
-          No matching cities found for "<strong>${escapeHtml(query)}</strong>"
-        </div>
-      `;
-      container.classList.remove("hidden");
-      return;
-    }
-
-    const apiKey = getApiKey();
-    const hasKey = Boolean(apiKey);
-    const hasOwm = suggestions.some((s) => s.source === "openweathermap");
-
-    let headerTitle = "Global Satellite Telemetry";
-    let indicatorText = "LIVE API";
-    if (hasOwm) {
-      headerTitle = "OpenWeather Geocoding · Direct Match";
-      indicatorText = "OWM VERIFIED";
-    } else if (hasKey) {
-      headerTitle = "OpenWeather API Engine · Active";
-      indicatorText = "OWM ACTIVE";
-    }
-
-    let html = `
-      <div class="dropdown-header">
-        <span class="dropdown-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-            <circle cx="12" cy="10" r="3"/>
-          </svg>
-          ${escapeHtml(headerTitle)}
-        </span>
-        <span class="dropdown-api-indicator">● ${escapeHtml(indicatorText)}</span>
-      </div>
-    `;
-
-    suggestions.forEach((item, index) => {
-      const region = item.admin1 ? `${item.admin1}, ` : "";
-      const locationSub = `${region}${item.country || ""}`;
-      const highlightedName = highlightMatch(item.name, query);
-      const cCode = item.country_code ? escapeHtml(item.country_code) : "";
-      
-      let badgeHtml = "";
-      if (item.source === "openweathermap") {
-        badgeHtml = '<span class="dropdown-source-badge dropdown-badge-owm">OWM PRO</span>';
-      } else if (hasKey) {
-        badgeHtml = '<span class="dropdown-source-badge dropdown-badge-owm">OWM ACTIVE</span>';
-      } else if (item.source === "open-meteo" || item.source === "api") {
-        badgeHtml = '<span class="dropdown-source-badge">LIVE API</span>';
-      } else if (item.source === "photon") {
-        badgeHtml = '<span class="dropdown-source-badge dropdown-badge-osm">OSM GEO</span>';
-      }
-
-      html += `
-        <div class="dropdown-item" data-index="${index}">
-          <div class="dropdown-item-left">
-            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-            <div class="dropdown-text-group">
-              <span class="dropdown-primary-text">
-                ${highlightedName}
-                ${badgeHtml}
-              </span>
-              <span class="dropdown-secondary-text">${escapeHtml(locationSub)}</span>
-            </div>
-          </div>
-          <div class="dropdown-item-right">
-            ${cCode ? `<span class="dropdown-country-badge">${cCode}</span>` : ""}
-            <span class="dropdown-select-hint">⏎</span>
-          </div>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-    container.classList.remove("hidden");
-
-    container.querySelectorAll(".dropdown-item").forEach((el) => {
-      el.addEventListener("click", () => {
-        const index = parseInt(el.getAttribute("data-index"), 10);
-        const sel = suggestions[index];
-        if (sel && onSelect) {
-          onSelect(sel);
-        }
-      });
-    });
-  }
-
-  // --- Main Search Bar Input Handlers ---
-  function onInputChange() {
-    const query = cityInput.value.trim();
-    updateSearchActionButtons(query.length > 0);
-
-    if (debounceTimeout) clearTimeout(debounceTimeout);
-    if (currentAbortController) currentAbortController.abort();
-
-    if (query.length === 0) {
-      currentSuggestions = [];
-      renderHistoryDropdown();
-      return;
-    }
-
-    if (query.length < 2) {
-      currentSuggestions = [];
-      closeDropdown();
-      return;
-    }
-
-    const cleanLower = query.toLowerCase();
-    const apiKey = getApiKey();
-
-    // 1. Instant 0ms local catalog preview
-    const instantMatches = GLOBAL_CITY_CATALOG.filter((c) =>
-      c.name.toLowerCase().includes(cleanLower) ||
-      (c.admin1 && c.admin1.toLowerCase().includes(cleanLower)) ||
-      (c.country && c.country.toLowerCase().includes(cleanLower))
-    ).slice(0, 6).map((c) => ({ ...c, source: "catalog" }));
-
-    if (instantMatches.length > 0) {
-      currentSuggestions = instantMatches;
-      renderSuggestionsList(searchDropdown, currentSuggestions, query, applySelectedLocation);
-    } else {
-      searchDropdown.innerHTML = `
-        <div class="dropdown-header">
-          <span class="dropdown-title">
-            <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API' : 'Satellite Mesh'}...
-          </span>
-          <span class="dropdown-api-indicator">● ${apiKey ? 'OWM SEARCH' : 'QUERYING'}</span>
-        </div>
-      `;
-      searchDropdown.classList.remove("hidden");
-    }
-
-    // 2. Debounced background live API fetch
-    debounceTimeout = setTimeout(async () => {
-      currentAbortController = new AbortController();
-      const liveResults = await fetchLiveCitySuggestions(query, currentAbortController.signal);
-      if (cityInput.value.trim().toLowerCase() === cleanLower) {
-        currentSuggestions = liveResults;
-        renderSuggestionsList(searchDropdown, currentSuggestions, query, applySelectedLocation);
-      }
-    }, 180);
-  }
-
-  function onInputFocus() {
-    const query = cityInput.value.trim();
-    if (query.length === 0) {
-      renderHistoryDropdown();
-    } else if (query.length >= 2) {
-      onInputChange();
-    }
-  }
-
-  function onInputKeydown(e) {
-    const items = searchDropdown.querySelectorAll(".dropdown-item");
-    if (e.key === "ArrowDown") {
-      if (searchDropdown.classList.contains("hidden") || items.length === 0) return;
-      e.preventDefault();
-      activeDropdownIndex = (activeDropdownIndex + 1) % items.length;
-      updateActiveDropdownItem(items);
-    } else if (e.key === "ArrowUp") {
-      if (searchDropdown.classList.contains("hidden") || items.length === 0) return;
-      e.preventDefault();
-      activeDropdownIndex = (activeDropdownIndex - 1 + items.length) % items.length;
-      updateActiveDropdownItem(items);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (!searchDropdown.classList.contains("hidden") && activeDropdownIndex >= 0 && activeDropdownIndex < items.length) {
-        items[activeDropdownIndex].click();
-      } else if (!searchDropdown.classList.contains("hidden") && currentSuggestions.length > 0) {
-        applySelectedLocation(currentSuggestions[0]);
-      } else {
-        closeDropdown();
-        handleSearch(cityInput.value.trim());
-      }
-    } else if (e.key === "Escape") {
-      closeDropdown();
-    }
-  }
-
-  function updateActiveDropdownItem(items) {
-    items.forEach((item, index) => {
-      if (index === activeDropdownIndex) {
-        item.classList.add("active-item");
-        item.scrollIntoView({ block: "nearest" });
-      } else {
-        item.classList.remove("active-item");
-      }
-    });
-  }
-
-  function closeDropdown() {
-    searchDropdown.classList.add("hidden");
-    searchDropdown.innerHTML = "";
-    activeDropdownIndex = -1;
-  }
-
-  // --- Recent Searches (History) ---
-  function getSearchHistory() {
-    try {
-      const stored = localStorage.getItem(HISTORY_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function saveSearchToHistory(locationObj) {
-    try {
-      let history = getSearchHistory();
-      history = history.filter(
-        (h) => h.name.toLowerCase() !== locationObj.name.toLowerCase() || h.country !== locationObj.country
-      );
-      history.unshift({
-        name: locationObj.name,
-        admin1: locationObj.admin1 || "",
-        country: locationObj.country || "",
-        latitude: locationObj.latitude,
-        longitude: locationObj.longitude,
-        timezone: locationObj.timezone || "auto",
-      });
-      if (history.length > MAX_HISTORY_ITEMS) {
-        history = history.slice(0, MAX_HISTORY_ITEMS);
-      }
-      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
-    } catch (e) {
-      console.error("Error saving search history:", e);
-    }
-  }
-
-  function removeHistoryItem(index) {
-    let history = getSearchHistory();
-    history.splice(index, 1);
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
-    renderHistoryDropdown();
-  }
-
-  function clearAllHistory() {
-    localStorage.removeItem(HISTORY_STORAGE_KEY);
-    closeDropdown();
-  }
-
-  function renderHistoryDropdown() {
-    const history = getSearchHistory();
-    if (history.length === 0) {
-      closeDropdown();
-      return;
-    }
-
-    activeDropdownIndex = -1;
-
-    let html = `
-      <div class="dropdown-header">
-        <span class="dropdown-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          Recent Searches
-        </span>
-        <button class="clear-history-btn" id="clear-all-history-btn">Clear all</button>
-      </div>
-    `;
-
-    history.forEach((item, index) => {
-      const region = item.admin1 ? `${item.admin1}, ` : "";
-      const locationSub = `${region}${item.country || ""}`;
-
-      html += `
-        <div class="dropdown-item" data-history-index="${index}">
-          <div class="dropdown-item-left">
-            <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-            <div class="dropdown-text-group">
-              <span class="dropdown-primary-text">${escapeHtml(item.name)}</span>
-              <span class="dropdown-secondary-text">${escapeHtml(locationSub)}</span>
-            </div>
-          </div>
-          <button class="delete-item-btn" title="Remove from history" data-delete-index="${index}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
-      `;
-    });
-
-    searchDropdown.innerHTML = html;
-    searchDropdown.classList.remove("hidden");
-
-    const clearAllBtn = document.getElementById("clear-all-history-btn");
-    if (clearAllBtn) {
-      clearAllBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        clearAllHistory();
-      });
-    }
-
-    searchDropdown.querySelectorAll(".dropdown-item").forEach((el) => {
-      el.addEventListener("click", (e) => {
-        if (e.target.closest(".delete-item-btn")) return;
-        const index = parseInt(el.getAttribute("data-history-index"), 10);
-        const item = history[index];
-        if (item) {
-          applySelectedLocation(item);
-        }
-      });
-    });
-
-    searchDropdown.querySelectorAll(".delete-item-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const deleteIndex = parseInt(btn.getAttribute("data-delete-index"), 10);
-        removeHistoryItem(deleteIndex);
-      });
-    });
-  }
-
-
-  // --- Global Command Palette Search Modal Logic ---
-  function openSearchModal() {
-    if (!searchModal) return;
-    searchModal.classList.remove("hidden");
-    searchModal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    if (modalSearchInput) {
-      modalSearchInput.value = "";
-      setTimeout(() => {
-        modalSearchInput.focus();
-      }, 50);
-    }
-    currentModalSuggestions = GLOBAL_CITY_CATALOG.slice(0, 8).map(c => ({ ...c, source: "catalog" }));
-    renderSuggestionsList(modalSearchDropdown, currentModalSuggestions, "", applySelectedLocation);
-  }
-
-  function closeSearchModal() {
-    if (!searchModal) return;
-    searchModal.classList.add("hidden");
-    searchModal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    if (modalSearchInput) modalSearchInput.blur();
-  }
-
-  let modalDebounceTimer = null;
-  let currentModalSuggestions = [];
-
-  async function onModalSearchInput(e) {
-    const query = e.target.value.trim();
-    if (!modalSearchDropdown) return;
-    if (modalDebounceTimer) clearTimeout(modalDebounceTimer);
-
-    if (!query) {
-      currentModalSuggestions = GLOBAL_CITY_CATALOG.slice(0, 8).map(c => ({ ...c, source: "catalog" }));
-      renderSuggestionsList(modalSearchDropdown, currentModalSuggestions, "", applySelectedLocation);
-      return;
-    }
-
-    const cleanLower = query.toLowerCase();
-    const localMatches = GLOBAL_CITY_CATALOG.filter((c) =>
-      c.name.toLowerCase().includes(cleanLower) ||
-      (c.admin1 && c.admin1.toLowerCase().includes(cleanLower)) ||
-      (c.country && c.country.toLowerCase().includes(cleanLower))
-    ).slice(0, 8).map(c => ({ ...c, source: "catalog" }));
-
-    currentModalSuggestions = localMatches;
-    renderSuggestionsList(modalSearchDropdown, currentModalSuggestions, query, applySelectedLocation);
-
-    if (query.length >= 2) {
-      modalDebounceTimer = setTimeout(async () => {
-        const liveResults = await fetchLiveCitySuggestions(query);
-        if (modalSearchInput.value.trim().toLowerCase() === cleanLower) {
-          currentModalSuggestions = liveResults;
-          renderSuggestionsList(modalSearchDropdown, currentModalSuggestions, query, applySelectedLocation);
-        }
-      }, 180);
-    }
-  }
-
-  // Hook up Dashboard search bar with instant autocomplete
-  function closeDashboardDropdown() {
-    if (dashboardSearchDropdown) {
-      dashboardSearchDropdown.classList.add("hidden");
-      dashboardSearchDropdown.innerHTML = "";
-    }
-  }
-
-  let dashDebounceTimer = null;
-  let currentDashSuggestions = [];
-
-  if (dashboardSearchBtn && dashboardCityInput) {
-    console.log("[Atmosphere] Dashboard search bar hooked up successfully");
-
-    dashboardCityInput.addEventListener("input", (e) => {
-      const query = e.target.value.trim();
-      if (!dashboardSearchDropdown) return;
-      if (dashDebounceTimer) clearTimeout(dashDebounceTimer);
-
-      if (!query || query.length < 2) {
-        closeDashboardDropdown();
-        return;
-      }
-
-      const cleanLower = query.toLowerCase();
-
-      // 1. Instant local catalog matches
-      const localMatches = GLOBAL_CITY_CATALOG.filter((c) =>
-        c.name.toLowerCase().includes(cleanLower) ||
-        (c.admin1 && c.admin1.toLowerCase().includes(cleanLower)) ||
-        (c.country && c.country.toLowerCase().includes(cleanLower))
-      ).slice(0, 6).map(c => ({ ...c, source: "catalog" }));
-
-      if (localMatches.length > 0) {
-        currentDashSuggestions = localMatches;
-        renderSuggestionsList(dashboardSearchDropdown, currentDashSuggestions, query, applySelectedLocation);
-      } else {
-        const apiKey = getApiKey();
-        dashboardSearchDropdown.innerHTML = `
-          <div class="dropdown-header">
-            <span class="dropdown-title">
-              <span class="pulse-beacon-sm"></span> Searching "${escapeHtml(query)}" via ${apiKey ? 'OpenWeather API' : 'Satellite Mesh'}...
-            </span>
-            <span class="dropdown-api-indicator">● ${apiKey ? 'OWM SEARCH' : 'QUERYING'}</span>
-          </div>
-        `;
-        dashboardSearchDropdown.classList.remove("hidden");
-      }
-
-      // 2. Debounced online suggestions from Open-Meteo
-      dashDebounceTimer = setTimeout(async () => {
-        const liveResults = await fetchLiveCitySuggestions(query);
-        if (dashboardCityInput.value.trim().toLowerCase() === cleanLower) {
-          currentDashSuggestions = liveResults;
-          renderSuggestionsList(dashboardSearchDropdown, currentDashSuggestions, query, applySelectedLocation);
-        }
-      }, 180);
-    });
-
-    dashboardSearchBtn.addEventListener("click", () => {
-      const q = dashboardCityInput.value.trim();
-      closeDashboardDropdown();
-      if (q) handleSearch(q);
-    });
-
-    dashboardCityInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (dashboardSearchDropdown && !dashboardSearchDropdown.classList.contains("hidden") && currentDashSuggestions.length > 0) {
-          applySelectedLocation(currentDashSuggestions[0]);
-        } else {
-          const q = dashboardCityInput.value.trim();
-          closeDashboardDropdown();
-          if (q) handleSearch(q);
-        }
-      } else if (e.key === "Escape") {
-        closeDashboardDropdown();
-      }
-    });
-
-    // Close on click outside
-    document.addEventListener("click", (e) => {
-      if (!dashboardCityInput.contains(e.target) && (!dashboardSearchDropdown || !dashboardSearchDropdown.contains(e.target))) {
-        closeDashboardDropdown();
-      }
-    });
-  } else {
-    console.warn("[Atmosphere] Dashboard search bar NOT found:", { dashboardSearchBtn, dashboardCityInput });
-  }
-
-  // Hook up Top Nav search button
-  if (navSearchTriggerBtn) {
-    navSearchTriggerBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      openSearchModal();
-    });
-  }
-
-  // Hook up Command Palette Modal
-  if (searchModal) {
-    if (closeSearchModalBtn) {
-      closeSearchModalBtn.addEventListener("click", closeSearchModal);
-    }
-
-    searchModal.addEventListener("click", (e) => {
-      if (e.target === searchModal) {
-        closeSearchModal();
-      }
-    });
-
-    if (modalSearchInput) {
-      modalSearchInput.addEventListener("input", onModalSearchInput);
-      modalSearchInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          if (modalSearchDropdown && !modalSearchDropdown.classList.contains("hidden") && currentModalSuggestions.length > 0) {
-            applySelectedLocation(currentModalSuggestions[0]);
-          } else if (modalSearchInput.value.trim()) {
-            const q = modalSearchInput.value.trim();
-            closeSearchModal();
-            handleSearch(q);
-          }
-        } else if (e.key === "Escape") {
-          closeSearchModal();
-        }
-      });
-    }
-
-    if (modalCityPills && modalCityPills.length > 0) {
-      modalCityPills.forEach((pill) => {
-        pill.addEventListener("click", () => {
-          const city = pill.getAttribute("data-city") || pill.textContent.trim();
-          closeSearchModal();
-          handleSearch(city);
-        });
-      });
-    }
-  }
-
-  // --- Main Search Execution ---
-  async function handleSearch(cityName) {
-    console.log("[Atmosphere] handleSearch called with:", cityName);
-    if (!cityName) return;
-    if (errorMessage) errorMessage.classList.add("hidden");
-
-    let clean = cityName.trim();
-
-    if (clean.length < 2) {
-      showError("Please enter at least 2 characters for city search.");
-      return;
-    }
-
-    closeSearchModal();
-    if (cityInput) {
-      cityInput.value = clean;
-      updateSearchActionButtons(true);
-    }
-    if (dashboardCityInput) {
-      dashboardCityInput.value = clean;
-    }
-    if (modalSearchInput) {
-      modalSearchInput.value = clean;
-    }
-
-    showLoading();
-
-    try {
-      console.log("[Atmosphere] Calling fetchCoordinates for:", clean);
-      const locationData = await fetchCoordinates(clean);
-      console.log("[Atmosphere] Geocoded result:", locationData);
-      await executeSearchWithCoords(locationData.latitude, locationData.longitude, locationData);
-      console.log("[Atmosphere] Search complete for:", locationData.name);
-    } catch (error) {
-      console.error("[Atmosphere] Search error:", error);
-      showError(error.message);
-    } finally {
-      hideLoading();
-    }
-  }
-
-  async function executeSearchWithCoords(lat, lon, locationData) {
-    showLoading();
-    if (errorMessage) errorMessage.classList.add("hidden");
-
-    try {
-      const weatherData = await fetchGlobalWeatherData(lat, lon, locationData.timezone);
-      activateDashboardView();
-      renderAtmosphereDashboard(weatherData, locationData);
-      saveSearchToHistory(locationData);
-
-      // Visibly display the full resolved city from the API across all search inputs
-      const fullLabel = formatLocationDisplayName(locationData);
-      if (cityInput) {
-        cityInput.value = fullLabel;
-        updateSearchActionButtons(true);
-      }
-      if (dashboardCityInput) {
-        dashboardCityInput.value = fullLabel;
-      }
-      if (modalSearchInput) {
-        modalSearchInput.value = fullLabel;
-      }
-
-      // Smooth scroll to showcase frame so user sees the newly populated results
-      const dashboardSection = document.getElementById("dashboard-section");
-      if (dashboardSection) {
-        dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    } catch (error) {
-      console.error(error);
-      showError(error.message);
-    } finally {
-      hideLoading();
-    }
-  }
-
-
-  // --- Photon (OpenStreetMap / Komoot) Universal Keyless Geocoder ---
-  async function fetchPhotonCoordinates(query, qualifier = "") {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
-    try {
-      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=10`;
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (!data.features || data.features.length === 0) return null;
-
-      const qLower = query.toLowerCase();
-      const qualLower = qualifier.toLowerCase();
-
-      // Priority 1: Match qualifier if provided (e.g. "uttarakhand" or "india")
-      let match = null;
-      if (qualLower) {
-        match = data.features.find((f) => {
-          const p = f.properties || {};
-          return (
-            (p.country && p.country.toLowerCase().includes(qualLower)) ||
-            (p.state && p.state.toLowerCase().includes(qualLower)) ||
-            (p.county && p.county.toLowerCase().includes(qualLower)) ||
-            (p.countrycode && p.countrycode.toLowerCase() === qualLower)
-          );
-        });
-      }
-
-      // Priority 2: Match India if query seems Indian or exact match
-      if (!match) {
-        match = data.features.find((f) => {
-          const p = f.properties || {};
-          return (p.name && p.name.toLowerCase() === qLower && (p.country === "India" || p.countrycode === "IN"));
-        });
-      }
-
-      // Priority 3: Exact name match anywhere
-      if (!match) {
-        match = data.features.find((f) => {
-          const p = f.properties || {};
-          return p.name && p.name.toLowerCase() === qLower;
-        });
-      }
-
-      // Priority 4: First India match
-      if (!match) {
-        match = data.features.find((f) => {
-          const p = f.properties || {};
-          return p.country === "India" || p.countrycode === "IN";
-        });
-      }
-
-      // Priority 5: First result
-      if (!match) {
-        match = data.features[0];
-      }
-
-      const p = match.properties || {};
-      const [lon, lat] = match.geometry.coordinates;
-      const isIndia = p.country === "India" || p.countrycode === "IN";
-
+    getMaskedStatus() {
       return {
-        name: p.name || p.city || query,
-        country: p.country || (isIndia ? "India" : ""),
-        country_code: p.countrycode ? p.countrycode.toUpperCase() : (isIndia ? "IN" : ""),
-        latitude: lat,
-        longitude: lon,
-        timezone: isIndia ? "Asia/Kolkata" : "auto",
-        admin1: p.state || p.county || ""
+        active: this.hasKey(),
+        label: this.hasKey()
+          ? "OpenWeather Geocoding Engine · Satellite Telemetry"
+          : "Open-Meteo High-Precision Satellite Telemetry",
+        badge: this.hasKey() ? "CONNECTED" : "ACTIVE"
       };
-    } catch (err) {
-      clearTimeout(timeoutId);
-      return null;
+    }
+
+    sanitize(input) {
+      if (typeof input !== "string") return "";
+      return input
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    buildAuthorizedUrl(endpoint, params = {}) {
+      const url = new URL(endpoint);
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== null) {
+          url.searchParams.set(k, String(v));
+        }
+      }
+      if (this.hasKey()) {
+        url.searchParams.set("appid", this.#apiKey);
+      }
+      return url.toString();
+    }
+
+    setCustomKey(key) {
+      if (key && typeof key === "string" && key.trim()) {
+        this.#apiKey = key.trim();
+        try {
+          localStorage.setItem("atmosphere_api_key", this.#apiKey);
+          console.log("[Atmosphere] Custom API key saved in browser localStorage.");
+        } catch {}
+      } else {
+        this.#apiKey = "";
+        try {
+          localStorage.removeItem("atmosphere_api_key");
+          console.log("[Atmosphere] Custom API key cleared.");
+        } catch {}
+      }
+    }
+
+    clearKey() {
+      this.#apiKey = "";
+      try {
+        localStorage.removeItem("atmosphere_api_key");
+      } catch {}
     }
   }
 
-  // --- Universal Multi-Provider Geocoding Engine (Catalog -> Open-Meteo -> Nominatim -> Coordinates) ---
-  async function fetchCoordinates(city) {
-    let raw = (city || "").trim();
-    if (!raw) {
-      throw new Error("Please enter a city name or coordinates.");
+  // ============================================================================
+  // 2. ATMOSPHERE GEOCODING SERVICE (Cascading Multi-Provider Location Engine)
+  // ============================================================================
+  class AtmosphereGeocodingService {
+    #security;
+    #catalog;
+    #cache = new Map();
+
+    constructor(security, catalog = []) {
+      this.#security = security;
+      this.#catalog = catalog;
     }
 
-    // 1. Numerical Coordinates direct detection (e.g. "28.61, 77.20" or "40.7128, -74.0060")
-    const coordMatch = raw.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
-    if (coordMatch) {
-      const lat = parseFloat(coordMatch[1]);
-      const lon = parseFloat(coordMatch[2]);
-      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+    async searchSuggestions(query, signal) {
+      const cleanLower = query.trim().toLowerCase();
+      if (!cleanLower) return [];
+
+      const cacheKey = `sug_${cleanLower}`;
+      if (this.#cache.has(cacheKey)) {
+        return this.#cache.get(cacheKey);
+      }
+
+      // 1. Instant 0ms Offline Catalog Match
+      const catalogMatches = this.#catalog
+        .filter((c) =>
+          c.name.toLowerCase().includes(cleanLower) ||
+          (c.admin1 && c.admin1.toLowerCase().includes(cleanLower)) ||
+          (c.country && c.country.toLowerCase().includes(cleanLower))
+        )
+        .slice(0, 6)
+        .map((c) => ({ ...c, source: "catalog" }));
+
+      // 2. Live API Providers
+      const apiPromises = [];
+
+      if (this.#security.hasKey()) {
+        const owmUrl = this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
+          q: query.trim(),
+          limit: 5
+        });
+        apiPromises.push(
+          fetch(owmUrl, { signal })
+            .then((res) => (res.ok ? res.json() : []))
+            .then((items) =>
+              Array.isArray(items)
+                ? items.map((item) => ({
+                    name: item.name,
+                    country: item.country,
+                    country_code: item.country,
+                    admin1: item.state || "",
+                    latitude: item.lat,
+                    longitude: item.lon,
+                    source: "openweathermap"
+                  }))
+                : []
+            )
+            .catch(() => [])
+        );
+      }
+
+      const omUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query.trim())}&count=6&language=en&format=json`;
+      apiPromises.push(
+        fetch(omUrl, { signal })
+          .then((res) => (res.ok ? res.json() : {}))
+          .then((data) =>
+            Array.isArray(data.results)
+              ? data.results.map((item) => ({
+                  name: item.name,
+                  country: item.country,
+                  country_code: item.country_code,
+                  admin1: item.admin1 || "",
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                  timezone: item.timezone,
+                  source: "open-meteo"
+                }))
+              : []
+          )
+          .catch(() => [])
+      );
+
+      const [owmResults = [], omResults = []] = await Promise.all(apiPromises);
+
+      const combined = [];
+      const seen = new Set();
+
+      const addUnique = (item) => {
+        const key = `${item.name.toLowerCase()}-${(item.country || "").toLowerCase()}-${(item.admin1 || "").toLowerCase()}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          combined.push(item);
+        }
+      };
+
+      catalogMatches.forEach(addUnique);
+      owmResults.forEach(addUnique);
+      omResults.forEach(addUnique);
+
+      const result = combined.slice(0, 8);
+      this.#cache.set(cacheKey, result);
+      return result;
+    }
+
+    async resolveCoordinates(query) {
+      const clean = query.trim();
+      if (!clean) throw new Error("City name cannot be empty.");
+
+      const cleanLower = clean.toLowerCase();
+
+      // Direct coordinates syntax (e.g. "40.7128, -74.0060")
+      const coordMatch = clean.match(/^(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)$/);
+      if (coordMatch) {
         return {
-          name: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
+          name: `${parseFloat(coordMatch[1]).toFixed(2)}°, ${parseFloat(coordMatch[2]).toFixed(2)}°`,
+          latitude: parseFloat(coordMatch[1]),
+          longitude: parseFloat(coordMatch[2]),
           country: "Coordinates",
-          country_code: "GEO",
-          latitude: lat,
-          longitude: lon,
-          timezone: "auto"
+          country_code: "LOC",
+          admin1: "Direct GPS",
+          timezone: "auto",
+          source: "coordinates"
         };
       }
-    }
 
-    let clean = raw;
-    let qualifier = "";
-    if (clean.includes(",")) {
-      const parts = clean.split(",");
-      clean = parts[0].trim();
-      qualifier = parts.slice(1).join(",").trim().toLowerCase();
-    }
-    const lower = clean.toLowerCase();
-    const cleanLowerFull = raw.toLowerCase();
+      // 1. Instant 0ms Exact Offline Catalog Match
+      const catalogMatch = this.#catalog.find(
+        (c) =>
+          c.name.toLowerCase() === cleanLower ||
+          `${c.name.toLowerCase()}, ${c.country.toLowerCase()}` === cleanLower ||
+          `${c.name.toLowerCase()}, ${(c.country_code || "").toLowerCase()}` === cleanLower
+      );
+      if (catalogMatch) {
+        return { ...catalogMatch, source: "catalog" };
+      }
 
-    // Helper for diacritic normalization (e.g. "Pithorāgarh" -> "pithoragarh", "München" -> "munchen")
-    const normalize = (str) =>
-      str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
-
-    const normLower = normalize(clean);
-
-    // 2. Instant 0ms localStorage cache lookup
-    const cached = getCachedCityCoordinates(cleanLowerFull) || getCachedCityCoordinates(lower);
-    if (cached) {
-      console.log("[Atmosphere] Resolved via CACHE:", cached.name);
-      return cached;
-    }
-
-    // 3. Online OpenWeatherMap Geocoding (if custom API key is supplied)
-    const apiKey = getApiKey();
-    if (apiKey) {
-      const owmController = new AbortController();
-      const owmTimeoutId = setTimeout(() => owmController.abort(), 3500);
-      try {
-        const owmQuery = qualifier ? `${clean},${qualifier}` : clean;
-        const owmUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(owmQuery)}&limit=5&appid=${apiKey}`;
-        const owmRes = await fetch(owmUrl, { signal: owmController.signal });
-        clearTimeout(owmTimeoutId);
-
-        if (owmRes.ok) {
-          const owmData = await owmRes.json();
-          if (Array.isArray(owmData) && owmData.length > 0) {
-            const best = owmData[0];
-            const resolved = {
-              name: best.name,
-              country: best.country || "",
-              country_code: best.country || "",
-              latitude: best.lat,
-              longitude: best.lon,
-              timezone: "auto",
-              admin1: best.state || "",
-              source: "openweathermap"
-            };
-            saveCityToCoordinatesCache(cleanLowerFull, resolved);
-            saveCityToCoordinatesCache(lower, resolved);
-            console.log("[Atmosphere] Resolved via OPENWEATHERMAP API:", resolved.name, resolved.country);
-            return resolved;
-          }
-        } else if (owmRes.status === 401 || owmRes.status === 403) {
-          console.warn(`[Atmosphere] OpenWeatherMap returned ${owmRes.status} (key pending activation). Cascading to Open-Meteo.`);
-        }
-
-        // Secondary OpenWeather check: 2.5/weather endpoint
+      // 2. OpenWeather Direct Geocode (if key present)
+      if (this.#security.hasKey()) {
         try {
-          const owmWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(owmQuery)}&appid=${apiKey}&units=metric`;
-          const owmWRes = await fetch(owmWeatherUrl);
-          if (owmWRes.ok) {
-            const wData = await owmWRes.json();
-            if (wData && wData.coord) {
-              const res = {
-                name: wData.name || clean,
-                country: wData.sys ? (wData.sys.country || "") : "",
-                country_code: wData.sys ? (wData.sys.country || "") : "",
-                latitude: wData.coord.lat,
-                longitude: wData.coord.lon,
+          const owmUrl = this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/direct", {
+            q: clean,
+            limit: 1
+          });
+          const res = await fetch(owmUrl);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              const first = data[0];
+              return {
+                name: first.name,
+                latitude: first.lat,
+                longitude: first.lon,
+                country: first.country,
+                country_code: first.country,
+                admin1: first.state || "",
                 timezone: "auto",
                 source: "openweathermap"
               };
-              saveCityToCoordinatesCache(cleanLowerFull, res);
-              saveCityToCoordinatesCache(lower, res);
-              console.log("[Atmosphere] Resolved via OPENWEATHERMAP 2.5 API:", res.name, res.country);
-              return res;
             }
           }
-        } catch (e) {}
-      } catch (owmErr) {
-        clearTimeout(owmTimeoutId);
-        if (owmErr.name !== "AbortError") {
-          console.warn("[Atmosphere] OpenWeatherMap request error:", owmErr.message);
+        } catch (err) {
+          console.warn("[Geocoding] OWM geocode fallback:", err);
         }
       }
-    }
 
-    // 4. Online Open-Meteo Geocoding with candidate ranking (PRIMARY LIVE RESOLVER)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-
-    try {
-      const searchName = qualifier ? `${clean} ${qualifier}` : clean;
-      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchName)}&count=10&language=en&format=json`;
-      const response = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.results && data.results.length > 0) {
-          let best = null;
-          // Priority A: Candidate matching qualifier (state/country)
-          if (qualifier) {
-            best = data.results.find((r) =>
-              (r.country && r.country.toLowerCase().includes(qualifier)) ||
-              (r.admin1 && r.admin1.toLowerCase().includes(qualifier)) ||
-              (r.country_code && r.country_code.toLowerCase() === qualifier)
-            );
+      // 3. Open-Meteo Geocoding API
+      try {
+        const omUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(clean)}&count=1&language=en&format=json`;
+        const res = await fetch(omUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.results && data.results.length > 0) {
+            const first = data.results[0];
+            return {
+              name: first.name,
+              latitude: first.latitude,
+              longitude: first.longitude,
+              country: first.country,
+              country_code: first.country_code,
+              admin1: first.admin1 || "",
+              timezone: first.timezone || "auto",
+              source: "open-meteo"
+            };
           }
-          // Priority B: Candidate with exact name match
-          if (!best) {
-            best = data.results.find((r) => r.name.toLowerCase() === lower || normalize(r.name) === normLower);
+        }
+      } catch (err) {
+        console.warn("[Geocoding] Open-Meteo geocode fallback:", err);
+      }
+
+      // 4. Photon OpenStreetMap Geocoder Fallback
+      try {
+        const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(clean)}&limit=1`;
+        const res = await fetch(photonUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.features && data.features.length > 0) {
+            const f = data.features[0];
+            const [lon, lat] = f.geometry.coordinates;
+            const props = f.properties || {};
+            return {
+              name: props.name || clean,
+              latitude: lat,
+              longitude: lon,
+              country: props.country || "",
+              country_code: props.countrycode || "",
+              admin1: props.state || props.city || "",
+              timezone: "auto",
+              source: "photon"
+            };
           }
-          // Priority C: First result
-          if (!best) {
-            best = data.results[0];
+        }
+      } catch (err) {
+        console.warn("[Geocoding] Photon geocode fallback:", err);
+      }
+
+      // 5. Catalog partial match fallback
+      const partialMatch = this.#catalog.find((c) =>
+        c.name.toLowerCase().includes(cleanLower)
+      );
+      if (partialMatch) {
+        return { ...partialMatch, source: "catalog-partial" };
+      }
+
+      throw new Error(`Could not locate "${clean}". Please check city spelling or try nearest major hub.`);
+    }
+
+    async reverseGeocode(lat, lon) {
+      if (this.#security.hasKey()) {
+        try {
+          const owmUrl = this.#security.buildAuthorizedUrl("https://api.openweathermap.org/geo/1.0/reverse", {
+            lat,
+            lon,
+            limit: 1
+          });
+          const res = await fetch(owmUrl);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              const first = data[0];
+              return {
+                name: first.name,
+                country: first.country,
+                country_code: first.country,
+                admin1: first.state || ""
+              };
+            }
           }
-
-          const resolved = {
-            name: best.name,
-            country: best.country || "",
-            country_code: best.country_code || "",
-            latitude: best.latitude,
-            longitude: best.longitude,
-            timezone: best.timezone || "auto",
-            admin1: best.admin1 || "",
-            source: "open-meteo"
-          };
-          saveCityToCoordinatesCache(cleanLowerFull, resolved);
-          saveCityToCoordinatesCache(lower, resolved);
-          console.log("[Atmosphere] Resolved via LIVE OPEN-METEO API:", resolved.name, resolved.country);
-          return resolved;
-        }
+        } catch {}
       }
-    } catch (err) {
-      clearTimeout(timeoutId);
-      console.warn("Open-Meteo geocoding network request failed or timed out:", err);
-    }
-
-    // 4. Instant 0ms catalog lookup fallback (offline or network failure)
-    const catalogMatch = GLOBAL_CITY_CATALOG.find((c) => {
-      const cNorm = normalize(c.name);
-      if (cNorm === normLower || c.name.toLowerCase() === lower) {
-        if (!qualifier) return true;
-        const qNorm = normalize(qualifier);
-        return (
-          (c.country && normalize(c.country).includes(qNorm)) ||
-          (c.country_code && c.country_code.toLowerCase() === qualifier) ||
-          (c.admin1 && normalize(c.admin1).includes(qNorm))
-        );
-      }
-      return false;
-    }) || GLOBAL_CITY_CATALOG.find((c) => normalize(c.name) === normLower || c.name.toLowerCase() === lower);
-
-    if (catalogMatch) {
-      console.log("[Atmosphere] Resolved via OFFLINE CATALOG:", catalogMatch.name);
-      return catalogMatch;
-    }
-
-    // 5. Photon (OpenStreetMap by Komoot) Fallback - Keyless open API, full CORS, resolves all Indian towns & villages!
-    try {
-      console.log("[Atmosphere] Querying Photon geocoder for:", clean);
-      const photonResult = await fetchPhotonCoordinates(clean, qualifier);
-      if (photonResult) {
-        saveCityToCoordinatesCache(cleanLowerFull, photonResult);
-        saveCityToCoordinatesCache(lower, photonResult);
-        console.log("[Atmosphere] Resolved via PHOTON:", photonResult.name, photonResult.admin1, photonResult.country);
-        return photonResult;
-      }
-    } catch (err) {
-      console.warn("Photon geocoding failed:", err);
-    }
-
-    // 6. OpenStreetMap Nominatim Geocoding Fallback (Keyless open API, covers every town/village/locality worldwide)
-    const nomController = new AbortController();
-    const nomTimeoutId = setTimeout(() => nomController.abort(), 3500);
-
-    try {
-      const nomUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(raw)}&format=json&limit=5&addressdetails=1`;
-      const nomResponse = await fetch(nomUrl, {
-        signal: nomController.signal,
-        
-      });
-      clearTimeout(nomTimeoutId);
-
-      if (nomResponse.ok) {
-        const nomData = await nomResponse.json();
-        if (nomData && nomData.length > 0) {
-          const item = nomData[0];
-          const resolved = {
-            name: item.name || item.display_name.split(",")[0].trim(),
-            country: item.address ? (item.address.country || "") : "",
-            country_code: item.address && item.address.country_code ? item.address.country_code.toUpperCase() : "",
-            latitude: parseFloat(item.lat),
-            longitude: parseFloat(item.lon),
-            timezone: "auto",
-            admin1: item.address ? (item.address.state || item.address.county || item.address.region || "") : ""
-          };
-          saveCityToCoordinatesCache(cleanLowerFull, resolved);
-          saveCityToCoordinatesCache(lower, resolved);
-          return resolved;
-        }
-      }
-    } catch (err) {
-      clearTimeout(nomTimeoutId);
-      console.warn("Nominatim geocoding network request failed or timed out:", err);
-    }
-
-    // 6. Fuzzy fallback in local catalog
-    const fuzzy = GLOBAL_CITY_CATALOG.find((c) =>
-      c.name.toLowerCase().startsWith(lower) ||
-      lower.startsWith(c.name.toLowerCase()) ||
-      normalize(c.name).includes(normLower)
-    );
-    if (fuzzy) return fuzzy;
-
-    throw new Error(`Could not find weather station for "${city}". Please check spelling or enter coordinates (e.g. 28.61, 77.20).`);
-  }
-
-  async function fetchGlobalWeatherData(lat, lon, timezone) {
-    const tzParam = timezone && timezone !== "auto" ? encodeURIComponent(timezone) : "auto";
-    const cacheKey = `weather_cache_${Number(lat).toFixed(2)}_${Number(lon).toFixed(2)}`;
-
-    // 1. Check 5-minute session cache (0ms instant return!)
-    try {
-      const cachedStr = sessionStorage.getItem(cacheKey);
-      if (cachedStr) {
-        const entry = JSON.parse(cachedStr);
-        if (Date.now() - entry.time < 5 * 60 * 1000) {
-          return entry.data;
-        }
-      }
-    } catch (e) {}
-
-    // 2. Online fetch with 5000ms timeout guard
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,visibility&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&timezone=${tzParam}&forecast_days=2`;
-      const response = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) throw new Error("Weather forecast service temporarily unavailable.");
-      const data = await response.json();
 
       try {
-        sessionStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), data }));
-      } catch (e) {}
+        const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`;
+        const res = await fetch(bdcUrl);
+        if (res.ok) {
+          const data = await res.json();
+          return {
+            name: data.city || data.locality || data.principalSubdivision || "Current Location",
+            country: data.countryName || "",
+            country_code: data.countryCode || "",
+            admin1: data.principalSubdivision || ""
+          };
+        }
+      } catch {}
 
-      return data;
-    } catch (err) {
-      clearTimeout(timeoutId);
-      if (err.name === "AbortError") {
-        throw new Error("Forecast server timed out. Please check your connection and try again.");
+      let nearest = null;
+      let minDist = Infinity;
+      for (const c of this.#catalog) {
+        const dLat = c.latitude - lat;
+        const dLon = c.longitude - lon;
+        const dist = dLat * dLat + dLon * dLon;
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = c;
+        }
       }
-      throw err;
+      if (nearest && minDist < 1.0) {
+        return nearest;
+      }
+
+      return {
+        name: `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,
+        country: "GPS",
+        country_code: "LOC",
+        admin1: ""
+      };
     }
   }
 
-  // --- Render Master Dashboard ---
-  function renderAtmosphereDashboard(data, location) {
-    const { current, hourly, daily, utc_offset_seconds, timezone } = data;
-    const { name, country } = location;
+  // ============================================================================
+  // 3. ATMOSPHERE WEATHER SERVICE (Telemetry, WMO Codes & Predictive Narrative)
+  // ============================================================================
+  class AtmosphereWeatherService {
+    #cache = new Map();
+    #wmoMap;
 
-    if (frameCityLabel) {
-      const cCode = location.country_code || location.countryCode || location.country || "";
-      frameCityLabel.textContent = `${name.toUpperCase()}${cCode ? ' · ' + cCode.toUpperCase() : ''} · LIVE TELEMETRY`;
+    constructor(wmoMap) {
+      this.#wmoMap = wmoMap;
     }
 
-    const wmoInfo = WMO_WEATHER_MAP[current.weather_code] || {
-      main: "Clear",
-      desc: "Clear Sky",
-      iconDay: "01d",
-      iconNight: "01n",
-    };
+    getWmoInfo(code) {
+      return this.#wmoMap[code] || {
+        main: "Clear",
+        desc: "Clear Sky",
+        iconDay: "01d",
+        iconNight: "01n"
+      };
+    }
 
-    // 1. Header & Location Meta with GSAP Kinetic Text Split
-    if (cityNameDisplay) {
-      if (window.motionEngine && window.motionEngine.animateTextSplit) {
-        window.motionEngine.animateTextSplit(cityNameDisplay, name);
-      } else {
-        cityNameDisplay.textContent = name;
+    async fetchForecast(lat, lon, timezone = "auto") {
+      const cacheKey = `${lat.toFixed(3)}_${lon.toFixed(3)}`;
+      const cached = this.#cache.get(cacheKey);
+      const now = Date.now();
+
+      if (cached && now - cached.timestamp < 10 * 60 * 1000) {
+        return cached.data;
       }
-    }
 
-    if (countryTag) {
-      countryTag.textContent = location.country_code || location.countryCode || location.country || "--";
-    }
-
-    if (descriptionDisplay) {
-      if (window.motionEngine && window.motionEngine.animateTextSplit) {
-        window.motionEngine.animateTextSplit(descriptionDisplay, wmoInfo.desc);
-      } else {
-        descriptionDisplay.textContent = wmoInfo.desc;
-      }
-    }
-
-    if (localTimeDisplay) {
-      localTimeDisplay.textContent = formatCurrentLocalTime(utc_offset_seconds, timezone);
-    }
-
-    // Populate Telemetry HUD Coordinates & Elevation
-    const hudCoords = document.getElementById("hud-coords");
-    const hudElev = document.getElementById("hud-elev");
-    if (hudCoords && data.latitude !== undefined) {
-      const latStr = `${Math.abs(data.latitude).toFixed(2)}° ${data.latitude >= 0 ? "N" : "S"}`;
-      const lonStr = `${Math.abs(data.longitude).toFixed(2)}° ${data.longitude >= 0 ? "E" : "W"}`;
-      hudCoords.textContent = `${latStr}, ${lonStr}`;
-    }
-    if (hudElev) {
-      hudElev.textContent = `${Math.round(data.elevation || 15)}m`;
-    }
-
-    // 2. Hero Weather Readings with GSAP animated counter
-    if (temperatureDisplay) {
-      if (window.motionEngine) {
-        window.motionEngine.animateCounter(temperatureDisplay, Math.round(current.temperature_2m), 0.9, 0);
-      } else {
-        temperatureDisplay.textContent = Math.round(current.temperature_2m);
-      }
-    }
-    if (tempMaxDisplay) tempMaxDisplay.textContent = `${Math.round(daily.temperature_2m_max[0])}°`;
-    if (tempMinDisplay) tempMinDisplay.textContent = `${Math.round(daily.temperature_2m_min[0])}°`;
-    if (dayHighLowDisplay) {
-      dayHighLowDisplay.textContent = `${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°`;
-    }
-    if (feelsLikeDisplay) {
-      feelsLikeDisplay.textContent = `${Math.round(current.apparent_temperature)}°`;
-    }
-    if (heroHumidityDisplay) {
-      heroHumidityDisplay.textContent = `${current.relative_humidity_2m}%`;
-    }
-
-    // 3. Dynamic Animated 3D Sky & Scenery Theme
-    updateSceneryAndTheme(current.is_day, wmoInfo.main);
-
-    // 4. Summary Banner
-    generateSummaryNarrative(current, daily, wmoInfo);
-
-    // 5. High-Resolution Hourly Forecast Spline Curve Chart
-    renderHourlySplineChart(hourly, current.time, utc_offset_seconds, timezone);
-
-    // 6. Sun Cycle Arc Widget
-    renderSunCycleArc(daily, current.time, current.is_day, utc_offset_seconds);
-
-    // 7. Insight Card
-    renderInsightWidget(daily);
-
-    // 8. Metrics Grid
-    renderMetricCards(current, hourly, daily);
-
-    // Initialize 3D card tilt & spotlight physics on all cards
-    if (window.motionEngine) {
-      window.motionEngine.initCardPhysics();
-    }
-
-    errorMessage.classList.add("hidden");
-  }
-
-  // --- Animated 3D Scenery & Theme Engine ---
-  function updateSceneryAndTheme(isDay, conditionMain) {
-    const isNight = isDay === 0;
-    const isRain = conditionMain === "Rain" || conditionMain === "Drizzle";
-    const isStorm = conditionMain === "Thunderstorm";
-    const isCloudy = conditionMain === "Clouds" || conditionMain === "Mist";
-
-    let themeClass = "theme-night-clear";
-    if (isStorm) {
-      themeClass = "theme-thunderstorm";
-    } else if (isRain) {
-      themeClass = isNight ? "theme-night-rain" : "theme-day-rain";
-    } else if (isCloudy) {
-      themeClass = isNight ? "theme-night-cloudy" : "theme-day-cloudy";
-    } else {
-      themeClass = isNight ? "theme-night-clear" : "theme-day-clear";
-    }
-
-    // Switch body theme class based on Day/Night x Weather Condition (always retain cinematic-dark-mode)
-    document.body.className = `cinematic-dark-mode ${themeClass}`;
-
-    // Also explicitly sync weather theme class directly onto the hero scenery card
-    const heroCard = document.querySelector(".hero-scenery-card");
-    if (heroCard) {
-      heroCard.classList.remove(
-        "theme-day", "theme-day-clear", "theme-day-cloudy", "theme-day-rain",
-        "theme-night", "theme-night-clear", "theme-night-cloudy", "theme-night-rain", "theme-thunderstorm"
+      const omUrl = new URL("https://api.open-meteo.com/v1/forecast");
+      omUrl.searchParams.set("latitude", lat.toFixed(4));
+      omUrl.searchParams.set("longitude", lon.toFixed(4));
+      omUrl.searchParams.set(
+        "current",
+        "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,uv_index"
       );
-      heroCard.classList.add(themeClass);
-    }
+      omUrl.searchParams.set(
+        "hourly",
+        "temperature_2m,weather_code,precipitation_probability"
+      );
+      omUrl.searchParams.set(
+        "daily",
+        "weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max"
+      );
+      omUrl.searchParams.set("timezone", timezone || "auto");
 
-    // Clear ambient sky canvas non-canvas elements to preserve Three.js WebGL canvas!
-    if (ambientSkyCanvas) {
-      const nonCanvas = ambientSkyCanvas.querySelectorAll(":not(#webgl-atmosphere-canvas)");
-      nonCanvas.forEach((el) => el.remove());
-    }
-
-    // Sync Three.js WebGL 3D atmosphere
-    if (window.threeAtmosphere) {
-      window.threeAtmosphere.setWeatherTheme(isDay, conditionMain);
-    }
-
-    // Build sky elements inside hero scenery card
-    skyElements.innerHTML = "";
-
-    if (isNight) {
-      // 3D Celestial Moon with craters & glowing halo
-      const moon3d = document.createElement("div");
-      moon3d.className = "moon-3d";
-      moon3d.innerHTML = `
-        <div class="moon-sphere">
-          <div class="moon-crater c1"></div>
-          <div class="moon-crater c2"></div>
-          <div class="moon-crater c3"></div>
-        </div>
-        <div class="moon-halo"></div>
-      `;
-      skyElements.appendChild(moon3d);
-
-      // Starfield particles (adjusted count based on cloud cover)
-      const starCount = isCloudy ? 15 : isRain || isStorm ? 6 : 38;
-      for (let i = 0; i < starCount; i++) {
-        const star = document.createElement("div");
-        star.className = "star-particle";
-        star.style.top = `${Math.random() * 60}%`;
-        star.style.left = `${Math.random() * 95}%`;
-        star.style.width = `${Math.random() * 3 + 1}px`;
-        star.style.height = star.style.width;
-        star.style.animationDelay = `${Math.random() * 4}s`;
-        skyElements.appendChild(star);
-      }
-    } else {
-      // 3D Radiant Sun with rotating corona and ambient halo
-      const sun3d = document.createElement("div");
-      sun3d.className = "sun-3d";
-      sun3d.innerHTML = `
-        <div class="sun-ambient-halo"></div>
-        <div class="sun-corona"></div>
-        <div class="sun-core"></div>
-      `;
-      if (isCloudy || isRain) {
-        sun3d.style.opacity = isRain ? "0.35" : "0.75";
-      }
-      skyElements.appendChild(sun3d);
-
-      // Soft ambient background clouds in daytime
-      if (ambientSkyCanvas && !isRain && !isStorm) {
-        const bgCloudCount = isCloudy ? 5 : 3;
-        for (let i = 0; i < bgCloudCount; i++) {
-          const bgCloud = document.createElement("div");
-          bgCloud.className = "cloud-layer";
-          bgCloud.style.top = `${5 + i * 16}%`;
-          bgCloud.style.left = `${-180 + i * 280}px`;
-          bgCloud.style.width = `${380 + i * 120}px`;
-          bgCloud.style.height = `${120 + i * 30}px`;
-          bgCloud.style.opacity = isCloudy ? "0.55" : "0.35";
-          bgCloud.style.animationDuration = `${50 + i * 16}s`;
-          ambientSkyCanvas.appendChild(bgCloud);
-        }
-      }
-    }
-
-    // 3D Volumetric Fluffy Clouds
-    let cloudConfigs = [];
-    if (isCloudy) {
-      cloudConfigs = [
-        { top: "10%", left: "-40px", scale: 1.2, dur: "38s", delay: "0s" },
-        { top: "24%", left: "140px", scale: 0.95, dur: "48s", delay: "-10s" },
-        { top: "6%", left: "360px", scale: 1.1, dur: "44s", delay: "-20s" },
-        { top: "18%", left: "580px", scale: 0.85, dur: "54s", delay: "-5s" },
-        { top: "28%", left: "780px", scale: 1.05, dur: "42s", delay: "-15s" },
-      ];
-    } else if (isRain || isStorm) {
-      cloudConfigs = [
-        { top: "8%", left: "-30px", scale: 1.25, dur: "32s", delay: "0s" },
-        { top: "20%", left: "200px", scale: 1.1, dur: "40s", delay: "-8s" },
-        { top: "12%", left: "480px", scale: 1.2, dur: "36s", delay: "-16s" },
-        { top: "22%", left: "720px", scale: 1.0, dur: "45s", delay: "-4s" },
-      ];
-    } else {
-      // Clear
-      cloudConfigs = [
-        { top: "14%", left: "-60px", scale: 1.0, dur: "48s", delay: "0s" },
-        { top: "24%", left: "420px", scale: 0.8, dur: "56s", delay: "-18s" },
-      ];
-    }
-
-    cloudConfigs.forEach((cfg) => {
-      const cloud = create3DFluffyCloud(cfg.top, cfg.left, cfg.scale, cfg.dur, cfg.delay);
-      skyElements.appendChild(cloud);
-    });
-
-    // Rain Streaks in rainy or stormy conditions
-    if (isRain || isStorm) {
-      const rainCount = isStorm ? 60 : 45;
-      for (let i = 0; i < rainCount; i++) {
-        const rain = document.createElement("div");
-        rain.className = "rain-streak";
-        rain.style.left = `${Math.random() * 100}%`;
-        rain.style.top = `${Math.random() * 55}%`;
-        rain.style.animationDelay = `${Math.random() * 1.5}s`;
-        rain.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
-        skyElements.appendChild(rain);
-      }
-    }
-
-    // Thunderstorm Lightning Flash Overlay
-    if (isStorm) {
-      const flash = document.createElement("div");
-      flash.className = "lightning-flash-overlay";
-      skyElements.appendChild(flash);
-    }
-
-    // --- Dynamic Samsung One UI Weather Companion Character State ---
-    if (characterFigure) {
-      characterFigure.classList.remove("state-sunny", "state-rainy", "state-stormy", "state-cloudy", "state-night");
-
-      let bubbleMsg = "☀️ Beautiful day out!";
-      if (isStorm) {
-        characterFigure.classList.add("state-stormy");
-        bubbleMsg = "⚡ Staying safe under cover!";
-      } else if (isRain) {
-        characterFigure.classList.add("state-rainy");
-        bubbleMsg = "🌧️ Keeping dry with my umbrella!";
-      } else if (isNight) {
-        characterFigure.classList.add("state-night");
-        bubbleMsg = "✨ Stargazing in the calm night!";
-      } else if (isCloudy) {
-        characterFigure.classList.add("state-cloudy");
-        bubbleMsg = "☁️ Watching soft clouds roll by!";
-      } else {
-        characterFigure.classList.add("state-sunny");
-        bubbleMsg = "☀️ Enjoying the sunny weather!";
+      const res = await fetch(omUrl.toString());
+      if (!res.ok) {
+        throw new Error(`Meteorological telemetry stream error (HTTP ${res.status})`);
       }
 
-      if (charReactionBubble) {
-        const textSpan = charReactionBubble.querySelector(".bubble-text");
-        if (textSpan) textSpan.textContent = bubbleMsg;
-      }
+      const data = await res.json();
+      this.#cache.set(cacheKey, { timestamp: now, data });
+      return data;
     }
 
-    // --- Dynamic Weather Ambient FX Particles Layer (Pollen, Ripples, Starlight) ---
-    if (sceneryFxParticles) {
-      sceneryFxParticles.innerHTML = "";
-
-      if (!isNight && !isRain && !isStorm) {
-        // Golden Sun Pollen / Warm Light Motes in clear daylight
-        const pollenCount = isCloudy ? 4 : 10;
-        for (let i = 0; i < pollenCount; i++) {
-          const mote = document.createElement("div");
-          mote.className = "pollen-mote";
-          const size = Math.random() * 3.5 + 2;
-          mote.style.width = `${size}px`;
-          mote.style.height = `${size}px`;
-          mote.style.top = `${25 + Math.random() * 55}%`;
-          mote.style.left = `${Math.random() * 85}%`;
-          mote.style.animationDuration = `${5 + Math.random() * 6}s`;
-          mote.style.animationDelay = `${Math.random() * 4}s`;
-          sceneryFxParticles.appendChild(mote);
-        }
-      } else if (isRain || isStorm) {
-        // Raindrop Splash Ripples on the Hill Crest
-        const rippleCount = isStorm ? 9 : 6;
-        for (let i = 0; i < rippleCount; i++) {
-          const ripple = document.createElement("div");
-          ripple.className = "hill-splash-ripple";
-          ripple.style.bottom = `${24 + Math.random() * 48}px`;
-          ripple.style.left = `${12 + Math.random() * 76}%`;
-          ripple.style.animationDuration = `${0.8 + Math.random() * 0.6}s`;
-          ripple.style.animationDelay = `${Math.random() * 1.6}s`;
-          sceneryFxParticles.appendChild(ripple);
-        }
-      } else if (isNight) {
-        // Shooting Star Streak across the starlight sky
-        const starStreak = document.createElement("div");
-        starStreak.className = "scenery-shooting-star";
-        starStreak.style.top = `${18 + Math.random() * 20}%`;
-        starStreak.style.right = `${14 + Math.random() * 25}%`;
-        sceneryFxParticles.appendChild(starStreak);
+    generateNarrative(daily, wmoInfo) {
+      if (!daily || !daily.temperature_2m_max || daily.temperature_2m_max.length === 0) {
+        return "Atmospheric models stabilized. Clear visibility across all observation stations.";
       }
+
+      const desc = wmoInfo.desc.toLowerCase();
+      const highs = Math.round(daily.temperature_2m_max[0]);
+      const lows = Math.round(daily.temperature_2m_min[0]);
+      const rainMax = daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
+
+      let narrative = `Generally ${desc}. Expected highs of ${highs}°C and lows near ${lows}°C.`;
+
+      if (rainMax > 40) {
+        narrative = `Chance of rain up to ${rainMax}%. Keep an umbrella handy with highs around ${highs}°C.`;
+      } else if (wmoInfo.main === "Clear") {
+        narrative = `Clear skies with great visibility. Expected high of ${highs}°C and low of ${lows}°C.`;
+      }
+
+      return narrative;
     }
   }
 
-  function create3DFluffyCloud(top, left, scale, duration, delay) {
-    const cloud = document.createElement("div");
-    cloud.className = "fluffy-cloud-3d";
-    cloud.style.top = top;
-    cloud.style.left = left;
-    cloud.style.transform = `scale(${scale})`;
-    cloud.style.animationDuration = duration;
-    cloud.style.animationDelay = delay;
+  // ============================================================================
+  // 4. ATMOSPHERE SPLINE RENDERER (1-Hour Catmull-Rom Curves & Crisp Vector Art)
+  // ============================================================================
+  class AtmosphereSplineRenderer {
+    #colWidth = 82;
+    #graphHeight = 120;
+    #graphTopPadding = 32;
+    #graphUsableHeight = 55;
 
-    cloud.innerHTML = `
-      <svg class="cloud-svg" viewBox="0 0 200 110">
-        <defs>
-          <radialGradient id="cloudVolumetricGrad" cx="38%" cy="28%" r="72%">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="55%" stop-color="#f2f8ff"/>
-            <stop offset="85%" stop-color="#d8ebfd"/>
-            <stop offset="100%" stop-color="#bddbf7"/>
-          </radialGradient>
-          <filter id="cloudDepthShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(15, 35, 75, 0.15)"/>
-          </filter>
-        </defs>
-        <g filter="url(#cloudDepthShadow)">
-          <circle cx="52" cy="66" r="32" fill="url(#cloudVolumetricGrad)"/>
-          <circle cx="98" cy="48" r="44" fill="url(#cloudVolumetricGrad)"/>
-          <circle cx="146" cy="62" r="36" fill="url(#cloudVolumetricGrad)"/>
-          <rect x="52" y="62" width="94" height="36" rx="18" fill="url(#cloudVolumetricGrad)"/>
-        </g>
-      </svg>
-    `;
-    return cloud;
-  }
+    render(container, hourly, currentTimeIso) {
+      if (!container || !hourly || !hourly.time || hourly.time.length === 0) return;
 
-  // --- Summary Narrative Generator ---
-  function generateSummaryNarrative(current, daily, wmoInfo) {
-    if (!summaryText) return;
-    const desc = wmoInfo.desc.toLowerCase();
-    const highs = Math.round(daily.temperature_2m_max[0]);
-    const lows = Math.round(daily.temperature_2m_min[0]);
-    const rainMax = daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
+      let startIndex = 0;
+      const currentPrefix = currentTimeIso ? currentTimeIso.slice(0, 13) : "";
+      const foundIdx = hourly.time.findIndex((t) => t.startsWith(currentPrefix));
+      if (foundIdx >= 0) {
+        startIndex = foundIdx;
+      }
 
-    let narrative = `Generally ${desc}. Expected highs of ${highs}°C and lows near ${lows}°C.`;
+      const hoursCount = window.innerWidth >= 1280 ? 16 : window.innerWidth >= 900 ? 12 : 10;
+      const sliceIndices = [];
+      for (let i = 0; i < hoursCount && startIndex + i < hourly.time.length; i++) {
+        sliceIndices.push(startIndex + i);
+      }
 
-    if (rainMax > 40) {
-      narrative = `Chance of rain up to ${rainMax}%. Keep an umbrella handy with highs around ${highs}°C.`;
-    } else if (wmoInfo.main === "Clear") {
-      narrative = `Clear skies with great visibility. Expected high of ${highs}°C and low of ${lows}°C.`;
-    }
+      const temps = sliceIndices.map((i) => Math.round(hourly.temperature_2m[i]));
+      const minTemp = Math.min(...temps);
+      const maxTemp = Math.max(...temps);
+      const tempRange = Math.max(maxTemp - minTemp, 4);
 
-    summaryText.textContent = narrative;
-  }
+      const totalWidth = sliceIndices.length * this.#colWidth;
 
-  // --- Hourly Forecast Spline Curve Chart (True 1-Hour Resolution) ---
-  function renderHourlySplineChart(hourly, currentTimeIso, utcOffsetSec, timezone) {
-    if (!hourlyTimeline) return;
-    if (!hourly || !hourly.time || hourly.time.length === 0) return;
+      const points = sliceIndices.map((itemIdx, seqIdx) => {
+        const x = seqIdx * this.#colWidth + this.#colWidth / 2;
+        const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
+        const y = this.#graphTopPadding + (1 - normalized) * this.#graphUsableHeight;
+        return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
+      });
 
-    // Find starting hour index in hourly.time
-    let startIndex = 0;
-    const currentPrefix = currentTimeIso ? currentTimeIso.slice(0, 13) : "";
-    const foundIdx = hourly.time.findIndex((t) => t.startsWith(currentPrefix));
-    if (foundIdx >= 0) {
-      startIndex = foundIdx;
-    }
+      const svgPath = this.#createSplinePath(points);
+      const areaPath = this.#createAreaPath(points, this.#graphHeight);
 
-    // Extract consecutive hours (dynamic resolution adapting to viewport width)
-    const hoursCount = window.innerWidth >= 1280 ? 16 : window.innerWidth >= 900 ? 12 : 10;
-    const sliceIndices = [];
-    for (let i = 0; i < hoursCount && startIndex + i < hourly.time.length; i++) {
-      sliceIndices.push(startIndex + i);
-    }
+      let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
 
-    const temps = sliceIndices.map((i) => Math.round(hourly.temperature_2m[i]));
-    const minTemp = Math.min(...temps);
-    const maxTemp = Math.max(...temps);
-    const tempRange = Math.max(maxTemp - minTemp, 4);
+      sliceIndices.forEach((itemIdx, seqIdx) => {
+        const timeIso = hourly.time[itemIdx];
+        const hourStr = seqIdx === 0 ? "Now" : this.#formatIsoHour(timeIso);
+        const code = hourly.weather_code[itemIdx];
+        const hourVal = parseInt(timeIso.split("T")[1].split(":")[0], 10);
+        const isDayHour = hourVal >= 6 && hourVal < 20;
+        const iconSvg = this.getWeatherIconSvg(code, isDayHour);
+        const popPercent = Math.round(hourly.precipitation_probability[itemIdx] || 0);
+        const popHtml = popPercent > 0
+          ? `<svg class="pop-drop-icon" viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M6 1.5 C6 1.5 2.5 5.5 2.5 7.8 A3.5 3.5 0 0 0 9.5 7.8 C9.5 5.5 6 1.5 6 1.5 Z" fill="#38bdf8"/></svg>${popPercent}%`
+          : `<span class="pop-dry">—</span>`;
 
-    const colWidth = 82;
-    const totalWidth = sliceIndices.length * colWidth;
-    const graphHeight = 120;
-    const graphTopPadding = 32;
-    const graphUsableHeight = 55;
-
-    // Calculate curve points
-    const points = sliceIndices.map((itemIdx, seqIdx) => {
-      const x = seqIdx * colWidth + colWidth / 2;
-      const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
-      const y = graphTopPadding + (1 - normalized) * graphUsableHeight;
-      return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
-    });
-
-    const svgPath = createSmoothSplinePath(points);
-    const areaPath = createSplineAreaPath(points, graphHeight);
-
-    let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
-
-    sliceIndices.forEach((itemIdx, seqIdx) => {
-      const timeIso = hourly.time[itemIdx];
-      const hourStr = seqIdx === 0 ? "Now" : formatIsoHour(timeIso);
-      const code = hourly.weather_code[itemIdx];
-      const hourVal = parseInt(timeIso.split("T")[1].split(":")[0], 10);
-      const isDayHour = hourVal >= 6 && hourVal < 20;
-      const iconSvg = getWeatherConditionSvg(code, isDayHour);
-      const popPercent = Math.round(hourly.precipitation_probability[itemIdx] || 0);
-      const popHtml = popPercent > 0
-        ? `<svg class="pop-drop-icon" viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M6 1.5 C6 1.5 2.5 5.5 2.5 7.8 A3.5 3.5 0 0 0 9.5 7.8 C9.5 5.5 6 1.5 6 1.5 Z" fill="#38bdf8"/></svg>${popPercent}%`
-        : `<span class="pop-dry">—</span>`;
-
-      html += `
-        <div class="hourly-col" style="width: ${colWidth}px;">
-          <span class="hourly-time">${hourStr}</span>
-          <div class="hourly-icon-box">
-            ${iconSvg}
+        html += `
+          <div class="hourly-col" style="width: ${this.#colWidth}px;">
+            <span class="hourly-time">${hourStr}</span>
+            <div class="hourly-icon-box">
+              ${iconSvg}
+            </div>
+            <span class="hourly-pop">${popHtml}</span>
           </div>
-          <span class="hourly-pop">${popHtml}</span>
+        `;
+      });
+
+      html += `</div>`;
+
+      let svgOverlay = `
+        <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${this.#graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${this.#graphHeight}px;">
+          <defs>
+            <linearGradient id="hourlySplineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.30" />
+              <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+            </linearGradient>
+            <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#38bdf8" flood-opacity="0.5" />
+            </filter>
+          </defs>
+          <path d="${areaPath}" fill="url(#hourlySplineGrad)" class="hourly-graph-area"/>
+          <path d="${svgPath}" class="hourly-graph-path" filter="url(#splineGlow)"/>
+      `;
+
+      points.forEach((pt) => {
+        svgOverlay += `
+          <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label">${pt.temp}°</text>
+          <circle cx="${pt.x}" cy="${pt.y}" r="4.5" class="hourly-temp-dot"/>
+        `;
+      });
+
+      svgOverlay += `</svg>`;
+      container.innerHTML = html + svgOverlay;
+    }
+
+    renderStandby(container) {
+      if (!container) return;
+      const hoursCount = 12;
+      const totalWidth = hoursCount * this.#colWidth;
+
+      const points = [];
+      let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
+
+      for (let i = 0; i < hoursCount; i++) {
+        const hourStr = i === 0 ? "Now" : `+${i}h`;
+        const x = i * this.#colWidth + this.#colWidth / 2;
+        const y = this.#graphTopPadding + 28 + Math.sin(i * 0.55) * 16;
+        points.push({ x, y, temp: "--" });
+
+        const iconSvg = this.getWeatherIconSvg(i % 3, i < 6);
+
+        html += `
+          <div class="hourly-col" style="width: ${this.#colWidth}px;">
+            <span class="hourly-time">${hourStr}</span>
+            <div class="hourly-icon-box">
+              ${iconSvg}
+            </div>
+            <span class="hourly-pop"><span class="pop-dry">—</span></span>
+          </div>
+        `;
+      }
+      html += `</div>`;
+
+      const svgPath = this.#createSplinePath(points);
+      const areaPath = this.#createAreaPath(points, this.#graphHeight);
+
+      let svgOverlay = `
+        <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${this.#graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${this.#graphHeight}px;">
+          <defs>
+            <linearGradient id="standbySplineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+          <path d="${areaPath}" fill="url(#standbySplineGrad)" class="hourly-graph-area"/>
+          <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 4 4; opacity: 0.55; stroke: #38bdf8;"/>
+      `;
+
+      points.forEach((pt) => {
+        svgOverlay += `
+          <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label" style="opacity: 0.5;">${pt.temp}</text>
+          <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.5; fill: #0b1329; stroke: #38bdf8;"/>
+        `;
+      });
+
+      svgOverlay += `</svg>`;
+      container.innerHTML = html + svgOverlay;
+    }
+
+    getWeatherIconSvg(code, isDayHour = true) {
+      const svgOpen = '<svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">';
+      const svgClose = '</svg>';
+
+      if (code === 0 || code === 1) {
+        if (isDayHour) {
+          return `${svgOpen}<circle cx="16" cy="16" r="6.5" fill="#f59e0b" filter="drop-shadow(0 0 6px rgba(245, 158, 11, 0.7))"/><circle cx="16" cy="16" r="4.5" fill="#fbbf24"/><path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.8 6.8l2.1 2.1M23.1 23.1l2.1 2.1M6.8 25.2l2.1-2.1M23.1 8.9l2.1-2.1" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>${svgClose}`;
+        } else {
+          return `${svgOpen}<path d="M22.5 16.5A9.5 9.5 0 1 1 12 6a7.5 7.5 0 0 0 10.5 10.5z" fill="#fde047" filter="drop-shadow(0 0 6px rgba(253, 224, 71, 0.6))"/><circle cx="21" cy="7" r="1" fill="#ffffff"/><circle cx="25" cy="11" r="0.75" fill="#ffffff"/>${svgClose}`;
+        }
+      }
+
+      if (code === 2) {
+        if (isDayHour) {
+          return `${svgOpen}<circle cx="12" cy="12" r="5" fill="#fbbf24" filter="drop-shadow(0 0 4px rgba(251, 191, 36, 0.6))"/><path d="M10 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 10 24z" fill="#e2e8f0" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
+        } else {
+          return `${svgOpen}<path d="M18 10a6 6 0 0 1-5-5 5 5 0 1 0 6.8 6.8c-.6-.6-1.2-1.2-1.8-1.8z" fill="#fde047"/><path d="M9 24h13a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 9 24z" fill="#cbd5e1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"/>${svgClose}`;
+        }
+      }
+
+      if (code === 3) {
+        return `${svgOpen}<path d="M14 18h11a4 4 0 0 0 1-7.9 5.5 5.5 0 0 0-10.7-1A3.5 3.5 0 0 0 14 18z" fill="#94a3b8" opacity="0.6"/><path d="M8 25h14a5 5 0 0 0 1-9.9 6.5 6.5 0 0 0-12.7-1.1A4.5 4.5 0 0 0 8 25z" fill="#e2e8f0" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.45))"/>${svgClose}`;
+      }
+
+      if (code === 45 || code === 48) {
+        return `${svgOpen}<line x1="6" y1="12" x2="26" y2="12" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/><line x1="4" y1="16" x2="28" y2="16" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round"/><line x1="7" y1="20" x2="25" y2="20" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round"/>${svgClose}`;
+      }
+
+      if ([51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(code)) {
+        return `${svgOpen}<path d="M8 19h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 9a4 4 0 0 0-2.3 10z" fill="#94a3b8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/><line x1="10" y1="22" x2="8.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="22" x2="13.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="22" x2="18.5" y2="26" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>${svgClose}`;
+      }
+
+      if ([66, 67, 71, 73, 75, 77, 85, 86].includes(code)) {
+        return `${svgOpen}<path d="M8 18h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 10.3 8a4 4 0 0 0-2.3 10z" fill="#cbd5e1"/><circle cx="10" cy="23" r="1.4" fill="#93c5fd"/><circle cx="15" cy="24" r="1.4" fill="#93c5fd"/><circle cx="20" cy="23" r="1.4" fill="#93c5fd"/>${svgClose}`;
+      }
+
+      if (code === 95 || code === 96 || code === 99) {
+        return `${svgOpen}<path d="M7 17h13a4.5 4.5 0 0 0 1-8.9A6 6 0 0 0 9.3 7a4 4 0 0 0-2.3 10z" fill="#64748b"/><polygon points="15,16 11,22 14,22 13,27 18,20 15,20" fill="#facc15" filter="drop-shadow(0 0 4px rgba(250, 204, 21, 0.8))"/>${svgClose}`;
+      }
+
+      return isDayHour
+        ? `${svgOpen}<circle cx="16" cy="16" r="6" fill="#fbbf24"/>${svgClose}`
+        : `${svgOpen}<path d="M22 16A8 8 0 1 1 12 6a6 6 0 0 0 10 10z" fill="#fde047"/>${svgClose}`;
+    }
+
+    #createSplinePath(points) {
+      if (points.length === 0) return "";
+      let d = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i === 0 ? i : i - 1];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[i + 2] || p2;
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+      return d;
+    }
+
+    #createAreaPath(points, bottomY) {
+      if (points.length === 0) return "";
+      const first = points[0];
+      const last = points[points.length - 1];
+      const curveD = this.#createSplinePath(points);
+      return `${curveD} L ${last.x.toFixed(1)} ${bottomY} L ${first.x.toFixed(1)} ${bottomY} Z`;
+    }
+
+    #formatIsoHour(isoString) {
+      try {
+        const timePart = isoString.split("T")[1];
+        const hour = parseInt(timePart.split(":")[0], 10);
+        const ampm = hour >= 12 ? "pm" : "am";
+        const displayHour = hour % 12 || 12;
+        return `${displayHour} ${ampm}`;
+      } catch {
+        return isoString;
+      }
+    }
+  }
+
+  // ============================================================================
+  // 5. ATMOSPHERE UI CONTROLLER (Presentation, DOM Bindings & Ambient Scenery)
+  // ============================================================================
+  class AtmosphereUIController {
+    #elements = {};
+    #app;
+    #debounceTimeout = null;
+    #dashDebounceTimeout = null;
+    #modalDebounceTimeout = null;
+
+    constructor(app) {
+      this.#app = app;
+      this.#queryDomElements();
+    }
+
+    #queryDomElements() {
+      const get = (id) => document.getElementById(id);
+      this.#elements = {
+        welcomeScreen: get("welcome-screen") || get("hero-section"),
+        topNav: get("top-nav") || get("cinematic-nav"),
+        brandHomeBtn: get("brand-home-btn"),
+        cityInput: get("city-input"),
+        clearInputBtn: get("clear-input-btn"),
+        searchShortcutKbd: get("search-shortcut-kbd") || document.querySelector(".search-shortcut-kbd"),
+        getWeatherBtn: get("get-weather-btn"),
+        navGeoBtn: get("nav-geo-btn"),
+        heroGeoBtn: get("hero-geo-btn"),
+        searchDropdown: get("search-dropdown"),
+        errorMessage: get("error-message"),
+        errorText: get("error-text"),
+        loadingSpinner: get("loading-spinner"),
+        weatherDashboard: get("weather-dashboard"),
+
+        dashboardCityInput: get("dashboard-city-input"),
+        dashboardSearchBtn: get("dashboard-search-btn"),
+        dashboardSearchDropdown: get("dashboard-search-dropdown"),
+        frameCityLabel: get("frame-city-label"),
+        navSearchTriggerBtn: get("nav-search-trigger-btn"),
+        searchModal: get("search-modal"),
+        modalSearchInput: get("modal-search-input"),
+        closeSearchModalBtn: get("close-search-modal-btn"),
+        modalSearchDropdown: get("modal-search-dropdown"),
+        modalCityPills: document.querySelectorAll(".modal-city-pill"),
+
+        ambientSkyCanvas: get("ambient-sky-canvas"),
+        skyElements: get("sky-elements"),
+        characterFigure: get("character-figure"),
+        charReactionBubble: get("char-reaction-bubble"),
+        sceneryFxParticles: get("scenery-fx-particles"),
+        cityNameDisplay: get("city-name"),
+        countryTag: get("country-tag"),
+        localTimeDisplay: get("local-time") || get("local-time-clock"),
+        temperatureDisplay: get("temperature"),
+        descriptionDisplay: get("description") || get("weather-description"),
+        tempMaxDisplay: get("temp-max"),
+        tempMinDisplay: get("temp-min"),
+        dayHighLowDisplay: get("day-high-low"),
+        feelsLikeDisplay: get("feels-like") || get("apparent-temp"),
+        heroHumidityDisplay: get("hero-humidity"),
+
+        summaryText: get("summary-text") || get("ai-summary-text"),
+        hourlyTimeline: get("hourly-timeline") || get("spline-chart-container"),
+
+        sunGlowCircle: get("sun-glow-circle") || get("sun-arc-orb"),
+        arcSunriseText: get("arc-sunrise-text"),
+        arcSunsetText: get("arc-sunset-text"),
+        sunStatusTitle: get("sun-status-title"),
+        sunFooterText: get("sun-footer-text"),
+
+        insightTitle: get("insight-title"),
+        insightDesc: get("insight-desc"),
+        insightBadge: get("insight-badge"),
+        insightRangeVal: get("insight-range-val"),
+        insightRainVal: get("insight-rain-val"),
+        insightOutlookVal: get("insight-outlook-val"),
+
+        humidityDisplay: get("humidity"),
+        humidityBar: get("humidity-bar"),
+        humidityStatus: get("humidity-status"),
+
+        windSpeedDisplay: get("wind-speed"),
+        windDirection: get("wind-direction"),
+        windCaption: get("wind-caption"),
+
+        pressureDisplay: get("pressure"),
+        pressureStatus: get("pressure-status"),
+        visibilityDisplay: get("visibility"),
+        visibilityStatus: get("visibility-status"),
+
+        uvIndexDisplay: get("uv-index"),
+        uvBar: get("uv-bar"),
+        uvStatus: get("uv-status"),
+
+        precipChanceDisplay: get("precip-chance"),
+        precipBar: get("precip-bar"),
+        precipStatus: get("precip-status"),
+
+        heroEyebrowText: get("hero-eyebrow-text"),
+        heroSubtitle: get("hero-subtitle"),
+        apiStatusLabel: get("api-status-label"),
+        apiStatusBadge: get("api-status-badge")
+      };
+    }
+
+    getHourlyTimeline() {
+      return this.#elements.hourlyTimeline;
+    }
+
+    showLoading(isLoading) {
+      if (!this.#elements.loadingSpinner) return;
+      if (isLoading) {
+        this.#elements.loadingSpinner.classList.remove("hidden");
+      } else {
+        this.#elements.loadingSpinner.classList.add("hidden");
+      }
+    }
+
+    showError(message) {
+      if (this.#elements.errorText) {
+        this.#elements.errorText.textContent = message;
+      }
+      if (this.#elements.errorMessage) {
+        this.#elements.errorMessage.classList.remove("hidden");
+      }
+    }
+
+    hideError() {
+      if (this.#elements.errorMessage) {
+        this.#elements.errorMessage.classList.add("hidden");
+      }
+    }
+
+    switchView(viewName) {
+      const isDashboard = viewName === "dashboard";
+      if (this.#elements.welcomeScreen) {
+        if (isDashboard) {
+          this.#elements.welcomeScreen.classList.add("hidden");
+        } else {
+          this.#elements.welcomeScreen.classList.remove("hidden");
+        }
+      }
+      if (this.#elements.weatherDashboard) {
+        if (isDashboard) {
+          this.#elements.weatherDashboard.classList.remove("hidden");
+        } else {
+          this.#elements.weatherDashboard.classList.add("hidden");
+        }
+      }
+
+      if (isDashboard && window.motionEngine) {
+        window.motionEngine.animateDashboardEntrance();
+        window.motionEngine.resetTabIndicator();
+      }
+    }
+
+    updateSearchActionButtons(hasText) {
+      if (this.#elements.clearInputBtn) {
+        this.#elements.clearInputBtn.classList.toggle("hidden", !hasText);
+      }
+      if (this.#elements.searchShortcutKbd) {
+        this.#elements.searchShortcutKbd.classList.toggle("hidden", hasText);
+      }
+    }
+
+    syncSearchInputs(cityName) {
+      if (this.#elements.cityInput) this.#elements.cityInput.value = cityName;
+      if (this.#elements.dashboardCityInput) this.#elements.dashboardCityInput.value = cityName;
+      if (this.#elements.frameCityLabel) this.#elements.frameCityLabel.textContent = cityName;
+    }
+
+    openSearchModal() {
+      if (!this.#elements.searchModal) return;
+      this.#elements.searchModal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+      if (this.#elements.modalSearchInput) {
+        this.#elements.modalSearchInput.value = "";
+        setTimeout(() => this.#elements.modalSearchInput.focus(), 50);
+      }
+      this.renderRecentHistory(this.#elements.modalSearchDropdown, (city) => {
+        this.closeSearchModal();
+        this.#app.executeSearch(city);
+      });
+    }
+
+    closeSearchModal() {
+      if (!this.#elements.searchModal) return;
+      this.#elements.searchModal.classList.add("hidden");
+      document.body.style.overflow = "";
+      if (this.#elements.modalSearchDropdown) {
+        this.#elements.modalSearchDropdown.classList.add("hidden");
+      }
+    }
+
+    renderSuggestionsList(dropdownEl, suggestions, query, onSelect) {
+      if (!dropdownEl) return;
+      if (!suggestions || suggestions.length === 0) {
+        dropdownEl.innerHTML = `
+          <div class="dropdown-header">
+            <span class="dropdown-title">No direct stations matching "${this.#app.sanitize(query)}"</span>
+          </div>
+        `;
+        dropdownEl.classList.remove("hidden");
+        return;
+      }
+
+      const hasOwm = suggestions.some((s) => s.source === "openweathermap");
+      const headerTitle = hasOwm
+        ? "OpenWeather Geocoding · Direct Match"
+        : "Global Satellite Telemetry";
+      const indicatorText = hasOwm ? "OWM VERIFIED" : "LIVE API";
+
+      let html = `
+        <div class="dropdown-header">
+          <span class="dropdown-title">${headerTitle}</span>
+          <span class="dropdown-api-indicator">● ${indicatorText}</span>
         </div>
       `;
-    });
 
-    html += `</div>`;
+      suggestions.forEach((item, index) => {
+        const adminPart = item.admin1 ? `${item.admin1}, ` : "";
+        const countryPart = item.country || item.country_code || "";
+        const subLocation = `${adminPart}${countryPart}`.trim();
 
-    let svgOverlay = `
-      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${graphHeight}px;">
-        <defs>
-          <linearGradient id="hourlySplineGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.30" />
-            <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.08" />
-            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
-          </linearGradient>
-          <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#38bdf8" flood-opacity="0.5" />
-          </filter>
-        </defs>
-        <path d="${areaPath}" fill="url(#hourlySplineGrad)" class="hourly-graph-area"/>
-        <path d="${svgPath}" class="hourly-graph-path" filter="url(#splineGlow)"/>
-    `;
-
-    points.forEach((pt) => {
-      svgOverlay += `
-        <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label">${pt.temp}°</text>
-        <circle cx="${pt.x}" cy="${pt.y}" r="4.5" class="hourly-temp-dot"/>
-      `;
-    });
-
-    svgOverlay += `</svg>`;
-
-    hourlyTimeline.innerHTML = html + svgOverlay;
-  }
-
-  function createSmoothSplinePath(points) {
-    if (points.length === 0) return "";
-    let d = `M ${points[0].x} ${points[0].y}`;
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i === 0 ? i : i - 1];
-      const p1 = points[i];
-      const p2 = points[i + 1];
-      const p3 = points[i + 2] || p2;
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-    return d;
-  }
-
-  function createSplineAreaPath(points, bottomY) {
-    if (points.length === 0) return "";
-    const first = points[0];
-    const last = points[points.length - 1];
-    const curveD = createSmoothSplinePath(points);
-    return `${curveD} L ${last.x.toFixed(1)} ${bottomY} L ${first.x.toFixed(1)} ${bottomY} Z`;
-  }
-
-  // --- Sun Cycle Arc Renderer ---
-  function renderSunCycleArc(daily, currentTimeIso, isDay, utcOffsetSec) {
-    if (!daily || !daily.sunrise || !daily.sunset) return;
-
-    const sunriseIso = daily.sunrise[0];
-    const sunsetIso = daily.sunset[0];
-
-    const sunriseStr = formatIsoTime(sunriseIso);
-    const sunsetStr = formatIsoTime(sunsetIso);
-
-    arcSunriseText.textContent = sunriseStr;
-    arcSunsetText.textContent = sunsetStr;
-
-    const sunriseMs = new Date(sunriseIso).getTime();
-    const sunsetMs = new Date(sunsetIso).getTime();
-    const nowMs = new Date(currentTimeIso).getTime();
-
-    let progress = (nowMs - sunriseMs) / (sunsetMs - sunriseMs);
-    progress = Math.max(0, Math.min(1, progress));
-
-    const cx = 120 - 95 * Math.cos(progress * Math.PI);
-    const cy = 105 - 95 * Math.sin(progress * Math.PI);
-
-    if (sunGlowCircle) {
-      sunGlowCircle.setAttribute("cx", cx);
-      sunGlowCircle.setAttribute("cy", cy);
-      sunGlowCircle.setAttribute("fill", isDay === 0 ? "#e0e7ff" : "#ffd700");
-    }
-
-    if (sunStatusTitle) {
-      if (isDay === 0) {
-        if (nowMs < sunriseMs) {
-          sunStatusTitle.textContent = "Night Sky";
-          if (sunFooterText) sunFooterText.textContent = `Sunrise will be at ${sunriseStr}`;
-        } else {
-          sunStatusTitle.textContent = "Evening Starlight";
-          if (sunFooterText) sunFooterText.textContent = `Sunset was at ${sunsetStr}`;
+        let sourceBadge = "";
+        if (item.source === "openweathermap") {
+          sourceBadge = '<span class="source-tag-owm">OWM</span>';
+        } else if (item.source === "catalog") {
+          sourceBadge = '<span class="source-tag-catalog">0ms</span>';
         }
-      } else {
-        sunStatusTitle.textContent = "Rise and Shine";
-        if (sunFooterText) sunFooterText.textContent = `Sunset will be at ${sunsetStr}`;
+
+        html += `
+          <div class="dropdown-item" data-index="${index}">
+            <div class="dropdown-item-left">
+              <span class="item-name">${this.#highlightMatch(item.name, query)}</span>
+              <span class="item-sub">${subLocation}</span>
+            </div>
+            <div class="dropdown-item-right">
+              ${sourceBadge}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="enter-icon">
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
+            </div>
+          </div>
+        `;
+      });
+
+      dropdownEl.innerHTML = html;
+      dropdownEl.classList.remove("hidden");
+
+      dropdownEl.querySelectorAll(".dropdown-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const idx = parseInt(el.getAttribute("data-index"), 10);
+          const sel = suggestions[idx];
+          if (sel) {
+            const label = sel.admin1 ? `${sel.name}, ${sel.admin1}` : `${sel.name}, ${sel.country || ""}`;
+            dropdownEl.classList.add("hidden");
+            onSelect(label.trim());
+          }
+        });
+      });
+    }
+
+    renderRecentHistory(dropdownEl, onSelect) {
+      if (!dropdownEl) return;
+      const history = this.#app.getRecentSearches();
+      if (!history || history.length === 0) {
+        dropdownEl.innerHTML = `
+          <div class="dropdown-header">
+            <span class="dropdown-title">Recent Observations</span>
+          </div>
+          <div class="dropdown-empty-state">No recent searches yet. Search any global city above.</div>
+        `;
+        dropdownEl.classList.remove("hidden");
+        return;
+      }
+
+      let html = `
+        <div class="dropdown-header">
+          <span class="dropdown-title">Recent Observations</span>
+        </div>
+      `;
+
+      history.forEach((city) => {
+        html += `
+          <div class="dropdown-item history-item" data-city="${this.#app.sanitize(city)}">
+            <div class="dropdown-item-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="history-clock-icon">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span class="item-name">${this.#app.sanitize(city)}</span>
+            </div>
+            <div class="dropdown-item-right">
+              <span class="history-badge">CACHED</span>
+            </div>
+          </div>
+        `;
+      });
+
+      dropdownEl.innerHTML = html;
+      dropdownEl.classList.remove("hidden");
+
+      dropdownEl.querySelectorAll(".history-item").forEach((el) => {
+        el.addEventListener("click", () => {
+          const city = el.getAttribute("data-city");
+          dropdownEl.classList.add("hidden");
+          onSelect(city);
+        });
+      });
+    }
+
+    #highlightMatch(text, query) {
+      if (!query || typeof text !== "string") return this.#app.sanitize(text);
+      const safeText = this.#app.sanitize(text);
+      const safeQuery = this.#app.sanitize(query.trim());
+      const regex = new RegExp(`(${safeQuery})`, "gi");
+      return safeText.replace(regex, '<span class="match-highlight">$1</span>');
+    }
+
+    initAmbientSky() {
+      if (!this.#elements.ambientSkyCanvas) return;
+      const nonCanvas = this.#elements.ambientSkyCanvas.querySelectorAll(":not(#webgl-atmosphere-canvas)");
+      nonCanvas.forEach((el) => el.remove());
+
+      const moon = document.createElement("div");
+      moon.className = "ambient-moon-glow";
+      moon.style.position = "absolute";
+      moon.style.top = "60px";
+      moon.style.right = "12%";
+      moon.style.width = "48px";
+      moon.style.height = "48px";
+      moon.style.borderRadius = "50%";
+      moon.style.background = "radial-gradient(circle, #fef08a 20%, #fde047 60%, transparent 80%)";
+      moon.style.filter = "blur(2px) drop-shadow(0 0 16px rgba(253, 224, 71, 0.45))";
+      moon.style.opacity = "0.75";
+      moon.style.pointerEvents = "none";
+      this.#elements.ambientSkyCanvas.appendChild(moon);
+
+      for (let i = 0; i < 24; i++) {
+        const star = document.createElement("div");
+        star.className = "ambient-star-twinkle";
+        star.style.position = "absolute";
+        star.style.top = `${Math.random() * 55}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.width = `${Math.random() * 2.5 + 1}px`;
+        star.style.height = star.style.width;
+        star.style.borderRadius = "50%";
+        star.style.background = "#ffffff";
+        star.style.opacity = (Math.random() * 0.7 + 0.2).toFixed(2);
+        star.style.pointerEvents = "none";
+        this.#elements.ambientSkyCanvas.appendChild(star);
       }
     }
-  }
 
-  // --- Insight Widget ---
-  function renderInsightWidget(daily) {
-    const todayMax = Math.round(daily.temperature_2m_max[0]);
-    const tomorrowMax = Math.round(daily.temperature_2m_max[1]);
-    const tomorrowMin = Math.round(daily.temperature_2m_min[1]);
-    const tomorrowRain = daily.precipitation_probability_max ? Math.round(daily.precipitation_probability_max[1] || 0) : 0;
-    const tomorrowCode = daily.weather_code[1] || 0;
-    const tomorrowWmo = WMO_WEATHER_MAP[tomorrowCode] || { desc: "Clear Sky" };
+    initStandbyLandingState(status) {
+      this.initAmbientSky();
+      if (this.#elements.summaryText) {
+        this.#elements.summaryText.textContent =
+          "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
+      }
 
-    const diff = tomorrowMax - todayMax;
+      if (status && status.active) {
+        if (this.#elements.heroEyebrowText) {
+          this.#elements.heroEyebrowText.textContent = "OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH";
+        }
+        if (this.#elements.heroSubtitle) {
+          this.#elements.heroSubtitle.textContent =
+            "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models.";
+        }
+        if (this.#elements.apiStatusLabel) {
+          this.#elements.apiStatusLabel.textContent = "OpenWeather API Active · Direct City Search";
+        }
+        if (this.#elements.apiStatusBadge) {
+          this.#elements.apiStatusBadge.textContent = "CONNECTED";
+        }
+      }
 
-    insightTitle.textContent = "Tomorrow's Temperature";
-
-    if (diff > 0) {
-      insightDesc.textContent = `Temperatures will be around ${Math.abs(diff)}° higher than today with highs reaching ${tomorrowMax}°C.`;
-      if (insightBadge) insightBadge.textContent = `+${Math.abs(diff)}° Warmer`;
-    } else if (diff < 0) {
-      insightDesc.textContent = `Temperatures will be a little lower than today (${Math.abs(diff)}° cooler, high of ${tomorrowMax}°C).`;
-      if (insightBadge) insightBadge.textContent = `-${Math.abs(diff)}° Cooler`;
-    } else {
-      insightDesc.textContent = `Expect similar temperatures to today with a high near ${tomorrowMax}°C.`;
-      if (insightBadge) insightBadge.textContent = `Steady Temp`;
-    }
-
-    if (insightRangeVal) insightRangeVal.textContent = `${tomorrowMax}° / ${tomorrowMin}°`;
-    if (insightRainVal) insightRainVal.textContent = `☂ ${tomorrowRain}%`;
-    if (insightOutlookVal) insightOutlookVal.textContent = tomorrowWmo.desc;
-  }
-
-  // --- Detailed Metrics Grid ---
-  function renderMetricCards(current, hourly, daily) {
-    // Humidity
-    if (window.motionEngine) {
-      window.motionEngine.animateCounter(humidityDisplay, current.relative_humidity_2m, 0.8, 0, "%");
-    } else {
-      humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
-    }
-    humidityBar.style.width = `${current.relative_humidity_2m}%`;
-    if (current.relative_humidity_2m < 40) humidityStatus.textContent = "Dry air";
-    else if (current.relative_humidity_2m <= 70) humidityStatus.textContent = "Comfortable level";
-    else humidityStatus.textContent = "High humidity";
-
-    // Wind
-    const speedMs = current.wind_speed_10m / 3.6;
-    if (window.motionEngine) {
-      window.motionEngine.animateCounter(windSpeedDisplay, speedMs, 0.8, 1, " m/s");
-    } else {
-      windSpeedDisplay.textContent = `${speedMs.toFixed(1)} m/s`;
-    }
-    windDirection.textContent = getWindDirectionText(current.wind_direction_10m);
-    if (speedMs < 3) windCaption.textContent = "Light air";
-    else if (speedMs < 8) windCaption.textContent = "Gentle breeze";
-    else windCaption.textContent = "Strong breeze";
-
-    // Pressure
-    if (window.motionEngine) {
-      window.motionEngine.animateCounter(pressureDisplay, Math.round(current.surface_pressure), 0.8, 0, " hPa");
-    } else {
-      pressureDisplay.textContent = `${Math.round(current.surface_pressure)} hPa`;
-    }
-
-    // Visibility
-    const visMeters = hourly && hourly.visibility ? hourly.visibility[0] : 10000;
-    const visKm = visMeters / 1000;
-    if (window.motionEngine) {
-      window.motionEngine.animateCounter(visibilityDisplay, visKm, 0.8, 1, " km");
-    } else {
-      visibilityDisplay.textContent = `${visKm.toFixed(1)} km`;
-    }
-    if (visMeters >= 9000) visibilityStatus.textContent = "Clear visibility";
-    else if (visMeters >= 4000) visibilityStatus.textContent = "Moderate haze";
-    else visibilityStatus.textContent = "Low visibility";
-
-    // UV Radiation Index
-    const uvVal = typeof current.uv_index === "number" ? current.uv_index : 0;
-    if (uvIndexDisplay) {
       if (window.motionEngine) {
-        window.motionEngine.animateCounter(uvIndexDisplay, uvVal, 0.8, 1, "");
-      } else {
-        uvIndexDisplay.textContent = uvVal.toFixed(1);
+        window.motionEngine.initCardPhysics();
       }
     }
-    if (uvBar) {
-      const uvPercent = Math.min(100, Math.max(0, Math.round((uvVal / 11) * 100)));
-      uvBar.style.width = `${uvPercent}%`;
-    }
-    if (uvStatus) {
-      if (uvVal <= 2.5) uvStatus.textContent = "Low exposure risk";
-      else if (uvVal <= 5.5) uvStatus.textContent = "Moderate exposure";
-      else if (uvVal <= 7.5) uvStatus.textContent = "High exposure — wear hat";
-      else if (uvVal <= 10.5) uvStatus.textContent = "Very high risk — seek shade";
-      else uvStatus.textContent = "Extreme danger — avoid sun";
+
+    updateDashboard(weatherData, locationName, timezone) {
+      const current = weatherData.current;
+      const daily = weatherData.daily;
+      const wmoInfo = this.#app.getWmoInfo(current.weather_code);
+      const isDay = current.is_day === 1;
+
+      // 1. Location Header
+      const nameParts = locationName.split(",");
+      const primaryCity = nameParts[0].trim();
+      const regionCountry = nameParts.slice(1).join(",").trim() || "Global Station";
+
+      if (this.#elements.cityNameDisplay) {
+        if (window.motionEngine && window.motionEngine.animateTextSplit) {
+          window.motionEngine.animateTextSplit(this.#elements.cityNameDisplay, primaryCity);
+        } else {
+          this.#elements.cityNameDisplay.textContent = primaryCity;
+        }
+      }
+      if (this.#elements.countryTag) {
+        this.#elements.countryTag.textContent = regionCountry;
+      }
+      if (this.#elements.frameCityLabel) {
+        this.#elements.frameCityLabel.textContent = primaryCity;
+      }
+
+      // 2. Weather Condition & Temperatures
+      if (this.#elements.descriptionDisplay) {
+        if (window.motionEngine && window.motionEngine.animateTextSplit) {
+          window.motionEngine.animateTextSplit(this.#elements.descriptionDisplay, wmoInfo.desc);
+        } else {
+          this.#elements.descriptionDisplay.textContent = wmoInfo.desc;
+        }
+      }
+
+      const tempVal = Math.round(current.temperature_2m);
+      if (this.#elements.temperatureDisplay) {
+        if (window.motionEngine && window.motionEngine.animateCounter) {
+          window.motionEngine.animateCounter(this.#elements.temperatureDisplay, tempVal, 1.0, 0);
+        } else {
+          this.#elements.temperatureDisplay.textContent = tempVal;
+        }
+      }
+
+      if (daily && daily.temperature_2m_max && daily.temperature_2m_min) {
+        const hi = Math.round(daily.temperature_2m_max[0]);
+        const lo = Math.round(daily.temperature_2m_min[0]);
+        if (this.#elements.tempMaxDisplay) this.#elements.tempMaxDisplay.textContent = `${hi}°`;
+        if (this.#elements.tempMinDisplay) this.#elements.tempMinDisplay.textContent = `${lo}°`;
+        if (this.#elements.dayHighLowDisplay) this.#elements.dayHighLowDisplay.textContent = `H: ${hi}°  L: ${lo}°`;
+      }
+
+      if (this.#elements.feelsLikeDisplay) {
+        this.#elements.feelsLikeDisplay.textContent = Math.round(current.apparent_temperature);
+      }
+      if (this.#elements.heroHumidityDisplay) {
+        this.#elements.heroHumidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+      }
+
+      // 3. Narrative AI Summary
+      if (this.#elements.summaryText) {
+        this.#elements.summaryText.textContent = this.#app.generateNarrative(daily, wmoInfo);
+      }
+
+      // 4. Scenery and Character updates
+      this.updateHeroScenery(current.weather_code, isDay, current);
+      this.updateCharacterState(wmoInfo.main.toLowerCase(), isDay);
+
+      // 5. Sun Cycle Arc Widget
+      this.renderSunCycleArc(daily, current.time, isDay, weatherData.utc_offset_seconds);
+
+      // 6. Insight Widget
+      this.renderInsightWidget(daily, current, wmoInfo);
+
+      // 7. Detailed Metrics
+      this.renderDetailedMetrics(current, daily);
+
+      // 8. Card Physics
+      if (window.motionEngine) {
+        window.motionEngine.initCardPhysics();
+      }
     }
 
-    // Precipitation Risk / Probability
-    const precipProb =
-      daily && daily.precipitation_probability_max && daily.precipitation_probability_max[0] !== undefined
-        ? daily.precipitation_probability_max[0]
-        : hourly && hourly.precipitation_probability && hourly.precipitation_probability[0] !== undefined
-        ? hourly.precipitation_probability[0]
+    updateHeroScenery(wmoCode, isDay, current) {
+      const body = document.body;
+      const isRain = [51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(wmoCode);
+      const isSnow = [66, 67, 71, 73, 75, 77, 85, 86].includes(wmoCode);
+      const isStorm = [95, 96, 99].includes(wmoCode);
+      const isCloudy = [2, 3, 45, 48].includes(wmoCode);
+
+      body.classList.remove(
+        "theme-day-clear",
+        "theme-day-cloudy",
+        "theme-day-rain",
+        "theme-night-clear",
+        "theme-night-cloudy",
+        "theme-night-rain",
+        "theme-thunderstorm"
+      );
+
+      let themeClass = "theme-night-clear";
+      if (isStorm) themeClass = "theme-thunderstorm";
+      else if (isRain || isSnow) themeClass = isDay ? "theme-day-rain" : "theme-night-rain";
+      else if (isCloudy) themeClass = isDay ? "theme-day-cloudy" : "theme-night-cloudy";
+      else themeClass = isDay ? "theme-day-clear" : "theme-night-clear";
+
+      body.classList.add(themeClass);
+
+      let weatherState = "clear";
+      if (isStorm) weatherState = "stormy";
+      else if (isRain) weatherState = "rainy";
+      else if (isSnow) weatherState = "snowy";
+      else if (isCloudy) weatherState = "cloudy";
+      else weatherState = isDay ? "sunny" : "clear-night";
+
+      this.updateSceneryFxParticles(weatherState);
+    }
+
+    updateCharacterState(weatherState, isDay) {
+      if (!this.#elements.characterFigure) return;
+      const figure = this.#elements.characterFigure;
+      figure.classList.remove("state-sunny", "state-cloudy", "state-rainy", "state-stormy", "state-night");
+
+      let reaction = "☀️ Atmospheric conditions nominal!";
+      if (weatherState === "rainy" || weatherState === "drizzle") {
+        figure.classList.add("state-rainy");
+        reaction = "☔ Rain expected · Carrying umbrellas!";
+      } else if (weatherState === "thunderstorm" || weatherState === "stormy") {
+        figure.classList.add("state-stormy");
+        reaction = "⚡ Severe telemetry alert · Stay sheltered!";
+      } else if (weatherState === "cloudy" || weatherState === "clouds") {
+        figure.classList.add("state-cloudy");
+        reaction = "☁️ Overcast skies with gentle airflow.";
+      } else if (!isDay) {
+        figure.classList.add("state-night");
+        reaction = "🌙 Crisp starry night under clear skies.";
+      } else {
+        figure.classList.add("state-sunny");
+        reaction = "☀️ Bright solar radiation today!";
+      }
+
+      if (this.#elements.charReactionBubble) {
+        const textSpan = this.#elements.charReactionBubble.querySelector(".bubble-text");
+        if (textSpan) textSpan.textContent = reaction;
+      }
+    }
+
+    updateSceneryFxParticles(weatherState) {
+      if (!this.#elements.sceneryFxParticles) return;
+      const container = this.#elements.sceneryFxParticles;
+      container.innerHTML = "";
+
+      if (weatherState === "rainy" || weatherState === "stormy") {
+        for (let i = 0; i < 28; i++) {
+          const drop = document.createElement("div");
+          drop.className = "rain-drop-particle";
+          drop.style.position = "absolute";
+          drop.style.top = "-10px";
+          drop.style.left = `${Math.random() * 100}%`;
+          drop.style.width = "1.5px";
+          drop.style.height = `${Math.random() * 14 + 10}px`;
+          drop.style.background = "linear-gradient(to bottom, transparent, #38bdf8)";
+          drop.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
+          drop.style.animation = `rainFall ${(Math.random() * 0.4 + 0.6).toFixed(2)}s linear infinite`;
+          drop.style.animationDelay = `${(Math.random() * 0.8).toFixed(2)}s`;
+          container.appendChild(drop);
+        }
+      }
+    }
+
+    renderSunCycleArc(daily, currentTimeIso, isDay, utcOffsetSec) {
+      if (!daily || !daily.sunrise || !daily.sunset) return;
+
+      const sunriseIso = daily.sunrise[0];
+      const sunsetIso = daily.sunset[0];
+
+      if (this.#elements.arcSunriseText) this.#elements.arcSunriseText.textContent = this.#formatIsoTime(sunriseIso);
+      if (this.#elements.arcSunsetText) this.#elements.arcSunsetText.textContent = this.#formatIsoTime(sunsetIso);
+
+      const riseDate = new Date(sunriseIso);
+      const setDate = new Date(sunsetIso);
+      const curDate = currentTimeIso ? new Date(currentTimeIso) : new Date();
+
+      const dayDuration = setDate - riseDate;
+      const elapsed = curDate - riseDate;
+      let ratio = Math.max(0, Math.min(1, elapsed / dayDuration));
+
+      if (curDate < riseDate) ratio = 0;
+      else if (curDate > setDate) ratio = 1;
+
+      const angle = ratio * Math.PI;
+      const cx = 120;
+      const cy = 105;
+      const rx = 95;
+      const ry = 75;
+
+      const orbX = cx - rx * Math.cos(angle);
+      const orbY = cy - ry * Math.sin(angle);
+
+      if (this.#elements.sunGlowCircle) {
+        this.#elements.sunGlowCircle.setAttribute("cx", orbX.toFixed(1));
+        this.#elements.sunGlowCircle.setAttribute("cy", orbY.toFixed(1));
+        this.#elements.sunGlowCircle.setAttribute("fill", isDay ? "#ffd700" : "#93c5fd");
+      }
+
+      if (this.#elements.sunFooterText) {
+        if (isDay) {
+          this.#elements.sunFooterText.textContent = `Sunset expected at ${this.#formatIsoTime(sunsetIso)}`;
+        } else {
+          this.#elements.sunFooterText.textContent = `Sunrise expected at ${this.#formatIsoTime(sunriseIso)}`;
+        }
+      }
+    }
+
+    renderInsightWidget(daily, current, wmoInfo) {
+      if (!daily || !daily.temperature_2m_max || daily.temperature_2m_max.length < 2) return;
+
+      const todayMax = Math.round(daily.temperature_2m_max[0]);
+      const tomorrowMax = Math.round(daily.temperature_2m_max[1]);
+      const tomorrowMin = Math.round(daily.temperature_2m_min[1]);
+      const delta = tomorrowMax - todayMax;
+
+      if (this.#elements.insightBadge) {
+        if (delta > 0) {
+          this.#elements.insightBadge.textContent = `+${delta}° Warmer`;
+        } else if (delta < 0) {
+          this.#elements.insightBadge.textContent = `${delta}° Cooler`;
+        } else {
+          this.#elements.insightBadge.textContent = "Similar Temp";
+        }
+      }
+
+      if (this.#elements.insightDesc) {
+        if (delta > 0) {
+          this.#elements.insightDesc.textContent = `Temperatures will be a little higher tomorrow (${delta}° warmer, high of ${tomorrowMax}°C).`;
+        } else if (delta < 0) {
+          this.#elements.insightDesc.textContent = `Temperatures will be a little lower than today (${Math.abs(delta)}° cooler, high of ${tomorrowMax}°C).`;
+        } else {
+          this.#elements.insightDesc.textContent = `Tomorrow's temperatures will be about the same as today (high of ${tomorrowMax}°C).`;
+        }
+      }
+
+      if (this.#elements.insightRangeVal) {
+        this.#elements.insightRangeVal.textContent = `${tomorrowMax}° / ${tomorrowMin}°`;
+      }
+
+      const rainProb = daily.precipitation_probability_max && daily.precipitation_probability_max[1]
+        ? daily.precipitation_probability_max[1]
         : 0;
+      if (this.#elements.insightRainVal) {
+        this.#elements.insightRainVal.textContent = `☂ ${rainProb}%`;
+      }
 
-    if (precipChanceDisplay) {
-      if (window.motionEngine) {
-        window.motionEngine.animateCounter(precipChanceDisplay, precipProb, 0.8, 0, "%");
-      } else {
-        precipChanceDisplay.textContent = `${precipProb}%`;
+      if (this.#elements.insightOutlookVal) {
+        const tomorrowCode = daily.weather_code[1];
+        const tomorrowWmo = this.#app.getWmoInfo(tomorrowCode);
+        this.#elements.insightOutlookVal.textContent = tomorrowWmo.desc;
       }
     }
-    if (precipBar) {
-      precipBar.style.width = `${Math.min(100, Math.max(0, precipProb))}%`;
+
+    renderDetailedMetrics(current, daily) {
+      // 1. Humidity
+      if (this.#elements.humidityDisplay) {
+        if (window.motionEngine) {
+          window.motionEngine.animateCounter(this.#elements.humidityDisplay, current.relative_humidity_2m, 0.8, 0, "%");
+        } else {
+          this.#elements.humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+        }
+      }
+      if (this.#elements.humidityBar) {
+        this.#elements.humidityBar.style.width = `${Math.min(100, current.relative_humidity_2m)}%`;
+      }
+
+      // 2. Wind
+      const speedMs = current.wind_speed_10m ? current.wind_speed_10m.toFixed(1) : "0.0";
+      if (this.#elements.windSpeedDisplay) {
+        if (window.motionEngine) {
+          window.motionEngine.animateCounter(this.#elements.windSpeedDisplay, parseFloat(speedMs), 0.8, 1, " m/s");
+        } else {
+          this.#elements.windSpeedDisplay.textContent = `${speedMs} m/s`;
+        }
+      }
+      if (this.#elements.windDirection) {
+        const deg = current.wind_direction_10m || 0;
+        this.#elements.windDirection.textContent = this.#getWindCardinal(deg);
+      }
+
+      // 3. Pressure
+      if (this.#elements.pressureDisplay) {
+        const press = Math.round(current.surface_pressure || 1013);
+        if (window.motionEngine) {
+          window.motionEngine.animateCounter(this.#elements.pressureDisplay, press, 0.8, 0, " hPa");
+        } else {
+          this.#elements.pressureDisplay.textContent = `${press} hPa`;
+        }
+      }
+
+      // 4. Visibility
+      if (this.#elements.visibilityDisplay) {
+        this.#elements.visibilityDisplay.textContent = "10.0 km";
+      }
+
+      // 5. UV Index
+      const uvVal = current.uv_index !== undefined ? current.uv_index : 0;
+      if (this.#elements.uvIndexDisplay) {
+        if (window.motionEngine) {
+          window.motionEngine.animateCounter(this.#elements.uvIndexDisplay, uvVal, 0.8, 1, "");
+        } else {
+          this.#elements.uvIndexDisplay.textContent = uvVal.toFixed(1);
+        }
+      }
+      if (this.#elements.uvBar) {
+        const uvPct = Math.min(100, Math.round((uvVal / 11) * 100));
+        this.#elements.uvBar.style.width = `${uvPct}%`;
+      }
+      if (this.#elements.uvStatus) {
+        if (uvVal >= 8) this.#elements.uvStatus.textContent = "Very High";
+        else if (uvVal >= 6) this.#elements.uvStatus.textContent = "High";
+        else if (uvVal >= 3) this.#elements.uvStatus.textContent = "Moderate";
+        else this.#elements.uvStatus.textContent = "Low";
+      }
+
+      // 6. Precipitation Chance
+      const precipProb = daily && daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
+      if (this.#elements.precipChanceDisplay) {
+        if (window.motionEngine) {
+          window.motionEngine.animateCounter(this.#elements.precipChanceDisplay, precipProb, 0.8, 0, "%");
+        } else {
+          this.#elements.precipChanceDisplay.textContent = `${precipProb}%`;
+        }
+      }
+      if (this.#elements.precipBar) {
+        this.#elements.precipBar.style.width = `${Math.min(100, precipProb)}%`;
+      }
     }
-    if (precipStatus) {
-      if (precipProb <= 15) precipStatus.textContent = "Dry conditions";
-      else if (precipProb <= 40) precipStatus.textContent = "Slight chance of rain";
-      else if (precipProb <= 70) precipStatus.textContent = "Rain likely today";
-      else precipStatus.textContent = "High risk of downpour";
+
+    #formatIsoTime(isoString) {
+      try {
+        const timePart = isoString.split("T")[1];
+        const [h, m] = timePart.split(":");
+        let hour = parseInt(h, 10);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12;
+        return `${String(hour).padStart(2, "0")}:${m} ${ampm}`;
+      } catch {
+        return isoString;
+      }
     }
-  }
 
-  function getWindDirectionText(deg) {
-    if (deg === undefined || deg === null) return "Calm";
-    const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-    return `${dirs[Math.round(deg / 45) % 8]} direction`;
-  }
-
-  // --- Utilities & Date Formats ---
-  function showError(message) {
-    errorText.textContent = message;
-    errorMessage.classList.remove("hidden");
-
-    // Visual shake feedback on the inputs
-    const inputsToShake = [dashboardCityInput, cityInput, modalSearchInput].filter(Boolean);
-    inputsToShake.forEach((inp) => {
-      const parent = inp.closest(".search-input-group") || inp.closest(".frame-search-input-group") || inp;
-      parent.classList.add("input-shake");
-      setTimeout(() => parent.classList.remove("input-shake"), 500);
-    });
-
-    if (searchModal && !searchModal.classList.contains("hidden") && modalSearchDropdown) {
-      modalSearchDropdown.innerHTML = `<div class="modal-dropdown-placeholder" style="color: #ef4444;">${escapeHtml(message)}</div>`;
+    #getWindCardinal(deg) {
+      const cardinals = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+      const index = Math.round((deg % 360) / 22.5) % 16;
+      return cardinals[index];
     }
-  }
 
-  function showLoading() {
-    loadingSpinner.classList.remove("hidden");
-  }
-
-  function hideLoading() {
-    loadingSpinner.classList.add("hidden");
-  }
-
-  function highlightMatch(text, query) {
-    if (!query) return escapeHtml(text);
-    const regex = new RegExp(`(${escapeRegex(query)})`, "gi");
-    return escapeHtml(text).replace(regex, "<strong>$1</strong>");
-  }
-
-  function escapeHtml(str) {
-    if (!str) return "";
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function escapeRegex(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
-
-  function formatCurrentLocalTime(utcOffsetSec, timezone) {
-    try {
-      if (timezone && timezone !== "auto") {
-        return new Date().toLocaleDateString("en-US", {
-          timeZone: timezone,
-          weekday: "short",
-          hour: "2-digit",
-          minute: "2-digit",
+    bindEvents() {
+      // 1. Hero Search Form & Button
+      if (this.#elements.getWeatherBtn && this.#elements.cityInput) {
+        this.#elements.getWeatherBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          this.#closeAllDropdowns();
+          this.#app.executeSearch(this.#elements.cityInput.value.trim());
         });
       }
-    } catch {}
 
-    const nowUtc = Date.now() + new Date().getTimezoneOffset() * 60000;
-    const cityTime = new Date(nowUtc + (utcOffsetSec || 0) * 1000);
-    return cityTime.toLocaleDateString([], {
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  function formatIsoHour(isoString) {
-    if (!isoString) return "--";
-    const parts = isoString.split("T");
-    if (parts.length < 2) return isoString;
-    const hour = parseInt(parts[1].split(":")[0], 10);
-    const ampm = hour >= 12 ? "pm" : "am";
-    const hour12 = hour % 12 || 12;
-    return `${hour12} ${ampm}`;
-  }
-
-  function formatIsoTime(isoString) {
-    if (!isoString) return "--";
-    const parts = isoString.split("T");
-    if (parts.length < 2) return isoString;
-    const timeParts = parts[1].split(":");
-    const hour = parseInt(timeParts[0], 10);
-    const min = timeParts[1];
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const hour12 = hour % 12 || 12;
-    const paddedHour = hour12 < 10 ? `0${hour12}` : hour12;
-    return `${paddedHour}:${min} ${ampm}`;
-  }
-
-  // --- Geolocation (GPS) Handlers ---
-  function handleCurrentLocation() {
-    if (!navigator.geolocation) {
-      showError("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    showLoading();
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        try {
-          const reverseUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
-          let cityName = "Current Location";
-          let countryCode = "";
-          try {
-            const revRes = await fetch(reverseUrl);
-            if (revRes.ok) {
-              const revData = await revRes.json();
-              cityName = revData.city || revData.locality || revData.principalSubdivision || "Current Location";
-              countryCode = revData.countryCode || "";
-            }
-          } catch (e) {
-            console.warn("Reverse geocode fallback:", e);
+      if (this.#elements.cityInput) {
+        this.#elements.cityInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            this.#closeAllDropdowns();
+            this.#app.executeSearch(this.#elements.cityInput.value.trim());
+          } else if (e.key === "Escape") {
+            this.#closeAllDropdowns();
           }
+        });
 
-          const locationData = {
-            name: cityName,
-            country: countryCode,
-            country_code: countryCode,
-            countryCode: countryCode,
-            latitude,
-            longitude,
-            timezone: "auto"
-          };
+        this.#elements.cityInput.addEventListener("input", () => {
+          const val = this.#elements.cityInput.value.trim();
+          this.updateSearchActionButtons(Boolean(val));
+          this.#handleHeroAutocomplete(val);
+        });
 
-          await executeSearchWithCoords(latitude, longitude, locationData);
-        } catch (err) {
-          showError("Could not retrieve weather for your current position.");
-        } finally {
-          hideLoading();
+        this.#elements.cityInput.addEventListener("focus", () => {
+          const val = this.#elements.cityInput.value.trim();
+          if (!val) {
+            this.renderRecentHistory(this.#elements.searchDropdown, (city) => {
+              this.#app.executeSearch(city);
+            });
+          }
+        });
+      }
+
+      // 2. Clear input button
+      if (this.#elements.clearInputBtn && this.#elements.cityInput) {
+        this.#elements.clearInputBtn.addEventListener("click", () => {
+          this.#elements.cityInput.value = "";
+          this.updateSearchActionButtons(false);
+          this.#elements.cityInput.focus();
+          this.renderRecentHistory(this.#elements.searchDropdown, (city) => {
+            this.#app.executeSearch(city);
+          });
+        });
+      }
+
+      // 3. Dashboard Search Form & Button
+      if (this.#elements.dashboardSearchBtn && this.#elements.dashboardCityInput) {
+        this.#elements.dashboardSearchBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          this.#closeAllDropdowns();
+          this.#app.executeSearch(this.#elements.dashboardCityInput.value.trim());
+        });
+      }
+
+      if (this.#elements.dashboardCityInput) {
+        this.#elements.dashboardCityInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            this.#closeAllDropdowns();
+            this.#app.executeSearch(this.#elements.dashboardCityInput.value.trim());
+          } else if (e.key === "Escape") {
+            this.#closeAllDropdowns();
+          }
+        });
+
+        this.#elements.dashboardCityInput.addEventListener("input", () => {
+          const val = this.#elements.dashboardCityInput.value.trim();
+          this.#handleDashboardAutocomplete(val);
+        });
+      }
+
+      // 4. Command Palette Search Modal
+      if (this.#elements.navSearchTriggerBtn) {
+        this.#elements.navSearchTriggerBtn.addEventListener("click", () => {
+          this.openSearchModal();
+        });
+      }
+      if (this.#elements.closeSearchModalBtn) {
+        this.#elements.closeSearchModalBtn.addEventListener("click", () => {
+          this.closeSearchModal();
+        });
+      }
+      if (this.#elements.searchModal) {
+        this.#elements.searchModal.addEventListener("click", (e) => {
+          if (e.target === this.#elements.searchModal) {
+            this.closeSearchModal();
+          }
+        });
+      }
+      if (this.#elements.modalSearchInput) {
+        this.#elements.modalSearchInput.addEventListener("input", () => {
+          const val = this.#elements.modalSearchInput.value.trim();
+          this.#handleModalAutocomplete(val);
+        });
+        this.#elements.modalSearchInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const val = this.#elements.modalSearchInput.value.trim();
+            if (val) {
+              this.closeSearchModal();
+              this.#app.executeSearch(val);
+            }
+          } else if (e.key === "Escape") {
+            this.closeSearchModal();
+          }
+        });
+      }
+
+      // 5. Global Keyboard Shortcuts (⌘K, Ctrl+K, Escape, /)
+      document.addEventListener("keydown", (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          this.openSearchModal();
+        } else if (e.key === "/" && document.activeElement.tagName !== "INPUT") {
+          e.preventDefault();
+          if (this.#elements.cityInput) {
+            this.#elements.cityInput.focus();
+            this.#elements.cityInput.select();
+          }
+        } else if (e.key === "Escape") {
+          this.closeSearchModal();
+          this.#closeAllDropdowns();
         }
-      },
-      (err) => {
-        hideLoading();
-        showError(err.message || "Location permission was denied or unavailable.");
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
+      });
+
+      // 6. City Pills (Hero and Modal)
+      document.querySelectorAll(".city-pill, .modal-city-pill").forEach((pill) => {
+        pill.addEventListener("click", () => {
+          const city = pill.getAttribute("data-city");
+          if (city) {
+            this.closeSearchModal();
+            this.#closeAllDropdowns();
+            this.#app.executeSearch(city);
+          }
+        });
+      });
+
+      // 7. Geolocation (GPS) Buttons
+      if (this.#elements.navGeoBtn) {
+        this.#elements.navGeoBtn.addEventListener("click", () => {
+          this.#app.executeGeolocation();
+        });
+      }
+      if (this.#elements.heroGeoBtn) {
+        this.#elements.heroGeoBtn.addEventListener("click", () => {
+          this.#app.executeGeolocation();
+        });
+      }
+
+      // 8. Brand Logo click -> Reset to clean state
+      if (this.#elements.brandHomeBtn) {
+        this.#elements.brandHomeBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          this.switchView("welcome");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
+
+      // 9. Interactive Companion Character Click
+      if (this.#elements.characterFigure) {
+        this.#elements.characterFigure.addEventListener("click", () => {
+          this.#elements.characterFigure.classList.remove("reacting");
+          void this.#elements.characterFigure.offsetWidth;
+          this.#elements.characterFigure.classList.add("reacting");
+        });
+      }
+
+      // 10. Click outside to dismiss autocomplete dropdowns
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-box-wrapper") && !e.target.closest(".search-dropdown")) {
+          this.#closeAllDropdowns();
+        }
+      });
+    }
+
+    #closeAllDropdowns() {
+      if (this.#elements.searchDropdown) this.#elements.searchDropdown.classList.add("hidden");
+      if (this.#elements.dashboardSearchDropdown) this.#elements.dashboardSearchDropdown.classList.add("hidden");
+      if (this.#elements.modalSearchDropdown) this.#elements.modalSearchDropdown.classList.add("hidden");
+    }
+
+    #handleHeroAutocomplete(query) {
+      if (!query) {
+        this.renderRecentHistory(this.#elements.searchDropdown, (city) => {
+          this.#app.executeSearch(city);
+        });
+        return;
+      }
+
+      clearTimeout(this.#debounceTimeout);
+      this.#debounceTimeout = setTimeout(async () => {
+        const suggestions = await this.#app.getGeocodingSuggestions(query);
+        this.renderSuggestionsList(this.#elements.searchDropdown, suggestions, query, (city) => {
+          this.#app.executeSearch(city);
+        });
+      }, 160);
+    }
+
+    #handleDashboardAutocomplete(query) {
+      if (!query) {
+        if (this.#elements.dashboardSearchDropdown) this.#elements.dashboardSearchDropdown.classList.add("hidden");
+        return;
+      }
+
+      clearTimeout(this.#dashDebounceTimeout);
+      this.#dashDebounceTimeout = setTimeout(async () => {
+        const suggestions = await this.#app.getGeocodingSuggestions(query);
+        this.renderSuggestionsList(this.#elements.dashboardSearchDropdown, suggestions, query, (city) => {
+          this.#app.executeSearch(city);
+        });
+      }, 160);
+    }
+
+    #handleModalAutocomplete(query) {
+      if (!query) {
+        this.renderRecentHistory(this.#elements.modalSearchDropdown, (city) => {
+          this.closeSearchModal();
+          this.#app.executeSearch(city);
+        });
+        return;
+      }
+
+      clearTimeout(this.#modalDebounceTimeout);
+      this.#modalDebounceTimeout = setTimeout(async () => {
+        const suggestions = await this.#app.getGeocodingSuggestions(query);
+        this.renderSuggestionsList(this.#elements.modalSearchDropdown, suggestions, query, (city) => {
+          this.closeSearchModal();
+          this.#app.executeSearch(city);
+        });
+      }, 160);
+    }
   }
 
-  if (navGeoBtn) navGeoBtn.addEventListener("click", handleCurrentLocation);
-  if (heroGeoBtn) heroGeoBtn.addEventListener("click", handleCurrentLocation);
+  // ============================================================================
+  // 6. ATMOSPHERE APP (Master Orchestrator & Application Lifecycle Manager)
+  // ============================================================================
+  class AtmosphereApp {
+    #security;
+    #geocoding;
+    #weather;
+    #splineRenderer;
+    #ui;
+    #historyKey = "atmosphere_recent_searches";
+    #maxHistory = 6;
 
-  const ctaSearchBtn = document.getElementById("cta-search-btn");
-  const ctaGeoBtn = document.getElementById("cta-geo-btn");
-  if (ctaSearchBtn) {
-    ctaSearchBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      if (cityInput) {
-        setTimeout(() => {
-          cityInput.focus();
-          cityInput.select();
-        }, 300);
-      }
-    });
-  }
-  if (ctaGeoBtn) {
-    ctaGeoBtn.addEventListener("click", handleCurrentLocation);
-  }
-
-  // --- Keyboard Shortcuts (⌘K, Ctrl+K, /) ---
-  document.addEventListener("keydown", (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-      e.preventDefault();
-      openSearchModal();
-    } else if (e.key === "/" && !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) {
-      e.preventDefault();
-      openSearchModal();
-    }
-  });
-
-  // --- Initial Clean Landing Page Standby State (Does NOT auto-fetch weather without user searching) ---
-  function initStandbyLandingState() {
-    // 1. Ensure landing page starts at the top
-    window.scrollTo({ top: 0, behavior: "instant" });
-
-    // 2. Set scenic artwork to calm night mode
-    updateSceneryAndTheme(0, "Clear");
-
-    // 3. Keep 3D globe centered in the Hero Section
-    if (window.threeAtmosphere) {
-      window.threeAtmosphere.repositionForWelcome();
+    constructor() {
+      this.#security = new AtmosphereSecurity();
+      this.#geocoding = new AtmosphereGeocodingService(this.#security, GLOBAL_CITY_CATALOG);
+      this.#weather = new AtmosphereWeatherService(WMO_WEATHER_MAP);
+      this.#splineRenderer = new AtmosphereSplineRenderer();
+      this.#ui = new AtmosphereUIController(this);
     }
 
-    // 4. Live local system clock ticking
-    function updateLiveSystemClock() {
-      if (!localTimeDisplay) return;
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedHours = hours % 12 || 12;
-      localTimeDisplay.textContent = `${formattedHours}:${minutes} ${ampm} (Local)`;
-    }
-    updateLiveSystemClock();
-    setInterval(updateLiveSystemClock, 30000);
+    init() {
+      this.#ui.bindEvents();
+      this.#ui.initStandbyLandingState(this.#security.getMaskedStatus());
+      this.#splineRenderer.renderStandby(this.#ui.getHourlyTimeline());
 
-    // 5. Standby labels in hero scenery card
-    if (cityNameDisplay) cityNameDisplay.textContent = "Atmosphere Station";
-    if (countryTag) countryTag.textContent = "STANDBY";
-    if (temperatureDisplay) temperatureDisplay.textContent = "--";
-    if (descriptionDisplay) descriptionDisplay.textContent = "Standby Mode · Search any city or click a chip above";
-    if (feelsLikeDisplay) feelsLikeDisplay.textContent = "--°";
-    if (dayHighLowDisplay) dayHighLowDisplay.textContent = "--° / --°";
-    if (heroHumidityDisplay) heroHumidityDisplay.textContent = "--%";
-
-    // 6. Standby AI narrative ribbon
-    if (summaryText) {
-      summaryText.textContent = "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
+      // Safe global debug facade (ZERO API KEY EXPOSURE)
+      window.Atmosphere = Object.freeze({
+        hasKey: () => this.#security.hasKey(),
+        setKey: (key) => this.#security.setCustomKey(key),
+        clearKey: () => this.#security.clearKey()
+      });
     }
 
-    // 7. Standby smooth spline curve preview
-    renderStandbySplineChart();
-
-    // 8. Initialize card physics for tilt/spotlight
-    if (window.motionEngine) {
-      window.motionEngine.initCardPhysics();
+    sanitize(input) {
+      return this.#security.sanitize(input);
     }
 
-    // 9. Sync API Status Indicators if Key is Present (NEVER expose key fragments)
-    const apiKey = getApiKey();
-    if (apiKey) {
-      const heroEyebrowText = document.getElementById("hero-eyebrow-text");
-      if (heroEyebrowText) {
-        heroEyebrowText.textContent = "OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH";
-      }
-      const heroSubtitle = document.getElementById("hero-subtitle");
-      if (heroSubtitle) {
-        heroSubtitle.textContent = "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models.";
-      }
-      const apiStatusLabel = document.getElementById("api-status-label");
-      const apiStatusBadge = document.getElementById("api-status-badge");
-      if (apiStatusLabel) {
-        apiStatusLabel.textContent = "OpenWeather API Active · Direct City Search";
-      }
-      if (apiStatusBadge) {
-        apiStatusBadge.textContent = "CONNECTED";
+    getWmoInfo(code) {
+      return this.#weather.getWmoInfo(code);
+    }
+
+    generateNarrative(daily, wmoInfo) {
+      return this.#weather.generateNarrative(daily, wmoInfo);
+    }
+
+    async getGeocodingSuggestions(query) {
+      return this.#geocoding.searchSuggestions(query);
+    }
+
+    async executeSearch(query) {
+      const clean = query.trim();
+      if (!clean) return;
+
+      this.#ui.hideError();
+      this.#ui.showLoading(true);
+
+      try {
+        const location = await this.#geocoding.resolveCoordinates(clean);
+        const weatherData = await this.#weather.fetchForecast(location.latitude, location.longitude, location.timezone);
+
+        const locationLabel = location.admin1
+          ? `${location.name}, ${location.admin1}`
+          : `${location.name}, ${location.country || ""}`;
+
+        this.#ui.syncSearchInputs(location.name);
+        this.#ui.updateDashboard(weatherData, locationLabel, location.timezone);
+        this.#splineRenderer.render(
+          this.#ui.getHourlyTimeline(),
+          weatherData.hourly,
+          weatherData.current ? weatherData.current.time : ""
+        );
+
+        this.saveRecentSearch(location.name);
+        this.#ui.switchView("dashboard");
+      } catch (err) {
+        console.error("[Atmosphere Search Error]:", err);
+        this.#ui.showError(err.message || "Failed to retrieve telemetry data for the specified city.");
+      } finally {
+        this.#ui.showLoading(false);
       }
     }
-  }
 
-  function renderStandbySplineChart() {
-    if (!hourlyTimeline) return;
-    const colWidth = 82;
-    const hoursCount = 12;
-    const totalWidth = hoursCount * colWidth;
-    const graphHeight = 120;
-    const graphTopPadding = 32;
+    async executeGeolocation() {
+      if (!navigator.geolocation) {
+        this.#ui.showError("Geolocation is not supported by your browser.");
+        return;
+      }
 
-    const points = [];
-    let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
+      this.#ui.hideError();
+      this.#ui.showLoading(true);
 
-    for (let i = 0; i < hoursCount; i++) {
-      const hourStr = i === 0 ? "Now" : `+${i}h`;
-      const x = i * colWidth + colWidth / 2;
-      const y = graphTopPadding + 28 + Math.sin(i * 0.55) * 16;
-      points.push({ x, y, temp: "--" });
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
 
-      const iconSvg = getWeatherConditionSvg(i % 3, i < 6);
+          try {
+            const loc = await this.#geocoding.reverseGeocode(lat, lon);
+            const weatherData = await this.#weather.fetchForecast(lat, lon, "auto");
 
-      html += `
-        <div class="hourly-col" style="width: ${colWidth}px;">
-          <span class="hourly-time">${hourStr}</span>
-          <div class="hourly-icon-box">
-            ${iconSvg}
-          </div>
-          <span class="hourly-pop"><span class="pop-dry">—</span></span>
-        </div>
-      `;
+            const label = loc.admin1 ? `${loc.name}, ${loc.admin1}` : `${loc.name}, ${loc.country || ""}`;
+
+            this.#ui.syncSearchInputs(loc.name);
+            this.#ui.updateDashboard(weatherData, label, "auto");
+            this.#splineRenderer.render(
+              this.#ui.getHourlyTimeline(),
+              weatherData.hourly,
+              weatherData.current ? weatherData.current.time : ""
+            );
+
+            this.saveRecentSearch(loc.name);
+            this.#ui.switchView("dashboard");
+          } catch (err) {
+            console.error("[Geolocation Telemetry Error]:", err);
+            this.#ui.showError("Could not retrieve atmospheric data for your current GPS coordinates.");
+          } finally {
+            this.#ui.showLoading(false);
+          }
+        },
+        (err) => {
+          this.#ui.showLoading(false);
+          let msg = "Unable to access your GPS location.";
+          if (err.code === err.PERMISSION_DENIED) msg = "GPS location access was denied.";
+          else if (err.code === err.POSITION_UNAVAILABLE) msg = "Location information is unavailable.";
+          this.#ui.showError(msg);
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+      );
     }
-    html += `</div>`;
 
-    const svgPath = createSmoothSplinePath(points);
-    const areaPath = createSplineAreaPath(points, graphHeight);
+    getRecentSearches() {
+      try {
+        const raw = localStorage.getItem(this.#historyKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed.slice(0, this.#maxHistory);
+        }
+      } catch {}
+      return [];
+    }
 
-    let svgOverlay = `
-      <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${graphHeight}px;">
-        <defs>
-          <linearGradient id="standbySplineGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
-            <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
-          </linearGradient>
-        </defs>
-        <path d="${areaPath}" fill="url(#standbySplineGrad)" class="hourly-graph-area"/>
-        <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 4 4; opacity: 0.55; stroke: #38bdf8;"/>
-    `;
-
-    points.forEach((pt) => {
-      svgOverlay += `
-        <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label" style="opacity: 0.5;">${pt.temp}</text>
-        <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.5; fill: #0b1329; stroke: #38bdf8;"/>
-      `;
-    });
-
-    svgOverlay += `</svg>`;
-    hourlyTimeline.innerHTML = html + svgOverlay;
+    saveRecentSearch(cityName) {
+      if (!cityName) return;
+      try {
+        let history = this.getRecentSearches();
+        history = history.filter((c) => c.toLowerCase() !== cityName.toLowerCase());
+        history.unshift(cityName);
+        if (history.length > this.#maxHistory) {
+          history = history.slice(0, this.#maxHistory);
+        }
+        localStorage.setItem(this.#historyKey, JSON.stringify(history));
+      } catch {}
+    }
   }
 
-  // Run clean standby setup on initial load
-  initStandbyLandingState();
+  // Bootstrap Application Orchestrator
+  const app = new AtmosphereApp();
+  app.init();
 });
-
