@@ -739,10 +739,10 @@
         </div>
       </div>
 
-      <!-- 5. PLANETARY ORBITAL SATELLITE RADAR SECTION (Template Signature Orbit Feature) -->
+      <!-- 5. PLANETARY ORBITAL SATELLITE RADAR SECTION (Interactive Telemetry Inspector) -->
       <section class="orbital-radar-section" id="orbital-radar-section">
         <div class="orbital-radar-grid">
-          <!-- Left Content -->
+          <!-- Left Content: Interactive Telemetry HUD -->
           <div class="orbital-text-col">
             <div class="pearl-badge">
               <span class="pulse-beacon"></span>
@@ -750,8 +750,85 @@
             </div>
             <h2 class="orbital-title">Seamless orbital telemetry.</h2>
             <p class="orbital-desc">
-              Synchronized directly with NOAA GOES, EUMETSAT Meteosat, JMA Himawari, and ECMWF supercomputing weather prediction clusters. We orchestrate numerical models without proprietary API keys.
+              Synchronized with geostationary satellites and global numerical prediction supercomputers. Select any constellation below to inspect orbital telemetry or stream real-time observations from its coverage zone.
             </p>
+
+            <!-- Interactive Constellation Switcher Tabs -->
+            <div class="sat-switcher-bar" role="tablist" aria-label="Satellite Constellation Selector">
+              <button class="sat-switch-btn active" data-sat-id="goes" role="tab" aria-selected="true">
+                <span class="sat-btn-dot"></span>
+                <span>GOES-18</span>
+              </button>
+              <button class="sat-switch-btn" data-sat-id="meteosat" role="tab" aria-selected="false">
+                <span class="sat-btn-dot"></span>
+                <span>Meteosat-11</span>
+              </button>
+              <button class="sat-switch-btn" data-sat-id="himawari" role="tab" aria-selected="false">
+                <span class="sat-btn-dot"></span>
+                <span>Himawari-9</span>
+              </button>
+              <button class="sat-switch-btn" data-sat-id="ecmwf" role="tab" aria-selected="false">
+                <span class="sat-btn-dot"></span>
+                <span>ECMWF IFS</span>
+              </button>
+              <button class="sat-switch-btn" data-sat-id="openmeteo" role="tab" aria-selected="false">
+                <span class="sat-btn-dot"></span>
+                <span>Open-Meteo</span>
+              </button>
+            </div>
+
+            <!-- Satellite Telemetry Inspector HUD Card -->
+            <div class="satellite-inspector-card" id="satellite-inspector-card">
+              <div class="sat-hud-header">
+                <div class="sat-hud-title-group">
+                  <div class="sat-hud-indicator">
+                    <span class="pulse-beacon-sm"></span>
+                    <span class="sat-status-txt" id="sat-hud-status">OPERATIONAL · LIVE TELEMETRY</span>
+                  </div>
+                  <h3 class="sat-hud-name" id="sat-hud-name">NOAA GOES-18 (Geostationary)</h3>
+                  <p class="sat-hud-agency" id="sat-hud-agency">NOAA / NASA · Western Hemisphere & Pacific Basin</p>
+                </div>
+                <div class="sat-hud-alt-badge" id="sat-hud-alt">35,786 km GEO</div>
+              </div>
+
+              <div class="sat-hud-metrics-grid">
+                <div class="sat-metric-box">
+                  <span class="sat-metric-label">SENSOR PAYLOAD</span>
+                  <span class="sat-metric-val" id="sat-hud-payload">ABI 16-Band Spectral Imager</span>
+                </div>
+                <div class="sat-metric-box">
+                  <span class="sat-metric-label">SPATIAL RESOLUTION</span>
+                  <span class="sat-metric-val" id="sat-hud-resolution">0.5 km Visible / 2.0 km IR</span>
+                </div>
+              </div>
+
+              <div class="sat-hud-mission">
+                <span class="sat-metric-label">ATMOSPHERIC MISSION</span>
+                <p class="sat-mission-desc" id="sat-hud-mission">Rapid hurricane tracking, convective storm severity forecasting, and geostationary lightning mapping across the Americas.</p>
+              </div>
+
+              <div class="sat-hud-streams">
+                <div class="sat-streams-header">
+                  <span class="sat-metric-label">STREAM REGIONAL OBSERVATION</span>
+                  <span class="sat-streams-hint">Click a station to load forecast:</span>
+                </div>
+                <div class="sat-stream-pills" id="sat-hud-city-pills">
+                  <button class="sat-city-chip" data-city="Miami">
+                    <span class="chip-dot"></span> Miami, US
+                  </button>
+                  <button class="sat-city-chip" data-city="New York">
+                    <span class="chip-dot"></span> New York, US
+                  </button>
+                  <button class="sat-city-chip" data-city="Los Angeles">
+                    <span class="chip-dot"></span> Los Angeles, US
+                  </button>
+                  <button class="sat-city-chip" data-city="São Paulo">
+                    <span class="chip-dot"></span> São Paulo, BR
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div class="orbital-capsule-tags">
               <div class="orbit-tag"><span class="tag-dot"></span> 100% Keyless Open APIs</div>
               <div class="orbit-tag"><span class="tag-dot"></span> Catmull-Rom Spline</div>
@@ -761,47 +838,47 @@
 
           <!-- Right: Interactive Rotating Orbit Radar Visualization -->
           <div class="orbital-visual-col">
-            <div class="orbit-radar-stage">
+            <div class="orbit-radar-stage" id="orbit-radar-stage">
               <!-- Outer Orbit Ring (Clockwise) -->
-              <div class="orbit-ring orbit-outer">
+              <div class="orbit-ring orbit-outer" title="Geostationary High Earth Orbit">
                 <div class="orbit-spoke" style="--start-angle: 0deg;">
-                  <div class="satellite-node" title="NOAA GOES-16 Geostationary">
+                  <div class="satellite-node active" data-sat-id="goes" title="NOAA GOES-18 (Americas)">
                     <span class="node-icon">🛰️</span>
-                    <span class="node-tooltip">GOES-16</span>
+                    <span class="node-tooltip">GOES-18 (Americas)</span>
                   </div>
                 </div>
                 <div class="orbit-spoke" style="--start-angle: 120deg;">
-                  <div class="satellite-node" title="EUMETSAT Meteosat-11">
+                  <div class="satellite-node" data-sat-id="meteosat" title="EUMETSAT Meteosat-11 (Europe)">
                     <span class="node-icon">🛰️</span>
-                    <span class="node-tooltip">Meteosat</span>
+                    <span class="node-tooltip">Meteosat-11 (Europe)</span>
                   </div>
                 </div>
                 <div class="orbit-spoke" style="--start-angle: 240deg;">
-                  <div class="satellite-node" title="JMA Himawari-9 Pacific">
+                  <div class="satellite-node" data-sat-id="himawari" title="JMA Himawari-9 (Pacific)">
                     <span class="node-icon">🛰️</span>
-                    <span class="node-tooltip">Himawari</span>
+                    <span class="node-tooltip">Himawari-9 (Asia-Pac)</span>
                   </div>
                 </div>
               </div>
 
               <!-- Inner Orbit Ring (Counter-Clockwise) -->
-              <div class="orbit-ring orbit-inner">
+              <div class="orbit-ring orbit-inner" title="Atmospheric Model & Telemetry Mesh">
                 <div class="orbit-spoke-ccw" style="--start-angle: 45deg;">
-                  <div class="satellite-node small" title="ECMWF Global Supercomputer">
+                  <div class="satellite-node small" data-sat-id="ecmwf" title="ECMWF Global Supercomputer">
                     <span class="node-icon">🌐</span>
-                    <span class="node-tooltip">ECMWF</span>
+                    <span class="node-tooltip">ECMWF IFS (Global)</span>
                   </div>
                 </div>
                 <div class="orbit-spoke-ccw" style="--start-angle: 225deg;">
-                  <div class="satellite-node small" title="Open-Meteo V1 API Mesh">
+                  <div class="satellite-node small" data-sat-id="openmeteo" title="Open-Meteo API Mesh">
                     <span class="node-icon">⚡</span>
-                    <span class="node-tooltip">Open-Meteo</span>
+                    <span class="node-tooltip">Open-Meteo Mesh</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Central Holographic Earth Core Beacon -->
-              <div class="central-earth-beacon">
+              <!-- Central Holographic Earth Core Beacon (Interactive Geolocation Trigger) -->
+              <div class="central-earth-beacon" id="orbit-earth-beacon" title="Click to detect your current location telemetry" role="button" tabindex="0">
                 <div class="earth-radar-pulse"></div>
                 <div class="earth-core-sphere">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="earth-icon">
@@ -810,7 +887,15 @@
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                   </svg>
                 </div>
+                <span class="earth-beacon-tooltip">Detect My Location</span>
               </div>
+            </div>
+            <div class="orbit-stage-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hint-icon">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m10 15 5-3-5-3v6Z"/>
+              </svg>
+              <span>Hover orbit to pause · Click satellite or center to inspect</span>
             </div>
           </div>
         </div>

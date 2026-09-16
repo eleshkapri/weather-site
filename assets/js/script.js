@@ -3574,6 +3574,92 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================================================
+  // SATELLITE CONSTELLATION & TELEMETRY REGISTRY
+  // ============================================================================
+  const SATELLITE_REGISTRY = {
+    goes: {
+      id: "goes",
+      name: "NOAA GOES-18 (Geostationary)",
+      agency: "NOAA / NASA · Western Hemisphere & Pacific Basin",
+      altitude: "35,786 km GEO",
+      status: "OPERATIONAL · LIVE TELEMETRY",
+      payload: "ABI 16-Band Spectral Imager",
+      resolution: "0.5 km Visible / 2.0 km IR",
+      mission: "Rapid hurricane tracking, convective storm severity forecasting, and geostationary lightning mapping (GLM) across the Americas.",
+      sampleCities: [
+        { name: "Miami", label: "Miami, US" },
+        { name: "New York", label: "New York, US" },
+        { name: "Los Angeles", label: "Los Angeles, US" },
+        { name: "São Paulo", label: "São Paulo, BR" }
+      ]
+    },
+    meteosat: {
+      id: "meteosat",
+      name: "EUMETSAT Meteosat-11 (Prime)",
+      agency: "EUMETSAT · Europe, Africa & Mediterranean",
+      altitude: "35,786 km GEO 0°",
+      status: "SYNCHRONIZED · LIVE TELEMETRY",
+      payload: "SEVIRI 12-Channel Advanced Radiometer",
+      resolution: "1.0 km Visible / 3.0 km IR",
+      mission: "Continuous 15-minute Earth disc scanning, convective storm genesis observation, and aerosol/fog detection across EMEA.",
+      sampleCities: [
+        { name: "London", label: "London, UK" },
+        { name: "Paris", label: "Paris, FR" },
+        { name: "Berlin", label: "Berlin, DE" },
+        { name: "Cairo", label: "Cairo, EG" }
+      ]
+    },
+    himawari: {
+      id: "himawari",
+      name: "JMA Himawari-9 (Pacific Hub)",
+      agency: "Japan Meteorological Agency · Asia-Pacific & Australia",
+      altitude: "35,786 km GEO 140.7°E",
+      status: "OPERATIONAL · LIVE TELEMETRY",
+      payload: "AHI True-Color 16-Band Optical Imager",
+      resolution: "0.5 km Visible / 2.0 km IR",
+      mission: "Super-rapid 2.5-minute typhoon scanning, volcanic ash tracking, and high-cadence marine monsoon monitoring.",
+      sampleCities: [
+        { name: "Tokyo", label: "Tokyo, JP" },
+        { name: "Sydney", label: "Sydney, AU" },
+        { name: "Singapore", label: "Singapore, SG" },
+        { name: "Seoul", label: "Seoul, KR" }
+      ]
+    },
+    ecmwf: {
+      id: "ecmwf",
+      name: "ECMWF Integrated Forecasting System (IFS)",
+      agency: "European Centre for Medium-Range Weather Forecasts",
+      altitude: "Planetary Supercomputing Mesh",
+      status: "SYNCHRONIZED · 4D-Var Assimilation",
+      payload: "137-Level Hybrid Atmospheric Mesh + AIFS ML",
+      resolution: "9.0 km Global High-Resolution Mesh",
+      mission: "World-standard 10-day medium-range deterministic and ensemble global numerical atmospheric simulation.",
+      sampleCities: [
+        { name: "Geneva", label: "Geneva, CH" },
+        { name: "Oslo", label: "Oslo, NO" },
+        { name: "Reykjavik", label: "Reykjavik, IS" },
+        { name: "Vancouver", label: "Vancouver, CA" }
+      ]
+    },
+    openmeteo: {
+      id: "openmeteo",
+      name: "Open-Meteo High-Resolution Blend Engine",
+      agency: "Open-Meteo Planetary API Mesh",
+      altitude: "Zero-Key Client Telemetry Mesh",
+      status: "ONLINE · 0ms INSTANT RESPONSE",
+      payload: "Multi-Model Seamless Ensemble (ICON, GFS, ERA5)",
+      resolution: "1.0 km Micro-Grid Spline Interpolation",
+      mission: "Direct keyless atmospheric ingestion with sub-second response times, hourly precision, and automatic elevation compensation.",
+      sampleCities: [
+        { name: "Dubai", label: "Dubai, AE" },
+        { name: "Mumbai", label: "Mumbai, IN" },
+        { name: "Toronto", label: "Toronto, CA" },
+        { name: "Honolulu", label: "Honolulu, US" }
+      ]
+    }
+  };
+
+  // ============================================================================
   // 5. ATMOSPHERE UI CONTROLLER (Presentation, DOM Bindings & Ambient Scenery)
   // ============================================================================
   class AtmosphereUIController {
@@ -3673,7 +3759,21 @@ document.addEventListener("DOMContentLoaded", () => {
         heroEyebrowText: get("hero-eyebrow-text"),
         heroSubtitle: get("hero-subtitle"),
         apiStatusLabel: get("api-status-label"),
-        apiStatusBadge: get("api-status-badge")
+        apiStatusBadge: get("api-status-badge"),
+
+        // Orbital Radar & Constellation Inspector Elements
+        ctaSearchBtn: get("cta-search-btn"),
+        ctaGeoBtn: get("cta-geo-btn"),
+        orbitEarthBeacon: get("orbit-earth-beacon"),
+        satelliteInspectorCard: get("satellite-inspector-card"),
+        satHudStatus: get("sat-hud-status"),
+        satHudName: get("sat-hud-name"),
+        satHudAgency: get("sat-hud-agency"),
+        satHudAlt: get("sat-hud-alt"),
+        satHudPayload: get("sat-hud-payload"),
+        satHudResolution: get("sat-hud-resolution"),
+        satHudMission: get("sat-hud-mission"),
+        satHudCityPills: get("sat-hud-city-pills")
       };
     }
 
@@ -4365,6 +4465,87 @@ document.addEventListener("DOMContentLoaded", () => {
       return cardinals[index];
     }
 
+    #renderSatelliteHud(satId) {
+      const sat = SATELLITE_REGISTRY[satId];
+      if (!sat) return;
+
+      if (this.#elements.satHudName) this.#elements.satHudName.textContent = sat.name;
+      if (this.#elements.satHudAgency) this.#elements.satHudAgency.textContent = sat.agency;
+      if (this.#elements.satHudAlt) this.#elements.satHudAlt.textContent = sat.altitude;
+      if (this.#elements.satHudStatus) this.#elements.satHudStatus.textContent = sat.status;
+      if (this.#elements.satHudPayload) this.#elements.satHudPayload.textContent = sat.payload;
+      if (this.#elements.satHudResolution) this.#elements.satHudResolution.textContent = sat.resolution;
+      if (this.#elements.satHudMission) this.#elements.satHudMission.textContent = sat.mission;
+
+      if (this.#elements.satHudCityPills) {
+        this.#elements.satHudCityPills.innerHTML = "";
+        sat.sampleCities.forEach((city) => {
+          const btn = document.createElement("button");
+          btn.className = "sat-city-chip";
+          btn.setAttribute("data-city", city.name);
+          btn.innerHTML = `<span class="chip-dot"></span> <span>${city.label}</span>`;
+          btn.addEventListener("click", () => {
+            this.#app.executeSearch(city.name);
+          });
+          this.#elements.satHudCityPills.appendChild(btn);
+        });
+      }
+
+      document.querySelectorAll(".sat-switch-btn").forEach((btn) => {
+        const isActive = btn.getAttribute("data-sat-id") === satId;
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+
+      document.querySelectorAll(".satellite-node").forEach((node) => {
+        const isActive = node.getAttribute("data-sat-id") === satId;
+        node.classList.toggle("active", isActive);
+      });
+    }
+
+    initSatelliteInspector() {
+      // 1. Constellation Switcher Tabs
+      document.querySelectorAll(".sat-switch-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const satId = btn.getAttribute("data-sat-id");
+          if (satId) this.#renderSatelliteHud(satId);
+        });
+      });
+
+      // 2. Orbit Radar Interactive Nodes
+      document.querySelectorAll(".satellite-node").forEach((node) => {
+        node.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const satId = node.getAttribute("data-sat-id");
+          if (satId) this.#renderSatelliteHud(satId);
+        });
+      });
+
+      // 3. Central Earth Beacon (Interactive Geolocation Trigger)
+      if (this.#elements.orbitEarthBeacon) {
+        this.#elements.orbitEarthBeacon.addEventListener("click", () => {
+          this.#app.executeGeolocation();
+        });
+        this.#elements.orbitEarthBeacon.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this.#app.executeGeolocation();
+          }
+        });
+      }
+
+      // 4. Initial Sample City Chips binding
+      document.querySelectorAll(".sat-city-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const city = chip.getAttribute("data-city");
+          if (city) this.#app.executeSearch(city);
+        });
+      });
+
+      // Set default selected constellation
+      this.#renderSatelliteHud("goes");
+    }
+
     bindEvents() {
       // 1. Hero Search Form & Button
       if (this.#elements.getWeatherBtn && this.#elements.cityInput) {
@@ -4562,6 +4743,21 @@ document.addEventListener("DOMContentLoaded", () => {
           this.#closeAllDropdowns();
         }
       });
+
+      // 12. Planetary Orbital Satellite Telemetry Inspector
+      this.initSatelliteInspector();
+
+      // 13. Cinematic CTA Section Buttons
+      if (this.#elements.ctaSearchBtn) {
+        this.#elements.ctaSearchBtn.addEventListener("click", () => {
+          this.openSearchModal();
+        });
+      }
+      if (this.#elements.ctaGeoBtn) {
+        this.#elements.ctaGeoBtn.addEventListener("click", () => {
+          this.#app.executeGeolocation();
+        });
+      }
     }
 
     #closeAllDropdowns() {
