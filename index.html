@@ -114,27 +114,28 @@
         </div>
 
         <!-- Sidebar Navigation Menu -->
+        <!-- Sidebar Navigation Menu (Matching Reference Design) -->
         <nav class="sidebar-nav" id="sidebar-nav">
-          <button class="sidebar-nav-item active" data-nav="overview" title="Atmospheric Overview & Station Standby">
+          <button class="sidebar-nav-item active" data-nav="overview" title="Atmospheric Overview & Station Telemetry">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
             <span>Overview</span>
           </button>
-          <button class="sidebar-nav-item" data-nav="live-map" title="Global Satellite & Radar Mesh">
+          <button class="sidebar-nav-item" data-nav="standby" title="Switch to Atmospheric Standby Mode">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
-              <line x1="8" y1="2" x2="8" y2="18"/>
-              <line x1="16" y1="6" x2="16" y2="22"/>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
-            <span>Live Map</span>
+            <span>Standby</span>
           </button>
-          <button class="sidebar-nav-item" data-nav="forecast" title="24-Hour Predictive Spline Forecast">
+          <button class="sidebar-nav-item" data-nav="forecast-7d" title="7-Day Multi-Model Predictive Spline Forecast">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
             </svg>
-            <span>Forecast</span>
+            <span>7D Forecast</span>
           </button>
           <button class="sidebar-nav-item" data-nav="satellite" title="Constellation Telemetry Inspector">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -149,13 +150,13 @@
             </svg>
             <span>Air Quality</span>
           </button>
-          <button class="sidebar-nav-item" data-nav="climate" title="Solar Horizon & Daylight Progression">
+          <button class="sidebar-nav-item" data-nav="radar" title="Global Satellite & Radar Mesh">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+              <line x1="8" y1="2" x2="8" y2="18"/>
+              <line x1="16" y1="6" x2="16" y2="22"/>
             </svg>
-            <span>Climate</span>
+            <span>Radar</span>
           </button>
           <button class="sidebar-nav-item" data-nav="settings" title="Atmosphere Preferences & Units">
             <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -202,8 +203,8 @@
             </svg>
           </div>
           <div class="greeting-content">
-            <h4 class="greeting-title" id="greeting-title">Good morning 👋</h4>
-            <p class="greeting-desc" id="greeting-desc">Check today's weather and plan your day better.</p>
+            <h4 class="greeting-title" id="greeting-title">Don't miss the sunset! 🌅</h4>
+            <p class="greeting-desc" id="greeting-desc">Deep golden twilight visible in approximately 45m.</p>
           </div>
         </div>
       </aside>
@@ -283,7 +284,7 @@
         <!-- =========================================================
              THE CORE WEATHER DASHBOARD (First-Class Standby & Active City State)
              ========================================================= -->
-        <main id="weather-dashboard" class="weather-dashboard state-standby">
+        <main id="weather-dashboard" class="weather-dashboard state-active-city">
           <!-- 1. HERO ATMOSPHERIC SCENERY CARD (Reference Design Layout) -->
           <section class="hero-scenery-card" id="hero-scenery-card">
             <!-- Dynamic Specular Gloss Sheen & Glass Bevel Glare -->
@@ -297,40 +298,117 @@
               <div class="landscape-ground" data-depth="0.22">
                 <div class="scenery-fx-particles" id="scenery-fx-particles"></div>
 
-                <!-- High-Fidelity Scenic Hill & Distant City Silhouette SVG -->
-                <svg class="landscape-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
+                <!-- High-Fidelity Sunset Lake & Mountains Scenery (Matching Reference Design media_1789757928547.jpg) -->
+                <svg class="landscape-svg sunset-lake-scene" viewBox="0 0 1000 320" preserveAspectRatio="none">
                   <defs>
-                    <linearGradient id="distantMountainGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="var(--mountain-top, rgba(30, 41, 59, 0.4))" />
-                      <stop offset="100%" stop-color="var(--mountain-base, rgba(15, 23, 42, 0.7))" />
+                    <linearGradient id="twilightSkyGrad" x1="0" y1="0" x2="1" y2="0.6">
+                      <stop offset="0%" stop-color="#0b1226" />
+                      <stop offset="35%" stop-color="#1b1d42" />
+                      <stop offset="60%" stop-color="#311e4a" />
+                      <stop offset="78%" stop-color="#6b2737" />
+                      <stop offset="90%" stop-color="#b45309" />
+                      <stop offset="100%" stop-color="#f59e0b" />
                     </linearGradient>
-                    <linearGradient id="middleHillsGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="var(--hills-top, rgba(34, 197, 94, 0.45))" />
-                      <stop offset="100%" stop-color="var(--hills-base, rgba(20, 83, 45, 0.8))" />
+
+                    <linearGradient id="sunsetSunDisk" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="40%" stop-color="#fef08a" />
+                      <stop offset="100%" stop-color="#f59e0b" />
                     </linearGradient>
-                    <linearGradient id="foregroundGrassGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="var(--grass-crest, rgba(74, 222, 128, 0.85))" />
-                      <stop offset="15%" stop-color="var(--grass-mid, rgba(22, 163, 74, 0.95))" />
-                      <stop offset="100%" stop-color="var(--grass-base, rgba(5, 46, 22, 1))" />
+
+                    <radialGradient id="sunCoronaRadial" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+                      <stop offset="25%" stop-color="#fef08a" stop-opacity="0.8" />
+                      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.45" />
+                      <stop offset="85%" stop-color="#ea580c" stop-opacity="0.15" />
+                      <stop offset="100%" stop-color="#ea580c" stop-opacity="0" />
+                    </radialGradient>
+
+                    <linearGradient id="lakeSurfaceGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#141c2e" />
+                      <stop offset="40%" stop-color="#0e1526" />
+                      <stop offset="100%" stop-color="#060a14" />
                     </linearGradient>
-                    <linearGradient id="crestGlowGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stop-color="rgba(255, 255, 255, 0)" />
-                      <stop offset="50%" stop-color="var(--crest-highlight, rgba(255, 255, 255, 0.35))" />
-                      <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+
+                    <linearGradient id="waterReflectionBeam" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.85" />
+                      <stop offset="35%" stop-color="#f59e0b" stop-opacity="0.6" />
+                      <stop offset="75%" stop-color="#d97706" stop-opacity="0.3" />
+                      <stop offset="100%" stop-color="#92400e" stop-opacity="0.05" />
                     </linearGradient>
+
+                    <linearGradient id="distantMtsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#241b3d" />
+                      <stop offset="100%" stop-color="#100d1e" />
+                    </linearGradient>
+
+                    <linearGradient id="foreKnollGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#064e3b" />
+                      <stop offset="20%" stop-color="#063e30" />
+                      <stop offset="65%" stop-color="#04271e" />
+                      <stop offset="100%" stop-color="#02140f" />
+                    </linearGradient>
+
+                    <linearGradient id="sunsetRimGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="rgba(245, 158, 11, 0)" />
+                      <stop offset="70%" stop-color="rgba(251, 191, 36, 0.6)" />
+                      <stop offset="100%" stop-color="rgba(254, 240, 138, 0.85)" />
+                    </linearGradient>
+
+                    <filter id="coronaBlur" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="8" />
+                    </filter>
                   </defs>
 
-                  <path class="distant-mountain-ridge" d="M0,130 Q180,75 360,115 T740,85 Q880,110 1000,95 L1000,320 L0,320 Z" fill="url(#distantMountainGrad)"/>
-                  <path class="middle-hills-layer" d="M0,175 Q240,115 500,165 T1000,140 L1000,320 L0,320 Z" fill="url(#middleHillsGrad)"/>
-                  <path class="foreground-knoll" d="M0,215 Q260,165 520,205 T1000,185 L1000,320 L0,320 Z" fill="url(#foregroundGrassGrad)"/>
-                  <path class="hill-crest-glow" d="M0,215 Q260,165 520,205 T1000,185" fill="none" stroke="url(#crestGlowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                  <!-- 1. Sky Backdrop -->
+                  <rect width="1000" height="320" fill="url(#twilightSkyGrad)"/>
 
+                  <!-- 2. Volumetric Twilight Backlit Clouds -->
+                  <path d="M 280,75 C 300,55 350,50 385,68 C 410,50 460,52 485,74 C 520,70 550,90 545,115 C 500,120 300,120 280,75 Z" fill="rgba(255, 255, 255, 0.12)" />
+                  <path d="M 340,95 C 365,80 410,78 435,92 C 455,80 495,82 515,98 C 530,105 520,125 490,125 C 440,125 360,125 340,95 Z" fill="rgba(254, 240, 138, 0.18)" />
+
+                  <!-- 3. Distant Mountain Range along the Lake Horizon -->
+                  <path class="distant-mountain-ridge" d="M 320,140 L 375,122 L 420,132 L 465,112 L 515,128 L 570,116 L 625,130 L 685,118 L 735,128 L 810,114 L 880,126 L 945,116 L 1000,124 L 1000,165 L 320,165 Z" fill="url(#distantMtsGrad)"/>
+                  <path d="M 320,140 L 375,122 L 420,132 L 465,112 L 515,128 L 570,116 L 625,130 L 685,118 L 735,128 L 810,114 L 880,126 L 945,116 L 1000,124" fill="none" stroke="url(#sunsetRimGrad)" stroke-width="1.6"/>
+
+                  <!-- 4. Setting Sun on the Right Horizon with Corona and Aura -->
+                  <g class="sunset-sun-group">
+                    <circle cx="760" cy="135" r="70" fill="url(#sunCoronaRadial)" opacity="0.65" filter="url(#coronaBlur)"/>
+                    <circle cx="760" cy="135" r="38" fill="url(#sunCoronaRadial)" opacity="0.85"/>
+                    <circle cx="760" cy="135" r="15" fill="url(#sunsetSunDisk)"/>
+                    <circle cx="760" cy="135" r="7" fill="#ffffff"/>
+                    <line x1="760" y1="135" x2="710" y2="40" stroke="rgba(254, 240, 138, 0.25)" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="760" y1="135" x2="760" y2="25" stroke="rgba(254, 240, 138, 0.3)" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="760" y1="135" x2="815" y2="45" stroke="rgba(254, 240, 138, 0.22)" stroke-width="2" stroke-linecap="round"/>
+                  </g>
+
+                  <!-- 5. Tranquil Lake Surface across Lower Right -->
+                  <path class="lake-water-surface" d="M 380,142 L 1000,132 L 1000,320 L 530,320 Z" fill="url(#lakeSurfaceGrad)"/>
+
+                  <!-- Lake Shimmering Golden Sunset Reflection Trail -->
+                  <g class="lake-reflection-trail">
+                    <polygon points="742,137 778,137 840,320 680,320" fill="url(#waterReflectionBeam)" class="lake-reflection-glow"/>
+                    <line x1="735" y1="145" x2="785" y2="145" stroke="#fef08a" stroke-width="2.5" opacity="0.85" class="lake-ripple r1"/>
+                    <line x1="720" y1="156" x2="800" y2="156" stroke="#fde047" stroke-width="2" opacity="0.75" class="lake-ripple r2"/>
+                    <line x1="710" y1="168" x2="815" y2="168" stroke="#f59e0b" stroke-width="2.5" opacity="0.8" class="lake-ripple r3"/>
+                    <line x1="695" y1="184" x2="830" y2="184" stroke="#fbbf24" stroke-width="2" opacity="0.7" class="lake-ripple r4"/>
+                    <line x1="680" y1="202" x2="850" y2="202" stroke="#f59e0b" stroke-width="2.2" opacity="0.65" class="lake-ripple r5"/>
+                    <line x1="660" y1="225" x2="870" y2="225" stroke="#ea580c" stroke-width="2.4" opacity="0.6" class="lake-ripple r6"/>
+                    <line x1="640" y1="252" x2="895" y2="252" stroke="#d97706" stroke-width="2" opacity="0.5" class="lake-ripple r7"/>
+                    <line x1="620" y1="285" x2="920" y2="285" stroke="#b45309" stroke-width="2" opacity="0.4" class="lake-ripple r8"/>
+                  </g>
+
+                  <!-- 6. Foreground Grassy Bluff / Promontory on Left (where Observer stands) -->
+                  <path class="foreground-bluff" d="M 0,165 Q 180,148 350,165 T 570,225 L 570,320 L 0,320 Z" fill="url(#foreKnollGrad)"/>
+                  <path d="M 0,165 Q 180,148 350,165 T 570,225" fill="none" stroke="rgba(74, 222, 128, 0.4)" stroke-width="2.5" stroke-linecap="round"/>
+
+                  <!-- Wind Grass Blades on Bluff -->
                   <g class="wind-grass-cluster">
-                    <path class="grass-blade g1" d="M280,185 Q282,170 279,162" stroke="rgba(187, 247, 208, 0.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                    <path class="grass-blade g2" d="M284,186 Q288,172 287,160" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
-                    <path class="grass-blade g3" d="M290,187 Q295,175 298,165" stroke="rgba(187, 247, 208, 0.65)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                    <path class="grass-blade g4" d="M420,195 Q422,178 418,168" stroke="rgba(187, 247, 208, 0.75)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                    <path class="grass-blade g5" d="M426,196 Q431,180 433,170" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g1" d="M 480,210 Q 483,195 479,186" stroke="rgba(187, 247, 208, 0.75)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g2" d="M 486,211 Q 492,197 490,184" stroke="rgba(251, 191, 36, 0.8)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g3" d="M 494,212 Q 500,200 503,190" stroke="rgba(187, 247, 208, 0.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g4" d="M 535,220 Q 538,204 534,194" stroke="rgba(187, 247, 208, 0.75)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g5" d="M 542,221 Q 548,206 551,195" stroke="rgba(251, 191, 36, 0.85)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
                   </g>
                 </svg>
               </div>
@@ -413,12 +491,12 @@
                   </svg>
                 </span>
                 <div class="location-names-col">
-                  <h1 class="hero-city-title" id="city-name">Atmosphere Station</h1>
-                  <span class="hero-country-tag" id="country-tag">Global Atmospheric Network · Standby</span>
+                  <h1 class="hero-city-title" id="city-name">Kanpur</h1>
+                  <span class="hero-country-tag" id="country-tag">Uttar Pradesh, India</span>
                 </div>
               </div>
 
-              <!-- Live Date & Clock Display -->
+              <!-- Live Date & Clock Display (Matching Reference Design) -->
               <div class="hero-datetime-widget">
                 <svg class="calendar-clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -426,8 +504,8 @@
                   <line x1="8" y1="2" x2="8" y2="6"></line>
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                <span class="hero-date-text" id="hero-date">Mon, 15 Sep 2026</span>
-                <span class="hero-clock-time" id="local-time-clock">10:24 AM</span>
+                <span class="hero-date-text" id="hero-date">Thu 19 Sep, 06:30</span>
+                <span class="hero-clock-time" id="local-time-clock">Kanpur</span>
               </div>
             </div>
 
@@ -456,7 +534,7 @@
                 <div class="hero-condition-title" id="weather-description">Partly Cloudy</div>
 
                 <p class="hero-narrative-advisory" id="ai-summary-text">
-                  A pleasant day with scattered clouds. Perfect for outdoor activities.
+                  Light rain in 45m (Southwest) · Low chance of continuation.
                 </p>
               </div>
 
@@ -509,7 +587,7 @@
                 <span>24-Hour Forecast & Timeline</span>
               </div>
               <div class="forecast-interval-dropdown-pill">
-                <span>1-HOUR INTERVALS</span>
+                <span>Catmull-Rom View</span>
                 <span class="pill-caret">⌵</span>
               </div>
             </div>
@@ -531,11 +609,11 @@
                     <circle cx="12" cy="12" r="4"/>
                     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
                   </svg>
-                  <span id="sun-status-title">Sun Path & Horizon</span>
+                  <span id="sun-status-title">Sun Path & Radiation</span>
                 </div>
                 <div class="daylight-badge-pill" id="daylight-badge-pill">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <span>Daylight: <strong id="daylight-duration-val">12h 43m</strong></span>
+                  <span class="pulse-beacon-sm" style="background: #f59e0b;"></span>
+                  <span>Clear Sky Radiation</span>
                 </div>
               </div>
 
@@ -570,17 +648,21 @@
                   <circle cx="40" cy="130" r="4.5" fill="#f59e0b"/>
                   <circle cx="420" cy="130" r="4.5" fill="#ea580c"/>
 
-                  <!-- Live Positioned Sun Orb (Calculated by celestial physics) -->
-                  <circle id="sun-arc-orb" cx="230" cy="24" r="9" fill="#fef08a" filter="url(#sunOrbGlow)"/>
+                  <!-- Radiant Sun Orb with 4-Point Solar Flare Star -->
+                  <g id="sun-arc-orb-group" transform="translate(230, 24)">
+                    <circle class="sun-flare-halo" cx="0" cy="0" r="16" fill="#f59e0b" opacity="0.35" filter="url(#sunOrbGlow)"/>
+                    <path class="sun-flare-star" d="M 0 -15 L 2.5 -2.5 L 15 0 L 2.5 2.5 L 0 15 L -2.5 2.5 L -15 0 L -2.5 -2.5 Z" fill="#ffffff" opacity="0.95"/>
+                    <circle id="sun-arc-orb" cx="0" cy="0" r="7.5" fill="#fef08a" filter="url(#sunOrbGlow)"/>
+                  </g>
                 </svg>
 
                 <div class="sun-times-row">
                   <div class="sun-time-block">
-                    <span class="sun-time-val" id="arc-sunrise-text">6:12 AM</span>
+                    <span class="sun-time-val" id="arc-sunrise-text">05:42 AM</span>
                     <span class="sun-time-label">Sunrise</span>
                   </div>
                   <div class="sun-time-block text-right">
-                    <span class="sun-time-val" id="arc-sunset-text">6:55 PM</span>
+                    <span class="sun-time-val" id="arc-sunset-text">06:18 PM</span>
                     <span class="sun-time-label">Sunset</span>
                   </div>
                 </div>
@@ -605,9 +687,9 @@
                 </button>
               </div>
 
-              <!-- Narrative Advisory Summary -->
+              <!-- Narrative Advisory Summary (Matching Reference Design) -->
               <p class="tomorrow-editorial-lead" id="insight-desc">
-                Slight chance of rain tomorrow. Similar temperatures with partly cloudy skies.
+                Slightly warmer tomorrow with clear skies throughout the early afternoon.
               </p>
 
               <!-- 3 Submetric Bento Capsules -->
@@ -618,7 +700,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m11 20-1 2M15 20l-1 2"/></svg>
                   </div>
                   <div class="stat-text-col">
-                    <span class="stat-main-number" id="insight-range-val">22° / 31°</span>
+                    <span class="stat-main-number" id="insight-range-val">29° / 22°</span>
                     <span class="stat-label">Min / Max</span>
                   </div>
                 </div>
@@ -640,7 +722,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/></svg>
                   </div>
                   <div class="stat-text-col">
-                    <span class="stat-main-number" id="insight-rain-val">40%</span>
+                    <span class="stat-main-number" id="insight-rain-val">10%</span>
                     <span class="stat-label">Chance of Rain</span>
                   </div>
                 </div>
@@ -650,7 +732,7 @@
 
           <!-- 4. 6 BENTO ENVIRONMENTAL METRIC CARDS (Reference Row 4) -->
           <section class="widgets-dashboard-grid" id="widgets-dashboard-grid">
-            <!-- 1. Relative Humidity (Cyan Wave) -->
+            <!-- 1. Relative Humidity (Cyan Glowing Ridge) -->
             <div class="widget-card metric-box bento-humidity" id="humidity-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
@@ -660,15 +742,25 @@
                 <span class="bento-value" id="humidity">62%</span>
                 <span class="bento-status" id="humidity-status">Comfortable</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,28 Q40,8 80,24 T160,18" fill="none" stroke="#38bdf8" stroke-width="2.5" class="wave-glow wave-blue"/>
-                  <path d="M0,28 Q40,8 80,24 T160,18 L160,40 L0,40 Z" fill="url(#waveGradBlue)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradCyan" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#0e172a" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#060c18" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowCyan" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#38bdf8" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,38 L 24,20 L 48,27 L 76,11 L 105,24 L 132,15 L 160,26 L 160,45 L 0,45 Z" fill="url(#terrainGradCyan)"/>
+                  <path class="bento-ridge-crest crest-cyan" d="M 0,38 L 24,20 L 48,27 L 76,11 L 105,24 L 132,15 L 160,26" fill="none" stroke="#38bdf8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowCyan)"/>
                 </svg>
               </div>
             </div>
 
-            <!-- 2. Wind Velocity (Emerald Wave) -->
+            <!-- 2. Wind Velocity (Emerald Glowing Ridge) -->
             <div class="widget-card metric-box bento-wind" id="wind-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
@@ -678,15 +770,25 @@
                 <span class="bento-value" id="wind-speed">12 km/h</span>
                 <span class="bento-status" id="wind-caption">Light breeze</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,24 Q40,32 80,16 T160,26" fill="none" stroke="#10b981" stroke-width="2.5" class="wave-glow wave-green"/>
-                  <path d="M0,24 Q40,32 80,16 T160,26 L160,40 L0,40 Z" fill="url(#waveGradGreen)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradGreen" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#10b981" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#06281e" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#03140f" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowGreen" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#10b981" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,35 L 28,17 L 58,26 L 88,10 L 118,22 L 142,13 L 160,21 L 160,45 L 0,45 Z" fill="url(#terrainGradGreen)"/>
+                  <path class="bento-ridge-crest crest-green" d="M 0,35 L 28,17 L 58,26 L 88,10 L 118,22 L 142,13 L 160,21" fill="none" stroke="#10b981" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowGreen)"/>
                 </svg>
               </div>
             </div>
 
-            <!-- 3. Surface Pressure (Amber Wave) -->
+            <!-- 3. Surface Pressure (Amber Glowing Ridge) -->
             <div class="widget-card metric-box bento-pressure" id="pressure-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4-4 4M12 16V9"/></svg>
@@ -696,15 +798,25 @@
                 <span class="bento-value" id="pressure">1012 hPa</span>
                 <span class="bento-status" id="pressure-status">Stable</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,20 Q40,10 80,30 T160,18" fill="none" stroke="#f59e0b" stroke-width="2.5" class="wave-glow wave-amber"/>
-                  <path d="M0,20 Q40,10 80,30 T160,18 L160,40 L0,40 Z" fill="url(#waveGradAmber)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradAmber" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#281706" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#140b03" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowAmber" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#f59e0b" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,32 L 32,15 L 66,25 L 98,9 L 128,20 L 160,13 L 160,45 L 0,45 Z" fill="url(#terrainGradAmber)"/>
+                  <path class="bento-ridge-crest crest-amber" d="M 0,32 L 32,15 L 66,25 L 98,9 L 128,20 L 160,13" fill="none" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowAmber)"/>
                 </svg>
               </div>
             </div>
 
-            <!-- 4. Air Quality (Cyan/Green Wave) -->
+            <!-- 4. Air Quality (Teal Glowing Ridge) -->
             <div class="widget-card metric-box bento-aqi" id="aqi-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
@@ -714,15 +826,25 @@
                 <span class="bento-value" id="aqi-val">Good <small class="aqi-badge-score">(AQI 42)</small></span>
                 <span class="bento-status" id="aqi-status">Fresh and safe</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,26 Q40,12 80,24 T160,16" fill="none" stroke="#06b6d4" stroke-width="2.5" class="wave-glow wave-cyan"/>
-                  <path d="M0,26 Q40,12 80,24 T160,16 L160,40 L0,40 Z" fill="url(#waveGradCyan)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradTeal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#07202b" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#031118" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowTeal" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#06b6d4" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,34 L 28,18 L 56,25 L 90,11 L 122,22 L 160,15 L 160,45 L 0,45 Z" fill="url(#terrainGradTeal)"/>
+                  <path class="bento-ridge-crest crest-teal" d="M 0,34 L 28,18 L 56,25 L 90,11 L 122,22 L 160,15" fill="none" stroke="#06b6d4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowTeal)"/>
                 </svg>
               </div>
             </div>
 
-            <!-- 5. UV Index (Golden Wave) -->
+            <!-- 5. UV Index (Golden Glowing Ridge) -->
             <div class="widget-card metric-box bento-uv" id="uv-index-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -732,15 +854,25 @@
                 <span class="bento-value" id="uv-index">6 - High</span>
                 <span class="bento-status" id="uv-status">Use sunscreen</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,28 Q40,14 80,26 T160,20" fill="none" stroke="#eab308" stroke-width="2.5" class="wave-glow wave-gold"/>
-                  <path d="M0,28 Q40,14 80,26 T160,20 L160,40 L0,40 Z" fill="url(#waveGradGold)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradGold" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#eab308" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#2a1f04" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#140f02" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowGold" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#eab308" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,36 L 32,16 L 64,27 L 96,10 L 126,21 L 160,14 L 160,45 L 0,45 Z" fill="url(#terrainGradGold)"/>
+                  <path class="bento-ridge-crest crest-gold" d="M 0,36 L 32,16 L 64,27 L 96,10 L 126,21 L 160,14" fill="none" stroke="#eab308" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowGold)"/>
                 </svg>
               </div>
             </div>
 
-            <!-- 6. Precipitation Risk (Purple Wave) -->
+            <!-- 6. Precipitation Risk (Purple Glowing Ridge) -->
             <div class="widget-card metric-box bento-precip" id="precip-card">
               <div class="bento-header">
                 <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/></svg>
@@ -750,44 +882,31 @@
                 <span class="bento-value" id="precip-chance">20%</span>
                 <span class="bento-status" id="precip-status">Low chance</span>
               </div>
-              <div class="bento-wave-wrapper">
-                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
-                  <path d="M0,22 Q40,30 80,14 T160,24" fill="none" stroke="#a855f7" stroke-width="2.5" class="wave-glow wave-purple"/>
-                  <path d="M0,22 Q40,30 80,14 T160,24 L160,40 L0,40 Z" fill="url(#waveGradPurple)" opacity="0.25"/>
+              <div class="bento-terrain-wrapper">
+                <svg class="bento-terrain-svg" viewBox="0 0 160 45" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="terrainGradPurple" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.32" />
+                      <stop offset="60%" stop-color="#230d3a" stop-opacity="0.9" />
+                      <stop offset="100%" stop-color="#12061f" stop-opacity="0.98" />
+                    </linearGradient>
+                    <filter id="neonGlowPurple" x="-20%" y="-40%" width="140%" height="180%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#a855f7" flood-opacity="0.9" />
+                    </filter>
+                  </defs>
+                  <path class="bento-terrain-polygon" d="M 0,33 L 30,18 L 60,28 L 90,12 L 124,23 L 160,17 L 160,45 L 0,45 Z" fill="url(#terrainGradPurple)"/>
+                  <path class="bento-ridge-crest crest-purple" d="M 0,33 L 30,18 L 60,28 L 90,12 L 124,23 L 160,17" fill="none" stroke="#a855f7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlowPurple)"/>
                 </svg>
               </div>
             </div>
           </section>
 
-          <!-- SVG Gradient Definitions for Bento Waves -->
-          <svg width="0" height="0" class="sr-only" aria-hidden="true">
-            <defs>
-              <linearGradient id="waveGradBlue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="waveGradGreen" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="waveGradAmber" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="waveGradCyan" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="waveGradGold" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#eab308" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
-              </linearGradient>
-              <linearGradient id="waveGradPurple" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-          </svg>
+          <!-- Cosmic Celestial Planet Sphere (Reference Design Bottom-Right Atmosphere) -->
+          <div class="cosmic-planet-sphere" id="cosmic-planet-sphere" aria-hidden="true">
+            <div class="planet-inner-surface"></div>
+            <div class="planet-atmosphere-rim"></div>
+            <div class="planet-shadow-crescent"></div>
+          </div>
         </main>
 
       <!-- 5. PLANETARY ORBITAL SATELLITE RADAR SECTION (Interactive Telemetry Inspector) -->

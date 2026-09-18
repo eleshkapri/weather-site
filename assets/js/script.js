@@ -13,6 +13,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const GLOBAL_CITY_CATALOG = [
   {
+    "name": "Kanpur",
+    "country": "India",
+    "country_code": "IN",
+    "latitude": 26.4499,
+    "longitude": 80.3319,
+    "timezone": "Asia/Kolkata",
+    "admin1": "Uttar Pradesh"
+  },
+  {
     "name": "Delhi",
     "country": "India",
     "country_code": "IN",
@@ -3500,22 +3509,29 @@ document.addEventListener("DOMContentLoaded", () => {
         <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${this.#graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${this.#graphHeight}px;">
           <defs>
             <linearGradient id="hourlySplineGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.30" />
-              <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.08" />
-              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35" />
+              <stop offset="45%" stop-color="#38bdf8" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#0284c7" stop-opacity="0.0" />
+            </linearGradient>
+            <linearGradient id="hourlyLineGrad" x1="0" y1="0" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#38bdf8" />
+              <stop offset="28%" stop-color="#fbbf24" />
+              <stop offset="60%" stop-color="#f59e0b" />
+              <stop offset="85%" stop-color="#818cf8" />
+              <stop offset="100%" stop-color="#38bdf8" />
             </linearGradient>
             <filter id="splineGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#38bdf8" flood-opacity="0.5" />
+              <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#f59e0b" flood-opacity="0.5" />
             </filter>
           </defs>
           <path d="${areaPath}" fill="url(#hourlySplineGrad)" class="hourly-graph-area"/>
-          <path d="${svgPath}" class="hourly-graph-path" filter="url(#splineGlow)"/>
+          <path d="${svgPath}" fill="none" stroke="url(#hourlyLineGrad)" stroke-width="2.6" class="hourly-graph-path" filter="url(#splineGlow)"/>
       `;
 
       points.forEach((pt) => {
         svgOverlay += `
           <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label">${pt.temp}°</text>
-          <circle cx="${pt.x}" cy="${pt.y}" r="4.5" class="hourly-temp-dot"/>
+          <circle cx="${pt.x}" cy="${pt.y}" r="4" class="hourly-temp-dot" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
         `;
       });
 
@@ -4764,6 +4780,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const orbX = 40 + progress * 380;
       const orbY = 130 - 4 * 110 * progress * (1 - progress);
 
+      const sunGroup = document.getElementById("sun-arc-orb-group");
+      if (sunGroup) {
+        sunGroup.setAttribute("transform", `translate(${orbX.toFixed(1)}, ${orbY.toFixed(1)})`);
+      }
       if (this.#elements.sunArcOrb) {
         this.#elements.sunArcOrb.setAttribute("cx", orbX.toFixed(1));
         this.#elements.sunArcOrb.setAttribute("cy", orbY.toFixed(1));
@@ -5276,8 +5296,12 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           if (navTarget === "overview") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } else if (navTarget === "standby") {
             this.#app.resetToStandby();
-          } else if (navTarget === "live-map" || navTarget === "satellite") {
+          } else if (navTarget === "forecast-7d") {
+            this.open7DayForecastModal();
+          } else if (navTarget === "radar" || navTarget === "satellite" || navTarget === "live-map") {
             const target = document.getElementById("orbital-radar-section");
             if (target) {
               if (window.motionEngine && window.motionEngine.lenis) {
@@ -5583,8 +5607,6 @@ document.addEventListener("DOMContentLoaded", () => {
     async init() {
       this.#ui.bindEvents();
       this.#ui.setTemperatureUnit(this.#temperatureUnit);
-      this.#ui.renderStandbyState(this.#security.getMaskedStatus());
-      this.renderStandbySpline();
 
       // Safe global debug facade (ZERO API KEY EXPOSURE)
       window.Atmosphere = Object.freeze({
@@ -5598,6 +5620,21 @@ document.addEventListener("DOMContentLoaded", () => {
       // Background health check for OpenWeather key
       if (this.#security.hasKey()) {
         await this.#security.testKeyHealth();
+      }
+
+      // Check URL search params or load Kanpur default active station matching reference design
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryCity = urlParams.get("city");
+        if (queryCity) {
+          await this.executeSearch(queryCity);
+        } else {
+          await this.executeSearch("Kanpur");
+        }
+      } catch (err) {
+        console.warn("Startup city initialization:", err);
+        this.#ui.renderStandbyState(this.#security.getMaskedStatus());
+        this.renderStandbySpline();
       }
     }
 

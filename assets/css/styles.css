@@ -367,6 +367,7 @@ html.lenis, html.lenis body {
    WEATHER DASHBOARD CONTAINER
    ========================================================= */
 .weather-dashboard {
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -508,21 +509,72 @@ body.theme-thunderstorm .hero-scenery-card {
 
 .hero-scenery-card .landscape-ground {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
-  height: 175px;
+  height: 100%;
   z-index: 3;
   pointer-events: none;
   transform: translateZ(25px);
 }
 
+.landscape-svg.sunset-lake-scene {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Sunset Lake Dynamic Water Shimmer & Corona Breathing */
+.sunset-sun-group {
+  animation: sunCoronaBreathe 6s ease-in-out infinite alternate;
+  transform-origin: 760px 135px;
+}
+
+.lake-ripple {
+  animation: lakeShimmer 2.8s ease-in-out infinite alternate;
+}
+.lake-ripple.r1 { animation-delay: 0s; }
+.lake-ripple.r2 { animation-delay: 0.35s; }
+.lake-ripple.r3 { animation-delay: 0.7s; }
+.lake-ripple.r4 { animation-delay: 1.05s; }
+.lake-ripple.r5 { animation-delay: 1.4s; }
+.lake-ripple.r6 { animation-delay: 1.75s; }
+.lake-ripple.r7 { animation-delay: 2.1s; }
+.lake-ripple.r8 { animation-delay: 2.45s; }
+
+@keyframes lakeShimmer {
+  0% {
+    opacity: 0.45;
+    stroke-width: 1.8;
+  }
+  50% {
+    opacity: 0.95;
+    stroke-width: 2.8;
+  }
+  100% {
+    opacity: 0.55;
+    stroke-width: 2.1;
+  }
+}
+
+@keyframes sunCoronaBreathe {
+  0% {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
 .hero-scenery-card .character-silhouette {
   position: absolute;
-  bottom: 44px;
-  right: 22%;
-  width: 68px;
-  height: 114px;
+  bottom: 60px;
+  left: 51%;
+  right: auto;
+  width: 44px;
+  height: 76px;
   z-index: 6;
   pointer-events: auto;
   cursor: pointer;
@@ -4968,6 +5020,28 @@ body.cinematic-dark-mode .app-layout {
   overflow: visible;
 }
 
+/* Sun Path & Radiation Radiant Solar Flare Star (Matching Reference Design) */
+.sun-flare-star {
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #fbbf24);
+  animation: flareStarSpin 24s linear infinite;
+  transform-origin: 0 0;
+}
+
+.sun-flare-halo {
+  animation: flareAuraBreathe 3.5s ease-in-out infinite alternate;
+  transform-origin: 0 0;
+}
+
+@keyframes flareStarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes flareAuraBreathe {
+  0% { transform: scale(0.9); opacity: 0.25; }
+  100% { transform: scale(1.15); opacity: 0.55; }
+}
+
 .sun-times-row {
   display: flex;
   justify-content: space-between;
@@ -5151,30 +5225,109 @@ body.cinematic-dark-mode .app-layout {
   font-weight: 600;
 }
 
-.bento-wave-wrapper {
+/* =========================================================
+   6 BENTO CARDS: MOUNTAIN TERRAIN WITH GLOWING NEON RIDGES
+   (Matching Reference Design media_1789757928547.jpg)
+   ========================================================= */
+.bento-terrain-wrapper {
   width: 100%;
-  height: 38px;
+  height: 44px;
   margin-top: 6px;
   overflow: hidden;
+  position: relative;
+  border-radius: 0 0 16px 16px;
 }
 
-.bento-wave-svg {
+.bento-terrain-svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-/* Glowing Neon Waves with Shimmer */
-.wave-glow {
-  stroke-linecap: round;
+.bento-terrain-polygon {
+  transition: opacity 0.3s ease;
 }
 
-.wave-blue { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7)); }
-.wave-green { filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.7)); }
-.wave-amber { filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.7)); }
-.wave-cyan { filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.7)); }
-.wave-gold { filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.7)); }
-.wave-purple { filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.7)); }
+.bento-ridge-crest {
+  transition: stroke-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+
+.crest-cyan {
+  stroke: #38bdf8;
+  filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.95)) drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+}
+.crest-green {
+  stroke: #10b981;
+  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.95)) drop-shadow(0 0 10px rgba(16, 185, 129, 0.45));
+}
+.crest-amber {
+  stroke: #f59e0b;
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.95)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.45));
+}
+.crest-teal {
+  stroke: #06b6d4;
+  filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.95)) drop-shadow(0 0 10px rgba(6, 182, 212, 0.45));
+}
+.crest-gold {
+  stroke: #eab308;
+  filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.95)) drop-shadow(0 0 10px rgba(234, 179, 8, 0.45));
+}
+.crest-purple {
+  stroke: #a855f7;
+  filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.95)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.45));
+}
+
+.widget-card.metric-box:hover .bento-ridge-crest {
+  stroke-width: 3.2;
+}
+
+/* =========================================================
+   COSMIC CELESTIAL PLANET SPHERE (Bottom-Right Atmosphere)
+   (Reference Design media_1789757928547.jpg)
+   ========================================================= */
+.cosmic-planet-sphere {
+  position: absolute;
+  right: -55px;
+  bottom: -65px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle at 35% 28%, #581c87 0%, #3b0764 42%, #1a0533 75%, #080214 100%);
+  box-shadow:
+    inset -14px -14px 40px rgba(0, 0, 0, 0.9),
+    inset 10px 10px 32px rgba(232, 121, 249, 0.55),
+    inset 3px 3px 10px rgba(255, 255, 255, 0.7),
+    0 0 65px rgba(168, 85, 247, 0.32),
+    0 0 110px rgba(126, 34, 206, 0.2);
+  animation: cosmicPlanetFloat 9s ease-in-out infinite alternate;
+  transform-style: preserve-3d;
+}
+
+.cosmic-planet-sphere .planet-atmosphere-rim {
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, rgba(244, 114, 182, 0.45) 0%, transparent 60%);
+  filter: blur(4px);
+}
+
+.cosmic-planet-sphere .planet-shadow-crescent {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 75% 75%, rgba(2, 6, 23, 0.88) 0%, rgba(2, 6, 23, 0.4) 50%, transparent 75%);
+}
+
+@keyframes cosmicPlanetFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-10px, -12px) rotate(5deg);
+  }
+}
 
 /* =========================================================
    FIRST-CLASS STANDBY STATE ARCHITECTURE
