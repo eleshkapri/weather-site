@@ -15,20 +15,72 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="assets/css/styles.css?v=2.3" />
+    <link rel="stylesheet" href="assets/css/atmospheric-background.css?v=2.4" />
   </head>
   <body class="theme-night cinematic-dark-mode">
     <!-- Cinematic Top Blur Mask -->
     <div class="cinematic-top-blur-mask" aria-hidden="true"></div>
 
-    <!-- 0. COSMIC SPACE BACKGROUND & HORIZON SYSTEM -->
-    <div class="cosmic-horizon-system" aria-hidden="true">
-      <div class="atmospheric-horizon-glow"></div>
-    </div>
+    <!-- =========================================================
+         PREMIUM FULL-PAGE ANIMATED ATMOSPHERIC BACKGROUND SYSTEM
+         (Sits continuously behind all sections & cards, -10 z-index)
+         ========================================================= -->
+    <div id="atmospheric-background" class="atmospheric-background-system tod-day weather-clear" aria-hidden="true">
+      <!-- LAYER 1: Deep Animated Radial Atmospheric Gradient & Horizon Shift -->
+      <div class="atmos-layer-gradient" id="atmos-layer-gradient"></div>
 
-    <!-- Dynamic Ambient Backdrop & 3D Celestial WebGL Canvas -->
-    <div id="ambient-bg" class="ambient-bg"></div>
-    <div class="ambient-sky-canvas" id="ambient-sky-canvas">
-      <canvas id="webgl-atmosphere-canvas"></canvas>
+      <!-- Dynamic Sun / Solar Elevation Atmosphere Bloom (Positioned by sunrise/sunset physics) -->
+      <div class="atmos-sun-glow" id="atmos-sun-glow"></div>
+
+      <!-- LAYER 2: Atmospheric Nebula & Volumetric Haze Blobs -->
+      <div class="atmos-layer-haze" id="atmos-layer-haze">
+        <div class="haze-blob haze-primary" id="haze-primary"></div>
+        <div class="haze-blob haze-secondary" id="haze-secondary"></div>
+        <div class="haze-blob haze-horizon" id="haze-horizon"></div>
+        <div class="haze-cloud-silhouette haze-cloud-1" id="haze-cloud-1"></div>
+        <div class="haze-cloud-silhouette haze-cloud-2" id="haze-cloud-2"></div>
+        <div class="atmos-fog-sheet" id="atmos-fog-sheet"></div>
+      </div>
+
+      <!-- LAYER 3 & 4: High-Performance 60fps Canvas for Stars, Dust & Weather FX -->
+      <canvas class="atmos-particles-canvas" id="atmos-particles-canvas"></canvas>
+
+      <!-- Ambient Thunderstorm Flash Layer -->
+      <div class="atmos-storm-flash" id="atmos-storm-flash"></div>
+
+      <!-- LAYER 5: Orbital Telemetry Lines (Thin SVG scientific geodesic arcs with stroke-dashoffset) -->
+      <svg class="atmos-layer-orbital" id="atmos-layer-orbital" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="orbitalArcGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(56, 189, 248, 0)" />
+            <stop offset="30%" stop-color="rgba(56, 189, 248, 0.16)" />
+            <stop offset="70%" stop-color="rgba(99, 102, 241, 0.12)" />
+            <stop offset="100%" stop-color="rgba(56, 189, 248, 0)" />
+          </linearGradient>
+          <linearGradient id="orbitalArcGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(147, 197, 253, 0)" />
+            <stop offset="50%" stop-color="rgba(56, 189, 248, 0.14)" />
+            <stop offset="100%" stop-color="rgba(147, 197, 253, 0)" />
+          </linearGradient>
+          <linearGradient id="orbitalArcGrad3" x1="0%" y1="50%" x2="100%" y2="50%">
+            <stop offset="0%" stop-color="rgba(168, 85, 247, 0)" />
+            <stop offset="50%" stop-color="rgba(129, 140, 248, 0.1)" />
+            <stop offset="100%" stop-color="rgba(56, 189, 248, 0)" />
+          </linearGradient>
+        </defs>
+        <!-- Trajectory Arc 1: Wide Low-Earth Equatorial Pass -->
+        <path class="orbital-path orbital-path-1" d="M -200,320 C 450,180 1250,220 2150,560" fill="none" stroke="url(#orbitalArcGrad1)" stroke-width="1.2"/>
+        <!-- Trajectory Arc 2: High Polar Satellite Orbit -->
+        <path class="orbital-path orbital-path-2" d="M 300,-100 C 580,480 1180,720 1850,1180" fill="none" stroke="url(#orbitalArcGrad2)" stroke-width="1"/>
+        <!-- Trajectory Arc 3: Atmospheric Telemetry Geodesic Sweep -->
+        <path class="orbital-path orbital-path-3" d="M -150,850 C 620,680 1350,780 2100,620" fill="none" stroke="url(#orbitalArcGrad3)" stroke-width="1.4"/>
+        <!-- Atmospheric Coordinate Reticle Points -->
+        <circle cx="850" cy="225" r="2.5" class="orbital-beacon beacon-1" fill="#38bdf8"/>
+        <circle cx="1180" cy="720" r="2" class="orbital-beacon beacon-2" fill="#818cf8"/>
+      </svg>
+
+      <!-- Ambient Contrast Vignette & Grounding Edge -->
+      <div class="atmos-vignette-overlay"></div>
     </div>
 
     <!-- 1. FIXED TOP CINEMATIC NAVIGATION -->
@@ -1011,6 +1063,7 @@
 
     <!-- Atmospheric 3D & GSAP Motion Engines -->
     <script src="assets/js/three-atmosphere.js?v=2.3"></script>
+    <script src="assets/js/atmospheric-background.js?v=2.4"></script>
     <script src="assets/js/motion-engine.js?v=2.3"></script>
     <!-- Environment & Secure Configuration (config.js is gitignored) -->
     <script src="assets/js/config.example.js"></script>

@@ -4165,6 +4165,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initStandbyLandingState(status) {
       this.initAmbientSky();
       this.renderSkyElements(0, true, null);
+      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
+        this.#app.getAtmosphericBackground().setInitialState();
+      }
       if (this.#elements.summaryText) {
         this.#elements.summaryText.textContent =
           "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
@@ -4277,6 +4280,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // 8. Card Physics
       if (window.motionEngine) {
         window.motionEngine.initCardPhysics();
+      }
+
+      // 9. Full-Page Atmospheric Background Intelligence System
+      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
+        this.#app.getAtmosphericBackground().update(weatherData, locationName, timezone);
       }
     }
 
@@ -5153,6 +5161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     #geocoding;
     #weather;
     #splineRenderer;
+    #atmosphericBackground;
     #ui;
     #historyKey = "atmosphere_recent_searches";
     #maxHistory = 6;
@@ -5162,6 +5171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       this.#geocoding = new AtmosphereGeocodingService(this.#security, GLOBAL_CITY_CATALOG);
       this.#weather = new AtmosphereWeatherService(WMO_WEATHER_MAP);
       this.#splineRenderer = new AtmosphereSplineRenderer();
+      this.#atmosphericBackground = window.AtmosphericBackground ? new window.AtmosphericBackground() : null;
       this.#ui = new AtmosphereUIController(this);
     }
 
@@ -5186,6 +5196,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sanitize(input) {
       return this.#security.sanitize(input);
+    }
+
+    getAtmosphericBackground() {
+      return this.#atmosphericBackground;
     }
 
     getWmoInfo(code) {

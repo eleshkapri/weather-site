@@ -47,11 +47,14 @@ body.cinematic-dark-mode {
   box-sizing: border-box;
 }
 
-html,
+html {
+  background-color: #020617;
+}
+
 body,
 body.cinematic-dark-mode {
   font-family: 'Plus Jakarta Sans', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #030712 !important;
+  background-color: transparent !important;
   color: #ffffff !important;
   min-height: 100vh;
   margin: 0;

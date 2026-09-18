@@ -1,0 +1,456 @@
+/* =========================================================
+   ATMOSPHERE • PREMIUM FULL-PAGE ANIMATED BACKGROUND SYSTEM
+   Cinematic Futuristic Atmospheric Intelligence Interface
+   ========================================================= */
+
+:root {
+  --atmos-bg-deep: #020617;
+  --atmos-grad-1: rgba(14, 28, 54, 0.85);
+  --atmos-grad-2: rgba(4, 18, 42, 0.92);
+  --atmos-glow-color: rgba(56, 189, 248, 0.12);
+  --atmos-sun-x: 50%;
+  --atmos-sun-y: 40%;
+  --atmos-sun-color: rgba(253, 224, 71, 0.14);
+  --atmos-sun-opacity: 0.2;
+  --atmos-haze-1: rgba(14, 165, 233, 0.15);
+  --atmos-haze-2: rgba(99, 102, 241, 0.12);
+  --atmos-haze-3: rgba(56, 189, 248, 0.08);
+  --atmos-cloud-opacity: 0;
+  --atmos-fog-opacity: 0;
+  --atmos-storm-flash-opacity: 0;
+}
+
+/* Base Fixed Full-Screen Container */
+.atmospheric-background-system {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: var(--atmos-bg-deep);
+  transform: translateZ(0);
+  will-change: transform;
+  contain: strict;
+  transition: background-color 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================
+   LAYER 1: DEEP ANIMATED RADIAL GRADIENT & HORIZON SHIFT
+   ========================================================= */
+.atmos-layer-gradient {
+  position: absolute;
+  inset: -20px;
+  background: 
+    radial-gradient(1300px circle at 50% -10%, var(--atmos-grad-1) 0%, transparent 70%),
+    radial-gradient(1100px circle at 85% 45%, var(--atmos-grad-2) 0%, transparent 65%),
+    radial-gradient(1200px circle at 15% 85%, var(--atmos-haze-1) 0%, transparent 60%),
+    radial-gradient(900px circle at 50% 110%, var(--atmos-haze-3) 0%, transparent 55%);
+  animation: atmosGradDrift 45s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+  transition: opacity 1.2s ease;
+}
+
+@keyframes atmosGradDrift {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.04) translate(15px, -12px);
+  }
+  100% {
+    transform: scale(1.02) translate(-12px, 15px);
+  }
+}
+
+/* Dynamic Sun / Solar Elevation Atmosphere Bloom */
+.atmos-sun-glow {
+  position: absolute;
+  left: var(--atmos-sun-x);
+  top: var(--atmos-sun-y);
+  width: 700px;
+  height: 700px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--atmos-sun-color) 0%,
+    rgba(251, 191, 36, 0.07) 35%,
+    transparent 70%
+  );
+  opacity: var(--atmos-sun-opacity);
+  filter: blur(50px);
+  pointer-events: none;
+  transition: left 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              top 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 1.2s ease,
+              background 1.5s ease;
+  will-change: transform, opacity;
+}
+
+/* =========================================================
+   LAYER 2: ATMOSPHERIC NEBULA & VOLUMETRIC HAZE BLOBS
+   ========================================================= */
+.atmos-layer-haze {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.haze-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(95px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.haze-primary {
+  width: 950px;
+  height: 650px;
+  top: -100px;
+  right: -150px;
+  background: radial-gradient(circle, var(--atmos-haze-1) 0%, transparent 70%);
+  opacity: 0.85;
+  animation: hazeFloat1 52s ease-in-out infinite alternate;
+}
+
+.haze-secondary {
+  width: 850px;
+  height: 750px;
+  bottom: 5%;
+  left: -120px;
+  background: radial-gradient(circle, var(--atmos-haze-2) 0%, transparent 70%);
+  opacity: 0.75;
+  animation: hazeFloat2 64s ease-in-out infinite alternate;
+}
+
+.haze-horizon {
+  width: 1400px;
+  height: 380px;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 100%, var(--atmos-haze-3) 0%, transparent 75%);
+  opacity: 0.8;
+  filter: blur(80px);
+}
+
+@keyframes hazeFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-45px, 35px) scale(1.08); }
+  100% { transform: translate(30px, -25px) scale(0.96); }
+}
+
+@keyframes hazeFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -40px) scale(1.1); }
+  100% { transform: translate(-35px, 25px) scale(0.95); }
+}
+
+/* Atmospheric Volumetric Cloud Silhouettes (Partly Cloudy / Cloudy) */
+.haze-cloud-silhouette {
+  position: absolute;
+  height: 220px;
+  background: radial-gradient(ellipse 65% 50% at 50% 50%, rgba(30, 41, 59, 0.4) 0%, transparent 70%);
+  filter: blur(45px);
+  opacity: var(--atmos-cloud-opacity);
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+.haze-cloud-1 {
+  top: 18%;
+  left: -20%;
+  width: 750px;
+  animation: cloudSilDrift 85s linear infinite;
+}
+
+.haze-cloud-2 {
+  top: 48%;
+  right: -25%;
+  width: 850px;
+  animation: cloudSilDrift 95s linear infinite reverse;
+}
+
+@keyframes cloudSilDrift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(80px); }
+  100% { transform: translateX(0); }
+}
+
+/* Atmospheric Fog Sheet */
+.atmos-fog-sheet {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.12) 40%,
+    rgba(203, 213, 225, 0.16) 70%,
+    transparent 100%
+  );
+  filter: blur(35px);
+  opacity: var(--atmos-fog-opacity);
+  transition: opacity 1.5s ease;
+  animation: fogWave 35s ease-in-out infinite alternate;
+}
+
+@keyframes fogWave {
+  0% { transform: translateY(0) scaleY(1); }
+  100% { transform: translateY(-30px) scaleY(1.08); }
+}
+
+/* =========================================================
+   LAYER 3 & 4: HIGH-PERFORMANCE PARTICLES CANVAS
+   (Stars, Dust Motes, Rain/Snow Streaks, Lightning Flash)
+   ========================================================= */
+.atmos-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Ambient Thunderstorm Flash Layer */
+.atmos-storm-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 60% 30%, rgba(224, 242, 254, 0.45) 0%, rgba(99, 102, 241, 0.25) 45%, transparent 80%);
+  opacity: var(--atmos-storm-flash-opacity);
+  pointer-events: none;
+  transition: opacity 0.08s ease-out;
+  mix-blend-mode: screen;
+}
+
+/* =========================================================
+   LAYER 5: ORBITAL TELEMETRY LINES (SVG GEODESIC ARCS)
+   ========================================================= */
+.atmos-layer-orbital {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0.9;
+  will-change: transform;
+}
+
+.orbital-path {
+  stroke-dasharray: 10 24;
+  animation: orbitalPathDash 50s linear infinite;
+  transition: stroke 1.2s ease, opacity 1.2s ease;
+}
+
+.orbital-path-1 {
+  stroke-dasharray: 12 28;
+  animation-duration: 48s;
+}
+
+.orbital-path-2 {
+  stroke-dasharray: 8 20;
+  animation-duration: 56s;
+  animation-direction: reverse;
+}
+
+.orbital-path-3 {
+  stroke-dasharray: 14 34;
+  animation-duration: 64s;
+}
+
+@keyframes orbitalPathDash {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 1200;
+  }
+}
+
+.orbital-beacon {
+  animation: beaconPulseAnim 3.5s ease-in-out infinite alternate;
+}
+
+.orbital-beacon.beacon-2 {
+  animation-delay: 1.8s;
+}
+
+@keyframes beaconPulseAnim {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.6); opacity: 0.95; }
+}
+
+/* Ambient Contrast Vignette & Grounding Edge */
+.atmos-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 92% 82% at 50% 50%, transparent 45%, rgba(2, 6, 23, 0.65) 100%);
+  pointer-events: none;
+}
+
+/* =========================================================
+   WEATHER-RESPONSIVE ATMOSPHERIC THEMES
+   ========================================================= */
+
+/* 1. Clear / Sunny */
+.atmospheric-background-system.weather-clear {
+  --atmos-glow-color: rgba(56, 189, 248, 0.16);
+  --atmos-cloud-opacity: 0;
+  --atmos-fog-opacity: 0;
+}
+
+/* 2. Partly Cloudy */
+.atmospheric-background-system.weather-partly-cloudy {
+  --atmos-cloud-opacity: 0.45;
+  --atmos-fog-opacity: 0;
+}
+
+/* 3. Cloudy / Overcast */
+.atmospheric-background-system.weather-cloudy {
+  --atmos-bg-deep: #050a14;
+  --atmos-grad-1: rgba(20, 32, 48, 0.85);
+  --atmos-grad-2: rgba(10, 20, 34, 0.92);
+  --atmos-haze-1: rgba(71, 85, 105, 0.18);
+  --atmos-haze-2: rgba(51, 65, 85, 0.15);
+  --atmos-cloud-opacity: 0.8;
+  --atmos-sun-opacity: 0.08;
+}
+
+/* 4. Rain & Drizzle */
+.atmospheric-background-system.weather-rain {
+  --atmos-bg-deep: #030814;
+  --atmos-grad-1: rgba(15, 27, 45, 0.9);
+  --atmos-grad-2: rgba(8, 16, 28, 0.95);
+  --atmos-haze-1: rgba(56, 189, 248, 0.12);
+  --atmos-haze-2: rgba(30, 41, 59, 0.22);
+  --atmos-cloud-opacity: 0.9;
+  --atmos-sun-opacity: 0.05;
+}
+
+/* 5. Thunderstorm */
+.atmospheric-background-system.weather-thunderstorm {
+  --atmos-bg-deep: #02050e;
+  --atmos-grad-1: rgba(12, 20, 38, 0.95);
+  --atmos-grad-2: rgba(22, 18, 42, 0.9);
+  --atmos-haze-1: rgba(99, 102, 241, 0.2);
+  --atmos-haze-2: rgba(147, 51, 234, 0.14);
+  --atmos-cloud-opacity: 0.95;
+  --atmos-sun-opacity: 0.04;
+}
+
+/* 6. Fog / Mist */
+.atmospheric-background-system.weather-fog {
+  --atmos-bg-deep: #060c18;
+  --atmos-grad-1: rgba(30, 41, 59, 0.8);
+  --atmos-grad-2: rgba(51, 65, 85, 0.7);
+  --atmos-haze-1: rgba(148, 163, 184, 0.18);
+  --atmos-haze-2: rgba(100, 116, 139, 0.16);
+  --atmos-cloud-opacity: 0.6;
+  --atmos-fog-opacity: 0.65;
+  --atmos-sun-opacity: 0.06;
+}
+
+/* 7. Snow */
+.atmospheric-background-system.weather-snow {
+  --atmos-bg-deep: #040918;
+  --atmos-grad-1: rgba(24, 38, 62, 0.85);
+  --atmos-grad-2: rgba(12, 24, 44, 0.9);
+  --atmos-haze-1: rgba(186, 230, 253, 0.15);
+  --atmos-haze-2: rgba(147, 197, 253, 0.12);
+  --atmos-cloud-opacity: 0.7;
+  --atmos-sun-opacity: 0.1;
+}
+
+/* =========================================================
+   TIME-OF-DAY ATMOSPHERIC THEMES
+   ========================================================= */
+
+/* 1. Dawn */
+.atmospheric-background-system.tod-dawn {
+  --atmos-bg-deep: #050b1a;
+  --atmos-grad-1: rgba(22, 34, 64, 0.88);
+  --atmos-grad-2: rgba(15, 23, 42, 0.95);
+  --atmos-sun-color: rgba(249, 115, 22, 0.22);
+  --atmos-haze-1: rgba(244, 63, 94, 0.12);
+  --atmos-haze-2: rgba(249, 115, 22, 0.14);
+  --atmos-haze-3: rgba(251, 146, 60, 0.16);
+}
+
+/* 2. Day */
+.atmospheric-background-system.tod-day {
+  --atmos-bg-deep: #030a1c;
+  --atmos-grad-1: rgba(14, 42, 78, 0.85);
+  --atmos-grad-2: rgba(6, 24, 52, 0.9);
+  --atmos-sun-color: rgba(253, 224, 71, 0.2);
+  --atmos-haze-1: rgba(14, 165, 233, 0.18);
+  --atmos-haze-2: rgba(56, 189, 248, 0.14);
+  --atmos-haze-3: rgba(125, 211, 252, 0.1);
+}
+
+/* 3. Sunset */
+.atmospheric-background-system.tod-sunset {
+  --atmos-bg-deep: #07091c;
+  --atmos-grad-1: rgba(36, 24, 60, 0.9);
+  --atmos-grad-2: rgba(18, 14, 38, 0.95);
+  --atmos-sun-color: rgba(245, 158, 11, 0.25);
+  --atmos-haze-1: rgba(234, 88, 12, 0.16);
+  --atmos-haze-2: rgba(168, 85, 247, 0.12);
+  --atmos-haze-3: rgba(245, 158, 11, 0.18);
+}
+
+/* 4. Night */
+.atmospheric-background-system.tod-night {
+  --atmos-bg-deep: #01040f;
+  --atmos-grad-1: rgba(8, 18, 38, 0.88);
+  --atmos-grad-2: rgba(3, 9, 22, 0.95);
+  --atmos-sun-color: rgba(186, 230, 253, 0.1);
+  --atmos-haze-1: rgba(56, 189, 248, 0.1);
+  --atmos-haze-2: rgba(99, 102, 241, 0.08);
+  --atmos-haze-3: rgba(56, 189, 248, 0.06);
+}
+
+/* =========================================================
+   PERFORMANCE & ACCESSIBILITY OVERRIDES
+   ========================================================= */
+
+/* Mobile Optimization (GPU Saving) */
+@media (max-width: 768px) {
+  .haze-blob {
+    filter: blur(45px);
+  }
+  .haze-horizon {
+    filter: blur(40px);
+  }
+  .atmos-sun-glow {
+    filter: blur(30px);
+    width: 450px;
+    height: 450px;
+  }
+  .haze-cloud-silhouette {
+    filter: blur(25px);
+  }
+  .atmos-layer-orbital {
+    opacity: 0.55;
+  }
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .atmos-layer-gradient,
+  .haze-primary,
+  .haze-secondary,
+  .haze-cloud-silhouette,
+  .atmos-fog-sheet,
+  .orbital-path,
+  .orbital-beacon {
+    animation: none !important;
+  }
+  .atmospheric-background-system {
+    transition: none !important;
+  }
+}
