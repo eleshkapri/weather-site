@@ -15,6 +15,7 @@ class MotionEngine {
     this.initSmoothScroll();
     this.initNavbarScrollMotion();
     this.initCardPhysics();
+    this.initHeroCard3DDepth();
     this.initDashboardTabs();
     this.initHeroScrollStackingAnimation();
   }
@@ -434,7 +435,7 @@ class MotionEngine {
 
   // --- 3D Magnetic Card Tilt & Cursor Spotlight ---
   initCardPhysics() {
-    const cards = document.querySelectorAll('.widget-card, .forecast-card, .summary-card, .hero-scenery-card');
+    const cards = document.querySelectorAll('.widget-card, .forecast-card, .summary-card');
 
     cards.forEach((card) => {
       if (card.getAttribute('data-tilt-bound') === 'true') return;
@@ -474,6 +475,91 @@ class MotionEngine {
           });
         }
       });
+    });
+
+    this.initHeroCard3DDepth();
+  }
+
+  // --- MotionSites.ai Multi-Layer 3D Depth & Specular Sheen Tracking ---
+  initHeroCard3DDepth() {
+    const heroCard = document.querySelector('.hero-scenery-card');
+    if (!heroCard) return;
+    if (heroCard.getAttribute('data-3d-depth-bound') === 'true') return;
+    heroCard.setAttribute('data-3d-depth-bound', 'true');
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    heroCard.addEventListener('pointermove', (e) => {
+      const rect = heroCard.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      heroCard.style.setProperty('--mouse-x', `${x}px`);
+      heroCard.style.setProperty('--mouse-y', `${y}px`);
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const normX = (x - centerX) / centerX; // -1 to 1
+      const normY = (y - centerY) / centerY; // -1 to 1
+
+      // 1. Natural Physical Card Tilt
+      const rotateX = -normY * 4.5;
+      const rotateY = normX * 4.5;
+
+      if (typeof gsap !== 'undefined') {
+        gsap.to(heroCard, {
+          rotateX: rotateX,
+          rotateY: rotateY,
+          scale: 1.015,
+          transformPerspective: 1200,
+          duration: 0.35,
+          ease: 'power1.out',
+          overwrite: 'auto'
+        });
+
+        // 2. Multi-Plane Internal Parallax across [data-depth] layers
+        const layers = heroCard.querySelectorAll('[data-depth]');
+        layers.forEach((layer) => {
+          const depth = parseFloat(layer.getAttribute('data-depth')) || 0;
+          const moveX = normX * depth * 22;
+          const moveY = normY * depth * 14;
+
+          gsap.to(layer, {
+            x: moveX,
+            y: moveY,
+            duration: 0.45,
+            ease: 'power1.out',
+            overwrite: 'auto'
+          });
+        });
+      }
+    });
+
+    heroCard.addEventListener('pointerleave', () => {
+      if (typeof gsap !== 'undefined') {
+        // Reset card tilt & scale
+        gsap.to(heroCard, {
+          rotateX: 0,
+          rotateY: 0,
+          scale: 1,
+          duration: 0.65,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+
+        // Reset all depth layers to resting position
+        const layers = heroCard.querySelectorAll('[data-depth]');
+        layers.forEach((layer) => {
+          gsap.to(layer, {
+            x: 0,
+            y: 0,
+            duration: 0.65,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        });
+      }
     });
   }
 

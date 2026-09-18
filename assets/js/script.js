@@ -4164,6 +4164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initStandbyLandingState(status) {
       this.initAmbientSky();
+      this.renderSkyElements(0, true, null);
       if (this.#elements.summaryText) {
         this.#elements.summaryText.textContent =
           "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
@@ -4250,6 +4251,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.#elements.heroHumidityDisplay) {
         this.#elements.heroHumidityDisplay.textContent = `${current.relative_humidity_2m}%`;
       }
+      const heroWindDisplay = document.getElementById("hero-wind-val");
+      if (heroWindDisplay && current.wind_speed_10m !== undefined) {
+        heroWindDisplay.textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+      }
 
       // 3. Narrative AI Summary
       if (this.#elements.summaryText) {
@@ -4308,6 +4313,167 @@ document.addEventListener("DOMContentLoaded", () => {
       else weatherState = isDay ? "sunny" : "clear-night";
 
       this.updateSceneryFxParticles(weatherState);
+      this.renderSkyElements(wmoCode, isDay, current);
+    }
+
+    renderSkyElements(wmoCode, isDay, current) {
+      if (!this.#elements.skyElements) return;
+      const sky = this.#elements.skyElements;
+      sky.innerHTML = "";
+
+      const isRain = [51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(wmoCode);
+      const isSnow = [66, 67, 71, 73, 75, 77, 85, 86].includes(wmoCode);
+      const isStorm = [95, 96, 99].includes(wmoCode);
+      const isCloudy = [2, 3, 45, 48].includes(wmoCode);
+
+      if (isDay) {
+        // --- 3D RADIANT SUN ---
+        const sunContainer = document.createElement("div");
+        sunContainer.className = "sun-3d";
+        sunContainer.innerHTML = `
+          <div class="sun-ambient-halo"></div>
+          <div class="sun-god-rays"></div>
+          <div class="sun-corona"></div>
+          <div class="sun-core"></div>
+        `;
+        sky.appendChild(sunContainer);
+
+        // Floating ambient solar motes drifting through god rays
+        for (let i = 0; i < 12; i++) {
+          const mote = document.createElement("div");
+          mote.className = "solar-mote";
+          const size = Math.random() * 3 + 2;
+          mote.style.width = `${size}px`;
+          mote.style.height = `${size}px`;
+          mote.style.top = `${Math.random() * 120 + 20}px`;
+          mote.style.right = `${Math.random() * 180 + 40}px`;
+          mote.style.animationDelay = `${(Math.random() * 4).toFixed(1)}s`;
+          mote.style.animationDuration = `${(Math.random() * 4 + 4).toFixed(1)}s`;
+          sky.appendChild(mote);
+        }
+
+        // Volumetric 3D fluffy clouds
+        if (isCloudy || isRain || isStorm) {
+          const cloudSvgPath = `
+            <svg class="cloud-svg" viewBox="0 0 320 160" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="cloudGradDay" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)"/>
+                  <stop offset="60%" stop-color="rgba(241, 245, 249, 0.88)"/>
+                  <stop offset="100%" stop-color="rgba(203, 213, 225, 0.75)"/>
+                </linearGradient>
+                <linearGradient id="cloudGradDark" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(148, 163, 184, 0.92)"/>
+                  <stop offset="70%" stop-color="rgba(100, 116, 139, 0.85)"/>
+                  <stop offset="100%" stop-color="rgba(51, 65, 85, 0.8)"/>
+                </linearGradient>
+              </defs>
+              <path d="M50 130 C20 130 0 110 0 85 C0 62 18 45 42 42 C54 18 80 0 110 0 C145 0 174 22 185 52 C196 46 210 42 225 42 C255 42 280 64 280 92 C280 96 279 100 278 104 C296 108 310 120 310 130 Z" fill="${isRain || isStorm ? 'url(#cloudGradDark)' : 'url(#cloudGradDay)'}"/>
+            </svg>
+          `;
+
+          const c1 = document.createElement("div");
+          c1.className = "fluffy-cloud-3d cloud-tier-1";
+          c1.innerHTML = cloudSvgPath;
+          sky.appendChild(c1);
+
+          const c2 = document.createElement("div");
+          c2.className = "fluffy-cloud-3d cloud-tier-2";
+          c2.innerHTML = cloudSvgPath;
+          sky.appendChild(c2);
+
+          if (isRain || isStorm) {
+            const c3 = document.createElement("div");
+            c3.className = "fluffy-cloud-3d cloud-tier-3";
+            c3.innerHTML = cloudSvgPath;
+            sky.appendChild(c3);
+          }
+        }
+      } else {
+        // --- 3D PHOTOREALISTIC MOON (NIGHT SCENE) ---
+        const moonContainer = document.createElement("div");
+        moonContainer.className = "moon-3d";
+        moonContainer.innerHTML = `
+          <div class="moon-halo"></div>
+          <div class="moon-sphere">
+            <div class="moon-crater c1"></div>
+            <div class="moon-crater c2"></div>
+            <div class="moon-crater c3"></div>
+            <div class="moon-crater c4"></div>
+          </div>
+        `;
+        sky.appendChild(moonContainer);
+
+        // Twinkling Star Field (38 stars with randomized distribution)
+        for (let i = 0; i < 38; i++) {
+          const star = document.createElement("div");
+          star.className = "star-particle";
+          const size = Math.random() * 2.5 + 1.2;
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          star.style.top = `${Math.random() * 65}%`;
+          star.style.left = `${Math.random() * 96}%`;
+          star.style.opacity = (Math.random() * 0.6 + 0.3).toFixed(2);
+          star.style.animationDelay = `${(Math.random() * 3).toFixed(1)}s`;
+          star.style.animationDuration = `${(Math.random() * 2.5 + 2).toFixed(1)}s`;
+          sky.appendChild(star);
+        }
+
+        // Night Volumetric Clouds
+        if (isCloudy || isRain || isStorm) {
+          const nightCloudSvg = `
+            <svg class="cloud-svg" viewBox="0 0 320 160" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="cloudGradNight" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(148, 163, 184, 0.45)"/>
+                  <stop offset="50%" stop-color="rgba(30, 41, 59, 0.7)"/>
+                  <stop offset="100%" stop-color="rgba(15, 23, 42, 0.85)"/>
+                </linearGradient>
+              </defs>
+              <path d="M50 130 C20 130 0 110 0 85 C0 62 18 45 42 42 C54 18 80 0 110 0 C145 0 174 22 185 52 C196 46 210 42 225 42 C255 42 280 64 280 92 C280 96 279 100 278 104 C296 108 310 120 310 130 Z" fill="url(#cloudGradNight)"/>
+            </svg>
+          `;
+
+          const nc1 = document.createElement("div");
+          nc1.className = "fluffy-cloud-3d cloud-tier-1";
+          nc1.innerHTML = nightCloudSvg;
+          sky.appendChild(nc1);
+
+          const nc2 = document.createElement("div");
+          nc2.className = "fluffy-cloud-3d cloud-tier-2";
+          nc2.innerHTML = nightCloudSvg;
+          sky.appendChild(nc2);
+        }
+      }
+
+      // --- RAIN STREAKS ---
+      if (isRain || isSnow || isStorm) {
+        for (let i = 0; i < 22; i++) {
+          const streak = document.createElement("div");
+          streak.className = "rain-streak";
+          streak.style.left = `${Math.random() * 95}%`;
+          streak.style.top = `${Math.random() * 20 - 20}px`;
+          streak.style.animationDelay = `${(Math.random() * 1.2).toFixed(2)}s`;
+          streak.style.animationDuration = `${(Math.random() * 0.4 + 0.6).toFixed(2)}s`;
+          sky.appendChild(streak);
+        }
+      }
+
+      // --- THUNDERSTORM REALISTIC LIGHTNING ---
+      if (isStorm) {
+        const lightningRig = document.createElement("div");
+        lightningRig.className = "lightning-strike-rig";
+        lightningRig.innerHTML = `
+          <svg viewBox="0 0 100 180" width="100%" height="100%" fill="none">
+            <path d="M55 0 L25 70 L48 70 L15 170 L80 85 L52 85 Z" fill="#ffffff" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+        `;
+        sky.appendChild(lightningRig);
+
+        const flashOverlay = document.createElement("div");
+        flashOverlay.className = "lightning-flash-overlay";
+        sky.appendChild(flashOverlay);
+      }
     }
 
     updateCharacterState(weatherState, isDay) {

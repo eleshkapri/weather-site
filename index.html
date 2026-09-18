@@ -348,13 +348,17 @@
               </button>
             </div>
 
-            <!-- 1. Hero Atmospheric Scenery Section (Samsung & Apple Design) -->
-            <section class="hero-scenery-card">
-              <!-- Dynamic Animated Artwork Backdrop -->
+            <!-- 1. Hero Atmospheric Scenery Section (Option A & MotionSites 3D Depth Model) -->
+            <section class="hero-scenery-card" id="hero-scenery-card">
+              <!-- Dynamic Specular Gloss Sheen & Glass Bevel Glare -->
+              <div class="card-specular-glare" id="card-specular-glare"></div>
+              <div class="card-glass-rim"></div>
+
+              <!-- Dynamic Animated Artwork Backdrop with Layered 3D Depth -->
               <div class="scenery-canvas" id="scenery-canvas">
-                <div class="sky-elements" id="sky-elements"></div>
-                <div class="mist-layer"></div>
-                <div class="landscape-ground">
+                <div class="sky-elements" id="sky-elements" data-depth="0.35"></div>
+                <div class="mist-layer" data-depth="0.45"></div>
+                <div class="landscape-ground" data-depth="0.22">
                   <!-- Dynamic Weather Ambient FX Particles -->
                   <div class="scenery-fx-particles" id="scenery-fx-particles"></div>
 
@@ -376,7 +380,7 @@
                       </linearGradient>
                       <linearGradient id="crestGlowGrad" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stop-color="rgba(255, 255, 255, 0)" />
-                        <stop offset="50%" stop-color="var(--crest-highlight, rgba(255, 255, 255, 0.28))" />
+                        <stop offset="50%" stop-color="var(--crest-highlight, rgba(255, 255, 255, 0.35))" />
                         <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
                       </linearGradient>
                     </defs>
@@ -399,8 +403,8 @@
                   </svg>
                 </div>
 
-                <!-- Samsung One UI Weather Companion Character -->
-                <div class="character-silhouette" id="character-figure" title="Atmospheric companion · Click to interact!">
+                <!-- Weather Companion Character Observer (Depth Tier 3) -->
+                <div class="character-silhouette" id="character-figure" data-depth="0.38" title="Atmospheric companion · Click to interact!">
                   <div class="character-reaction-bubble" id="char-reaction-bubble">
                     <span class="bubble-text">☀️ Beautiful day out!</span>
                     <span class="bubble-tail"></span>
@@ -471,9 +475,10 @@
                 </div>
               </div>
 
-              <!-- Top Floating Meta Details (Samsung One UI Aesthetic) -->
-              <div class="hero-top-details">
+              <!-- Top Floating Meta Details (Option A Frosted Glass Tier) -->
+              <div class="hero-top-details" data-depth="-0.15">
                 <div class="city-location-badge">
+                  <span class="live-telemetry-beacon"></span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                     <circle cx="12" cy="10" r="3"/>
@@ -481,11 +486,16 @@
                   <h1 id="city-name">Atmosphere Station</h1>
                   <span class="country-tag" id="country-tag">--</span>
                 </div>
-                <div class="hero-local-time" id="local-time-clock">--:-- --</div>
+                <div class="hero-local-time-box">
+                  <svg class="clock-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  <span class="hero-local-time" id="local-time-clock">--:-- --</span>
+                </div>
               </div>
 
-              <!-- Bottom Weather Reading Metrics -->
-              <div class="hero-bottom-reading">
+              <!-- Bottom Weather Reading Metrics (Option A Floating Glass Tier) -->
+              <div class="hero-bottom-reading" data-depth="-0.22">
                 <div class="temp-condition-block">
                   <div class="temperature-row">
                     <span class="main-temperature" id="temperature">--</span>
@@ -496,6 +506,7 @@
 
                 <div class="hero-submetrics">
                   <div class="submetric-pill" title="Feels like temperature">
+                    <span class="pill-dot thermal-dot"></span>
                     <span class="pill-label">Feels like</span>
                     <span class="pill-val" id="apparent-temp">--°</span>
                   </div>
@@ -504,8 +515,14 @@
                     <span class="pill-val" id="day-high-low">--° / --°</span>
                   </div>
                   <div class="submetric-pill" title="Atmospheric Humidity">
+                    <svg class="pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
                     <span class="pill-label">Humidity</span>
                     <span class="pill-val" id="hero-humidity">--%</span>
+                  </div>
+                  <div class="submetric-pill" title="Wind Velocity">
+                    <svg class="pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                    <span class="pill-label">Wind</span>
+                    <span class="pill-val" id="hero-wind-val">-- km/h</span>
                   </div>
                 </div>
               </div>

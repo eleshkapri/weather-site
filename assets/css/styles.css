@@ -376,96 +376,177 @@ html.lenis, html.lenis body {
    ========================================================= */
 .hero-scenery-card {
   position: relative;
-  height: 320px;
-  border-radius: var(--radius-card);
+  height: 360px;
+  border-radius: 28px;
   overflow: hidden;
-  border: 1px solid var(--card-border);
-  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 26px 36px;
-  transition: all 0.6s ease;
+  padding: 26px 32px;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
 }
 
-/* --- HERO CARD SCENERY BACKGROUNDS PER THEME --- */
+/* Dynamic Specular Gloss Sheen (MotionSites.ai Model) */
+.card-specular-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 12;
+  background: radial-gradient(
+    580px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.04) 38%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  mix-blend-mode: overlay;
+}
+
+.hero-scenery-card:hover .card-specular-glare {
+  opacity: 1;
+}
+
+/* Double-Beveled Glass Rim Reflection */
+.card-glass-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 13;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.38), inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* --- HERO CARD SCENERY BACKGROUNDS & DYNAMIC GLOWS PER THEME --- */
 .hero-scenery-card.theme-day,
 .hero-scenery-card.theme-day-clear,
 body.theme-day .hero-scenery-card,
 body.theme-day-clear .hero-scenery-card {
-  background: linear-gradient(180deg, #1967d2 0%, #3b8cf0 38%, #6cb4fd 72%, #9ad3fd 100%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(180deg, #135fc7 0%, #2982ec 38%, #5da9fd 72%, #93cef9 100%);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 24px 60px -12px rgba(25, 103, 210, 0.45), 0 0 40px rgba(59, 130, 246, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.4);
 }
 
 .hero-scenery-card.theme-day-cloudy,
 body.theme-day-cloudy .hero-scenery-card {
-  background: linear-gradient(180deg, #2c3840 0%, #3d4f58 35%, #546e7a 70%, #78909c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #28333b 0%, #37464e 35%, #4d646f 70%, #6f8692 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 24px 60px -12px rgba(30, 41, 59, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.25);
 }
 
 .hero-scenery-card.theme-day-rain,
 body.theme-day-rain .hero-scenery-card {
-  background: linear-gradient(180deg, #161f2c 0%, #243041 40%, #374659 75%, #4f5f73 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #131b26 0%, #1d2836 40%, #2d3b4d 75%, #435467 100%);
+  border-color: rgba(56, 189, 248, 0.25);
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.6), 0 0 35px rgba(56, 189, 248, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.25);
 }
 
 .hero-scenery-card.theme-night,
 .hero-scenery-card.theme-night-clear,
 body.theme-night .hero-scenery-card,
 body.theme-night-clear .hero-scenery-card {
-  background: linear-gradient(180deg, #040916 0%, #0a1936 50%, #0f244c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(180deg, #030712 0%, #071228 45%, #0d1e3d 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 70px -12px rgba(0, 0, 0, 0.85), 0 0 45px rgba(56, 189, 248, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .hero-scenery-card.theme-night-cloudy,
 body.theme-night-cloudy .hero-scenery-card {
-  background: linear-gradient(180deg, #070e1a 0%, #101c2e 50%, #1b2a40 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #050a14 0%, #0c1626 50%, #152236 100%);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 70px -12px rgba(0, 0, 0, 0.85), inset 0 1px 2px rgba(255, 255, 255, 0.18);
 }
 
 .hero-scenery-card.theme-night-rain,
 .hero-scenery-card.theme-thunderstorm,
 body.theme-night-rain .hero-scenery-card,
 body.theme-thunderstorm .hero-scenery-card {
-  background: linear-gradient(180deg, #02050f 0%, #080f1e 50%, #111d33 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #02040c 0%, #060d1a 45%, #0d1629 100%);
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 24px 70px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(99, 102, 241, 0.18), inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
+/* 3D Parallax Canvas & Depth Plane Geometry */
 .scenery-canvas {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
+  border-radius: inherit;
+  transform-style: preserve-3d;
 }
 
-/* Sky layers & animated 3D celestial elements */
-.sky-elements {
+.hero-scenery-card [data-depth] {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.hero-scenery-card .sky-elements {
   position: absolute;
   inset: 0;
   z-index: 1;
+  transform: translateZ(35px);
 }
 
-/* --- 3D SUN --- */
+.hero-scenery-card .mist-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform: translateZ(48px);
+}
+
+.hero-scenery-card .landscape-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 175px;
+  z-index: 3;
+  pointer-events: none;
+  transform: translateZ(25px);
+}
+
+.hero-scenery-card .character-silhouette {
+  position: absolute;
+  bottom: 44px;
+  right: 22%;
+  width: 68px;
+  height: 114px;
+  z-index: 6;
+  pointer-events: auto;
+  cursor: pointer;
+  transform: translateZ(75px);
+}
+
+/* --- PHOTOREALISTIC 3D SUN (DAYTIME SCENE) --- */
 .sun-3d {
   position: absolute;
-  top: 28px;
-  right: 90px;
-  width: 100px;
-  height: 100px;
+  top: 24px;
+  right: 85px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  transform-style: preserve-3d;
 }
 
 .sun-core {
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7b8 25%, #fec810 65%, #f59e0b 100%);
-  box-shadow: 0 0 45px rgba(254, 200, 16, 0.85), 0 0 90px rgba(255, 230, 100, 0.5), inset -4px -4px 10px rgba(217, 119, 6, 0.4);
+  background: radial-gradient(circle at 35% 32%, #ffffff 0%, #fef08a 24%, #f59e0b 68%, #d97706 100%);
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.9), 0 0 90px rgba(254, 240, 138, 0.6), inset -5px -5px 12px rgba(180, 83, 9, 0.5);
   animation: sunPulse 5s ease-in-out infinite alternate;
 }
 
@@ -473,38 +554,87 @@ body.theme-thunderstorm .hero-scenery-card {
   position: absolute;
   inset: -18px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(254, 200, 16, 0.22) 45%, transparent 70%);
-  animation: sunFlareRotate 24s linear infinite;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(254, 200, 16, 0.28) 45%, transparent 70%);
+  animation: sunFlareRotate 22s linear infinite;
 }
 
 .sun-ambient-halo {
   position: absolute;
-  inset: -45px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 240, 160, 0.28) 0%, rgba(255, 215, 0, 0.08) 45%, transparent 70%);
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.35) 0%, rgba(251, 191, 36, 0.14) 45%, transparent 72%);
+  filter: blur(8px);
   pointer-events: none;
 }
 
-/* --- 3D MOON --- */
+.sun-god-rays {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 235, 150, 0.15) 0deg 15deg,
+    transparent 15deg 35deg,
+    rgba(255, 235, 150, 0.18) 35deg 55deg,
+    transparent 55deg 80deg,
+    rgba(255, 235, 150, 0.12) 80deg 105deg,
+    transparent 105deg 140deg,
+    rgba(255, 235, 150, 0.2) 140deg 165deg,
+    transparent 165deg 200deg,
+    rgba(255, 235, 150, 0.14) 200deg 230deg,
+    transparent 230deg 260deg,
+    rgba(255, 235, 150, 0.18) 260deg 285deg,
+    transparent 285deg 320deg,
+    rgba(255, 235, 150, 0.12) 320deg 360deg
+  );
+  filter: blur(4px);
+  animation: sunRaySpin 45s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes sunRaySpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.solar-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, rgba(254, 240, 138, 0.8) 50%, transparent 100%);
+  box-shadow: 0 0 6px #fef08a;
+  animation: solarMoteDrift 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes solarMoteDrift {
+  0% { transform: translate(0, 0) scale(0.8); opacity: 0.3; }
+  50% { opacity: 0.9; }
+  100% { transform: translate(30px, -25px) scale(1.2); opacity: 0.2; }
+}
+
+/* --- PHOTOREALISTIC 3D MOON (NIGHT SCENE) --- */
 .moon-3d {
   position: absolute;
-  top: 28px;
-  right: 90px;
-  width: 70px;
-  height: 70px;
+  top: 24px;
+  right: 85px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  transform-style: preserve-3d;
 }
 
 .moon-sphere {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e2e8f0 40%, #cbd5e1 80%, #94a3b8 100%);
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.85), 0 0 70px rgba(180, 210, 255, 0.35), inset -5px -5px 12px rgba(71, 85, 105, 0.5);
+  background: radial-gradient(circle at 35% 32%, #ffffff 0%, #e2e8f0 38%, #cbd5e1 75%, #64748b 100%);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.85), 0 0 75px rgba(186, 230, 253, 0.4), inset -6px -6px 14px rgba(51, 65, 85, 0.55);
   position: relative;
   overflow: hidden;
 }
@@ -512,19 +642,20 @@ body.theme-thunderstorm .hero-scenery-card {
 .moon-crater {
   position: absolute;
   border-radius: 50%;
-  background: rgba(100, 116, 139, 0.25);
-  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3);
+  background: rgba(71, 85, 105, 0.28);
+  box-shadow: inset 1px 1px 2px rgba(15, 23, 42, 0.45);
 }
 
-.moon-crater.c1 { width: 12px; height: 12px; top: 14px; left: 16px; }
-.moon-crater.c2 { width: 8px; height: 8px; top: 32px; left: 28px; }
-.moon-crater.c3 { width: 10px; height: 10px; top: 36px; left: 12px; }
+.moon-crater.c1 { width: 13px; height: 13px; top: 14px; left: 16px; }
+.moon-crater.c2 { width: 9px; height: 9px; top: 34px; left: 30px; }
+.moon-crater.c3 { width: 11px; height: 11px; top: 38px; left: 14px; }
+.moon-crater.c4 { width: 7px; height: 7px; top: 22px; left: 38px; }
 
 .moon-halo {
   position: absolute;
-  inset: -30px;
+  inset: -36px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(220, 235, 255, 0.25) 0%, rgba(200, 225, 255, 0.08) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(224, 242, 254, 0.32) 0%, rgba(186, 230, 253, 0.12) 48%, transparent 72%);
   pointer-events: none;
 }
 
@@ -536,20 +667,103 @@ body.theme-thunderstorm .hero-scenery-card {
   animation: starTwinkle 3s ease-in-out infinite alternate;
 }
 
-/* --- 3D FLUFFY VOLUMETRIC CLOUDS --- */
+/* --- 3D VOLUMETRIC FLUFFY CLOUDS --- */
 .fluffy-cloud-3d {
   position: absolute;
-  width: 220px;
-  height: 110px;
   pointer-events: none;
-  z-index: 2;
-  animation: cloudDrift 50s linear infinite;
-  filter: drop-shadow(0 12px 24px rgba(10, 35, 75, 0.16));
+  filter: drop-shadow(0 14px 28px rgba(10, 30, 60, 0.25));
+  will-change: transform;
+}
+
+.fluffy-cloud-3d.cloud-tier-1 {
+  top: 25px;
+  left: -20px;
+  width: 240px;
+  height: 120px;
+  opacity: 0.95;
+  animation: cloudDriftSlow 65s linear infinite;
+}
+
+.fluffy-cloud-3d.cloud-tier-2 {
+  top: 55px;
+  right: 15px;
+  width: 290px;
+  height: 140px;
+  opacity: 0.88;
+  animation: cloudDriftMid 50s linear infinite reverse;
+}
+
+.fluffy-cloud-3d.cloud-tier-3 {
+  top: 85px;
+  left: 30%;
+  width: 200px;
+  height: 100px;
+  opacity: 0.75;
+  animation: cloudDriftFast 40s linear infinite;
+}
+
+@keyframes cloudDriftSlow {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(45px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes cloudDriftMid {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-35px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes cloudDriftFast {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(25px); }
+  100% { transform: translateX(0); }
 }
 
 .cloud-svg {
   width: 100%;
   height: 100%;
+}
+
+/* --- THUNDERSTORM LIGHTNING RIG --- */
+.lightning-strike-rig {
+  position: absolute;
+  top: 10px;
+  right: 25%;
+  width: 140px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  filter: drop-shadow(0 0 16px #38bdf8) drop-shadow(0 0 32px #818cf8);
+  animation: lightningStrikeLoop 7s ease-in-out infinite;
+}
+
+@keyframes lightningStrikeLoop {
+  0%, 88%, 91%, 94%, 97%, 100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  89% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+  90% {
+    opacity: 0.2;
+  }
+  92% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  93% {
+    opacity: 0.4;
+  }
+  95% {
+    opacity: 0.85;
+  }
+  96% {
+    opacity: 0;
+  }
 }
 
 .rain-streak {
@@ -864,105 +1078,213 @@ body[class*="theme-day"] .mist-layer {
 /* =========================================================
    HERO SCENERY TYPOGRAPHY (PURE CRISP WHITE)
    ========================================================= */
-.hero-overlay-content {
+.hero-top-details {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  transform: translateZ(95px);
+  pointer-events: auto;
+}
+
+.city-location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-telemetry-beacon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981, 0 0 20px rgba(16, 185, 129, 0.5);
+  animation: liveBeaconPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  flex-shrink: 0;
+}
+
+@keyframes liveBeaconPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+  }
+}
+
+.city-location-badge svg {
+  width: 20px;
+  height: 20px;
+  stroke: #ffffff;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  flex-shrink: 0;
+}
+
+.city-location-badge h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.country-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hero-local-time-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.hero-local-time-box .clock-icon {
+  stroke: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
+}
+
+.hero-local-time-box .hero-local-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #ffffff !important;
+  margin: 0;
+  text-shadow: none;
+}
+
+.hero-bottom-reading {
   position: relative;
   z-index: 10;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  gap: 16px;
+  width: 100%;
+  transform: translateZ(105px);
   pointer-events: auto;
 }
 
-.hero-overlay-content * {
-  color: #ffffff !important;
-}
-
-.hero-header-meta {
+.temp-condition-block {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.city-location-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.city-location-badge svg {
-  width: 22px;
-  height: 22px;
-  stroke: #ffffff !important;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.45));
-}
-
-.city-location-badge h1 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: #ffffff !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.hero-local-time {
-  font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.88) !important;
-  font-weight: 400;
-  margin-left: 30px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-}
-
-.hero-temp-block {
-  display: flex;
-  flex-direction: column;
+.temperature-row {
+  display: inline-flex;
+  align-items: flex-start;
+  line-height: 0.9;
 }
 
 .main-temperature {
-  display: flex;
-  align-items: flex-start;
-  font-size: 96px;
+  font-size: 92px;
   font-weight: 300;
-  line-height: 0.95;
   letter-spacing: -4px;
   color: #ffffff !important;
-  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
 }
 
 .deg-symbol {
-  font-size: 54px;
+  font-size: 50px;
   font-weight: 300;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-left: 2px;
   margin-top: 4px;
-  opacity: 0.95;
 }
 
 .hero-condition-title {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 600;
-  margin-top: 6px;
+  letter-spacing: -0.2px;
   color: #ffffff !important;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   text-transform: capitalize;
+  margin-top: 4px;
 }
 
 .hero-submetrics {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 8px;
-  font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.92) !important;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-.range-pill,
-.feels-pill {
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.92) !important;
+.submetric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  color: #ffffff !important;
+  cursor: default;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease;
 }
 
-.dot-sep {
-  opacity: 0.6;
+.submetric-pill:hover {
+  transform: translateY(-2px) scale(1.03);
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.submetric-pill .pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.submetric-pill .thermal-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+}
+
+.submetric-pill .pill-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.76) !important;
+  letter-spacing: 0.01em;
+}
+
+.submetric-pill .pill-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff !important;
+  letter-spacing: -0.01em;
+}
+
+.submetric-pill .pill-icon {
+  stroke: rgba(255, 255, 255, 0.85);
+  flex-shrink: 0;
 }
 
 /* =========================================================
