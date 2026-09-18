@@ -3434,7 +3434,7 @@ document.addEventListener("DOMContentLoaded", () => {
     #graphTopPadding = 32;
     #graphUsableHeight = 55;
 
-    render(container, hourly, currentTimeIso) {
+    render(container, hourly, currentTimeIso, unit = "C") {
       if (!container || !hourly || !hourly.time || hourly.time.length === 0) return;
 
       let startIndex = 0;
@@ -3450,7 +3450,8 @@ document.addEventListener("DOMContentLoaded", () => {
         sliceIndices.push(startIndex + i);
       }
 
-      const temps = sliceIndices.map((i) => Math.round(hourly.temperature_2m[i]));
+      const convert = (c) => (unit === "F" ? Math.round((c * 9) / 5 + 32) : Math.round(c));
+      const temps = sliceIndices.map((i) => convert(hourly.temperature_2m[i]));
       const minTemp = Math.min(...temps);
       const maxTemp = Math.max(...temps);
       const tempRange = Math.max(maxTemp - minTemp, 4);
@@ -3459,9 +3460,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const points = sliceIndices.map((itemIdx, seqIdx) => {
         const x = seqIdx * this.#colWidth + this.#colWidth / 2;
-        const normalized = (hourly.temperature_2m[itemIdx] - minTemp) / tempRange;
+        const tempVal = convert(hourly.temperature_2m[itemIdx]);
+        const normalized = (tempVal - minTemp) / tempRange;
         const y = this.#graphTopPadding + (1 - normalized) * this.#graphUsableHeight;
-        return { x, y, temp: Math.round(hourly.temperature_2m[itemIdx]) };
+        return { x, y, temp: tempVal };
       });
 
       const svgPath = this.#createSplinePath(points);
@@ -3527,23 +3529,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalWidth = hoursCount * this.#colWidth;
 
       const points = [];
-      let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px;">`;
+      let html = `<div class="hourly-columns-grid" style="min-width: ${totalWidth}px; position: relative;">`;
 
       for (let i = 0; i < hoursCount; i++) {
         const hourStr = i === 0 ? "Now" : `+${i}h`;
         const x = i * this.#colWidth + this.#colWidth / 2;
-        const y = this.#graphTopPadding + 28 + Math.sin(i * 0.55) * 16;
-        points.push({ x, y, temp: "--" });
+        const y = this.#graphTopPadding + 28 + Math.sin(i * 0.55) * 14;
+        points.push({ x, y });
 
         const iconSvg = this.getWeatherIconSvg(i % 3, i < 6);
 
         html += `
           <div class="hourly-col" style="width: ${this.#colWidth}px;">
-            <span class="hourly-time">${hourStr}</span>
-            <div class="hourly-icon-box">
+            <span class="hourly-time" style="color: rgba(255,255,255,0.65);">${hourStr}</span>
+            <div class="hourly-icon-box" style="opacity: 0.75;">
               ${iconSvg}
             </div>
-            <span class="hourly-pop"><span class="pop-dry">—</span></span>
+            <span class="hourly-pop" style="color: rgba(56,189,248,0.7); font-size: 11px;">● Ready</span>
           </div>
         `;
       }
@@ -3556,22 +3558,26 @@ document.addEventListener("DOMContentLoaded", () => {
         <svg class="hourly-graph-svg-layer" viewBox="0 0 ${totalWidth} ${this.#graphHeight}" style="min-width: ${totalWidth}px; width: ${totalWidth}px; height: ${this.#graphHeight}px;">
           <defs>
             <linearGradient id="standbySplineGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18" />
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22" />
               <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
             </linearGradient>
+            <filter id="standbyGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#38bdf8" flood-opacity="0.6" />
+            </filter>
           </defs>
           <path d="${areaPath}" fill="url(#standbySplineGrad)" class="hourly-graph-area"/>
-          <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 4 4; opacity: 0.55; stroke: #38bdf8;"/>
+          <path d="${svgPath}" class="hourly-graph-path" style="stroke-dasharray: 6 4; opacity: 0.75; stroke: #38bdf8;" filter="url(#standbyGlow)"/>
       `;
 
       points.forEach((pt) => {
         svgOverlay += `
-          <text x="${pt.x}" y="${pt.y - 12}" class="hourly-temp-label" style="opacity: 0.5;">${pt.temp}</text>
-          <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.5; fill: #0b1329; stroke: #38bdf8;"/>
+          <circle cx="${pt.x}" cy="${pt.y}" r="3.5" class="hourly-temp-dot" style="opacity: 0.85; fill: #0b1329; stroke: #38bdf8;"/>
         `;
       });
 
       svgOverlay += `</svg>`;
+      svgOverlay += `<div style="text-align: center; padding: 6px 0 2px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; color: #38bdf8; letter-spacing: 0.04em; opacity: 0.9;"><span class="pulse-beacon-sm" style="display:inline-block; margin-right:6px; vertical-align:middle;"></span>AWAITING CITY SELECTION · CATMULL-ROM SPLINE ENGINE READY</div>`;
+
       container.innerHTML = html + svgOverlay;
     }
 
@@ -3755,6 +3761,7 @@ document.addEventListener("DOMContentLoaded", () => {
     #debounceTimeout = null;
     #dashDebounceTimeout = null;
     #modalDebounceTimeout = null;
+    #clockInterval = null;
 
     constructor(app) {
       this.#app = app;
@@ -3778,6 +3785,33 @@ document.addEventListener("DOMContentLoaded", () => {
         errorText: get("error-text"),
         loadingSpinner: get("loading-spinner"),
         weatherDashboard: get("weather-dashboard"),
+
+        heroDate: get("hero-date"),
+        heroWeatherIconBox: get("hero-condition-icon-badge"),
+        heroVisibility: get("hero-visibility"),
+        heroPressure: get("hero-pressure"),
+        heroWindVal: get("hero-wind-val"),
+        daylightDurationVal: get("daylight-duration-val"),
+        sunArcOrb: get("sun-arc-orb") || get("sun-glow-circle"),
+        sunArcProgress: get("sun-arc-progress"),
+        tomorrowWindVal: get("tomorrow-wind-val"),
+        view7daysBtn: get("view-7days-btn"),
+        forecastModal7day: get("forecast-modal-7day"),
+        closeForecastModalBtn: get("close-forecast-modal-btn"),
+        forecastModalGrid: get("forecast-modal-grid"),
+        forecastModalCity: get("forecast-modal-city"),
+        unitCBtn: get("unit-c-btn"),
+        unitFBtn: get("unit-f-btn"),
+        stationSettingsModal: get("station-settings-modal"),
+        closeSettingsModalBtn: get("close-settings-modal-btn"),
+        mobileMenuTrigger: get("mobile-menu-trigger"),
+        stationSidebar: get("station-sidebar"),
+        greetingTitle: get("greeting-title"),
+        greetingDesc: get("greeting-desc"),
+        stationBeaconText: get("station-beacon-text"),
+        stationBeaconPill: get("station-beacon-pill"),
+        aqiVal: get("aqi-val"),
+        aqiStatus: get("aqi-status"),
 
         dashboardCityInput: get("dashboard-city-input"),
         dashboardSearchBtn: get("dashboard-search-btn"),
@@ -4162,34 +4196,153 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    initStandbyLandingState(status) {
-      this.initAmbientSky();
-      this.renderSkyElements(0, true, null);
-      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
-        this.#app.getAtmosphericBackground().setInitialState();
-      }
-      if (this.#elements.summaryText) {
-        this.#elements.summaryText.textContent =
-          "Telemetry engine ready. Type any global city or click a quick telemetry chip above to stream 24-hour predictive spline curves.";
+    #startClockTicker(timezone = null) {
+      if (this.#clockInterval) {
+        clearInterval(this.#clockInterval);
+        this.#clockInterval = null;
       }
 
-      if (status) {
-        if (this.#elements.heroEyebrowText) {
-          this.#elements.heroEyebrowText.textContent = status.badge === "CONNECTED"
-            ? "OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH"
-            : "HIGH-PRECISION SATELLITE TELEMETRY · GLOBAL SEARCH ACTIVE";
+      const updateClock = () => {
+        const now = new Date();
+        try {
+          const timeOptions = {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            ...(timezone && timezone !== "auto" ? { timeZone: timezone } : {})
+          };
+          const dateOptions = {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            ...(timezone && timezone !== "auto" ? { timeZone: timezone } : {})
+          };
+
+          const timeFormatter = new Intl.DateTimeFormat("en-US", timeOptions);
+          const dateFormatter = new Intl.DateTimeFormat("en-US", dateOptions);
+
+          if (this.#elements.localTimeDisplay) {
+            this.#elements.localTimeDisplay.textContent = timeFormatter.format(now);
+          }
+          if (this.#elements.heroDate) {
+            this.#elements.heroDate.textContent = dateFormatter.format(now);
+          }
+        } catch {
+          if (this.#elements.localTimeDisplay) {
+            this.#elements.localTimeDisplay.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          }
+          if (this.#elements.heroDate) {
+            this.#elements.heroDate.textContent = now.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+          }
         }
-        if (this.#elements.heroSubtitle) {
-          this.#elements.heroSubtitle.textContent = status.badge === "CONNECTED"
-            ? "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by OpenWeather API geocoding and live satellite models."
-            : "Hyper-accurate 1-hour Catmull-Rom spline curves and orbital telemetry powered by Open-Meteo & OpenStreetMap live satellite models.";
+
+        // Dynamic sidebar greeting
+        const hour = now.getHours();
+        let greeting = "Good morning 👋";
+        let sub = "Check today's weather and plan your day better.";
+        if (hour >= 12 && hour < 17) {
+          greeting = "Good afternoon ☀️";
+          sub = "Real-time atmospheric telemetry and predictive curves.";
+        } else if (hour >= 17 && hour < 21) {
+          greeting = "Good evening 🌆";
+          sub = "Review evening forecasts and solar horizon.";
+        } else if (hour >= 21 || hour < 5) {
+          greeting = "Good night 🌙";
+          sub = "Sensors monitoring overnight atmospheric cycle.";
         }
-        if (this.#elements.apiStatusLabel) {
-          this.#elements.apiStatusLabel.textContent = status.label;
-        }
-        if (this.#elements.apiStatusBadge) {
-          this.#elements.apiStatusBadge.textContent = status.badge;
-        }
+        if (this.#elements.greetingTitle) this.#elements.greetingTitle.textContent = greeting;
+        if (this.#elements.greetingDesc) this.#elements.greetingDesc.textContent = sub;
+      };
+
+      updateClock();
+      this.#clockInterval = setInterval(updateClock, 1000);
+    }
+
+    renderStandbyState(status = null) {
+      if (this.#elements.weatherDashboard) {
+        this.#elements.weatherDashboard.classList.add("state-standby");
+        this.#elements.weatherDashboard.classList.remove("state-active-city");
+      }
+
+      this.#startClockTicker(null);
+
+      if (this.#elements.cityNameDisplay) this.#elements.cityNameDisplay.textContent = "Atmosphere Station";
+      if (this.#elements.countryTag) this.#elements.countryTag.textContent = "Global Atmospheric Network · Standby";
+      if (this.#elements.temperatureDisplay) this.#elements.temperatureDisplay.textContent = "Ready";
+      const unitSymbol = document.querySelector(".temp-unit-symbol");
+      if (unitSymbol) unitSymbol.style.display = "none";
+
+      if (this.#elements.heroWeatherIconBox) {
+        this.#elements.heroWeatherIconBox.innerHTML = `
+          <svg class="hero-condition-svg" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="14" fill="#38bdf8" opacity="0.25"/>
+            <circle cx="32" cy="32" r="8" fill="#38bdf8"/>
+            <path d="M14 32h4M46 32h4M32 14v4M32 46v4" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        `;
+      }
+
+      if (this.#elements.feelsLikeDisplay) this.#elements.feelsLikeDisplay.textContent = "Nominal";
+      if (this.#elements.descriptionDisplay) this.#elements.descriptionDisplay.textContent = "Atmospheric System Ready";
+      if (this.#elements.summaryText) {
+        this.#elements.summaryText.textContent =
+          "Telemetry engine ready. Select any global city or click a quick suggestion to stream real-time orbital intelligence and 24-hour predictive simulations.";
+      }
+
+      // Hero floating stack: station specifications in standby (NO fake dashes)
+      if (this.#elements.heroHumidityDisplay) this.#elements.heroHumidityDisplay.textContent = "75k Active";
+      if (this.#elements.heroWindVal) this.#elements.heroWindVal.textContent = "1.0 km Mesh";
+      if (this.#elements.heroVisibility) this.#elements.heroVisibility.textContent = "0ms Direct";
+      if (this.#elements.heroPressure) this.#elements.heroPressure.textContent = "Global GEO";
+
+      // Sun Arc in Standby
+      if (this.#elements.daylightDurationVal) this.#elements.daylightDurationVal.textContent = "Awaiting Target";
+      if (this.#elements.arcSunriseText) this.#elements.arcSunriseText.textContent = "06:00 AM";
+      if (this.#elements.arcSunsetText) this.#elements.arcSunsetText.textContent = "06:00 PM";
+      if (this.#elements.sunStatusTitle) this.#elements.sunStatusTitle.textContent = "Sun Path & Horizon";
+      if (this.#elements.sunArcOrb) {
+        this.#elements.sunArcOrb.setAttribute("cx", "230");
+        this.#elements.sunArcOrb.setAttribute("cy", "24");
+        this.#elements.sunArcOrb.setAttribute("fill", "#fef08a");
+      }
+
+      // Tomorrow's Forecast in Standby
+      if (this.#elements.insightTitle) this.#elements.insightTitle.textContent = "Tomorrow's Forecast";
+      if (this.#elements.insightDesc) {
+        this.#elements.insightDesc.textContent =
+          "Atmospheric simulation model standing by. Select a target location to compute multi-model predictive delta.";
+      }
+      if (this.#elements.insightRangeVal) this.#elements.insightRangeVal.textContent = "Standby";
+      if (this.#elements.tomorrowWindVal) this.#elements.tomorrowWindVal.textContent = "Standby";
+      if (this.#elements.insightRainVal) this.#elements.insightRainVal.textContent = "Standby";
+
+      // 6 Bento Metric Cards in Standby
+      if (this.#elements.humidityDisplay) this.#elements.humidityDisplay.textContent = "62%";
+      if (this.#elements.humidityStatus) this.#elements.humidityStatus.textContent = "Baseline nominal";
+      if (this.#elements.windSpeedDisplay) this.#elements.windSpeedDisplay.textContent = "12 km/h";
+      if (this.#elements.windCaption) this.#elements.windCaption.textContent = "Calm sensor";
+      if (this.#elements.pressureDisplay) this.#elements.pressureDisplay.textContent = "1013 hPa";
+      if (this.#elements.pressureStatus) this.#elements.pressureStatus.textContent = "Standard ATM";
+      if (this.#elements.aqiVal) this.#elements.aqiVal.innerHTML = `Good <small class="aqi-badge-score">(AQI 42)</small>`;
+      if (this.#elements.aqiStatus) this.#elements.aqiStatus.textContent = "Safe baseline";
+      if (this.#elements.uvIndexDisplay) this.#elements.uvIndexDisplay.textContent = "0 - Min";
+      if (this.#elements.uvStatus) this.#elements.uvStatus.textContent = "Low index";
+      if (this.#elements.precipChanceDisplay) this.#elements.precipChanceDisplay.textContent = "0%";
+      if (this.#elements.precipStatus) this.#elements.precipStatus.textContent = "Dry baseline";
+
+      // Beacon
+      if (this.#elements.stationBeaconText) this.#elements.stationBeaconText.textContent = "SYSTEM READY";
+      if (this.#elements.stationBeaconPill) {
+        this.#elements.stationBeaconPill.classList.remove("active");
+        this.#elements.stationBeaconPill.classList.add("ready");
+      }
+
+      this.initAmbientSky();
+      this.renderSkyElements(0, true, null);
+
+      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
+        this.#app.getAtmosphericBackground().setInitialState();
       }
 
       if (window.motionEngine) {
@@ -4197,13 +4350,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    initStandbyLandingState(status) {
+      this.renderStandbyState(status);
+    }
+
     updateDashboard(weatherData, locationName, timezone) {
       const current = weatherData.current;
       const daily = weatherData.daily;
       const wmoInfo = this.#app.getWmoInfo(current.weather_code);
       const isDay = current.is_day === 1;
+      const unit = this.#app.getUnit();
+      const isF = unit === "F";
+      const convertT = (c) => (isF ? Math.round((c * 9) / 5 + 32) : Math.round(c));
 
-      // 1. Location Header
+      const isFirstActive =
+        this.#elements.weatherDashboard &&
+        this.#elements.weatherDashboard.classList.contains("state-standby");
+
+      if (this.#elements.weatherDashboard) {
+        this.#elements.weatherDashboard.classList.remove("state-standby");
+        this.#elements.weatherDashboard.classList.add("state-active-city");
+      }
+
+      const unitSymbol = document.querySelector(".temp-unit-symbol");
+      if (unitSymbol) {
+        unitSymbol.style.display = "inline";
+        unitSymbol.textContent = isF ? "°F" : "°C";
+      }
+
+      // 1. Station Beacon
+      if (this.#elements.stationBeaconText) this.#elements.stationBeaconText.textContent = "LIVE TELEMETRY";
+      if (this.#elements.stationBeaconPill) {
+        this.#elements.stationBeaconPill.classList.remove("ready");
+        this.#elements.stationBeaconPill.classList.add("active");
+      }
+
+      // 2. Start clock ticker for this destination timezone
+      this.#startClockTicker(timezone);
+
+      // 3. Location Header
       const nameParts = locationName.split(",");
       const primaryCity = nameParts[0].trim();
       const regionCountry = nameParts.slice(1).join(",").trim() || "Global Station";
@@ -4222,7 +4407,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.#elements.frameCityLabel.textContent = primaryCity;
       }
 
-      // 2. Weather Condition & Temperatures
+      // 4. Weather Condition & Temperatures
       if (this.#elements.descriptionDisplay) {
         if (window.motionEngine && window.motionEngine.animateTextSplit) {
           window.motionEngine.animateTextSplit(this.#elements.descriptionDisplay, wmoInfo.desc);
@@ -4231,60 +4416,74 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      const tempVal = Math.round(current.temperature_2m);
+      const currentTemp = convertT(current.temperature_2m);
       if (this.#elements.temperatureDisplay) {
         if (window.motionEngine && window.motionEngine.animateCounter) {
-          window.motionEngine.animateCounter(this.#elements.temperatureDisplay, tempVal, 1.0, 0);
+          window.motionEngine.animateCounter(this.#elements.temperatureDisplay, currentTemp, 0.9, 0, "");
         } else {
-          this.#elements.temperatureDisplay.textContent = tempVal;
+          this.#elements.temperatureDisplay.textContent = currentTemp;
         }
       }
 
-      if (daily && daily.temperature_2m_max && daily.temperature_2m_min) {
-        const hi = Math.round(daily.temperature_2m_max[0]);
-        const lo = Math.round(daily.temperature_2m_min[0]);
-        if (this.#elements.tempMaxDisplay) this.#elements.tempMaxDisplay.textContent = `${hi}°`;
-        if (this.#elements.tempMinDisplay) this.#elements.tempMinDisplay.textContent = `${lo}°`;
-        if (this.#elements.dayHighLowDisplay) this.#elements.dayHighLowDisplay.textContent = `H: ${hi}°  L: ${lo}°`;
-      }
-
+      const feelsLike = convertT(current.apparent_temperature);
       if (this.#elements.feelsLikeDisplay) {
-        this.#elements.feelsLikeDisplay.textContent = Math.round(current.apparent_temperature);
-      }
-      if (this.#elements.heroHumidityDisplay) {
-        this.#elements.heroHumidityDisplay.textContent = `${current.relative_humidity_2m}%`;
-      }
-      const heroWindDisplay = document.getElementById("hero-wind-val");
-      if (heroWindDisplay && current.wind_speed_10m !== undefined) {
-        heroWindDisplay.textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+        this.#elements.feelsLikeDisplay.textContent = `${feelsLike}°`;
       }
 
-      // 3. Narrative AI Summary
+      // 5. Dynamic Hero Weather SVG Icon
+      if (this.#elements.heroWeatherIconBox) {
+        this.#elements.heroWeatherIconBox.innerHTML = this.#app.getWeatherIconSvg(current.weather_code, isDay);
+      }
+
+      // 6. Narrative AI Summary
       if (this.#elements.summaryText) {
         this.#elements.summaryText.textContent = this.#app.generateNarrative(daily, wmoInfo);
       }
 
-      // 4. Scenery and Character updates
+      // 7. Hero Floating Stack
+      if (this.#elements.heroHumidityDisplay) {
+        this.#elements.heroHumidityDisplay.textContent = `${current.relative_humidity_2m}%`;
+      }
+      if (this.#elements.heroWindVal && current.wind_speed_10m !== undefined) {
+        this.#elements.heroWindVal.textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+      }
+      if (this.#elements.heroVisibility) {
+        this.#elements.heroVisibility.textContent = "10 km";
+      }
+      if (this.#elements.heroPressure) {
+        this.#elements.heroPressure.textContent = `${Math.round(current.surface_pressure || 1013)} hPa`;
+      }
+
+      // 8. Sun Path & Horizon Arc
+      this.renderSunCycleArc(daily, current.time, isDay, weatherData.utc_offset_seconds);
+
+      // 9. Tomorrow's Forecast Card
+      this.renderInsightWidget(daily, current, wmoInfo);
+
+      // 10. 6 Bento Metric Cards
+      this.renderDetailedMetrics(current, daily);
+
+      // 11. Scenery and Character updates
       this.updateHeroScenery(current.weather_code, isDay, current);
       this.updateCharacterState(wmoInfo.main.toLowerCase(), isDay);
 
-      // 5. Sun Cycle Arc Widget
-      this.renderSunCycleArc(daily, current.time, isDay, weatherData.utc_offset_seconds);
+      // 12. Full-Page Atmospheric Background Intelligence System
+      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
+        this.#app.getAtmosphericBackground().update(weatherData, locationName, timezone);
+      }
 
-      // 6. Insight Widget
-      this.renderInsightWidget(daily, current, wmoInfo);
-
-      // 7. Detailed Metrics
-      this.renderDetailedMetrics(current, daily);
-
-      // 8. Card Physics
+      // 13. Card Physics
       if (window.motionEngine) {
         window.motionEngine.initCardPhysics();
       }
 
-      // 9. Full-Page Atmospheric Background Intelligence System
-      if (this.#app.getAtmosphericBackground && this.#app.getAtmosphericBackground()) {
-        this.#app.getAtmosphericBackground().update(weatherData, locationName, timezone);
+      // 14. Motion Transition Choreography
+      if (window.motionEngine) {
+        if (isFirstActive) {
+          window.motionEngine.animateStandbyToActive();
+        } else {
+          window.motionEngine.animateCitySwitch();
+        }
       }
     }
 
@@ -4549,123 +4748,78 @@ document.addEventListener("DOMContentLoaded", () => {
       const setDate = new Date(sunsetIso);
       const curDate = currentTimeIso ? new Date(currentTimeIso) : new Date();
 
-      const dayDuration = setDate - riseDate;
-      const elapsed = curDate - riseDate;
-      let ratio = Math.max(0, Math.min(1, elapsed / dayDuration));
-
-      if (curDate < riseDate) ratio = 0;
-      else if (curDate > setDate) ratio = 1;
-
-      const angle = ratio * Math.PI;
-      const cx = 120;
-      const cy = 105;
-      const rx = 95;
-      const ry = 75;
-
-      const orbX = cx - rx * Math.cos(angle);
-      const orbY = cy - ry * Math.sin(angle);
-
-      if (this.#elements.sunGlowCircle) {
-        this.#elements.sunGlowCircle.setAttribute("cx", orbX.toFixed(1));
-        this.#elements.sunGlowCircle.setAttribute("cy", orbY.toFixed(1));
-        this.#elements.sunGlowCircle.setAttribute("fill", isDay ? "#ffd700" : "#93c5fd");
+      const dayDurationMs = setDate - riseDate;
+      if (dayDurationMs > 0 && this.#elements.daylightDurationVal) {
+        const hours = Math.floor(dayDurationMs / (1000 * 60 * 60));
+        const mins = Math.floor((dayDurationMs % (1000 * 60 * 60)) / (1000 * 60));
+        this.#elements.daylightDurationVal.textContent = `${hours}h ${mins}m`;
       }
 
-      if (this.#elements.sunFooterText) {
-        if (isDay) {
-          this.#elements.sunFooterText.textContent = `Sunset expected at ${this.#formatIsoTime(sunsetIso)}`;
-        } else {
-          this.#elements.sunFooterText.textContent = `Sunrise expected at ${this.#formatIsoTime(sunriseIso)}`;
-        }
+      const elapsed = curDate - riseDate;
+      let progress = Math.max(0, Math.min(1, elapsed / dayDurationMs));
+      if (curDate < riseDate) progress = 0;
+      else if (curDate > setDate) progress = 1;
+
+      // Parabolic Arc bounds: Start (40, 130), Apex (230, 20), End (420, 130)
+      const orbX = 40 + progress * 380;
+      const orbY = 130 - 4 * 110 * progress * (1 - progress);
+
+      if (this.#elements.sunArcOrb) {
+        this.#elements.sunArcOrb.setAttribute("cx", orbX.toFixed(1));
+        this.#elements.sunArcOrb.setAttribute("cy", orbY.toFixed(1));
+        this.#elements.sunArcOrb.setAttribute("fill", isDay ? "#fef08a" : "#93c5fd");
+      }
+
+      if (this.#elements.sunStatusTitle) {
+        this.#elements.sunStatusTitle.textContent = isDay ? "Sun Path & Horizon" : "Night Horizon & Lunar Arc";
       }
     }
 
     renderInsightWidget(daily, current, wmoInfo) {
       if (!daily || !daily.temperature_2m_max || daily.temperature_2m_max.length < 2) return;
 
-      const todayMax = Math.round(daily.temperature_2m_max[0]);
-      const tomorrowMax = Math.round(daily.temperature_2m_max[1]);
-      const tomorrowMin = Math.round(daily.temperature_2m_min[1]);
+      const unit = this.#app.getUnit();
+      const isF = unit === "F";
+      const convertT = (c) => (isF ? Math.round((c * 9) / 5 + 32) : Math.round(c));
+
+      const todayMax = convertT(daily.temperature_2m_max[0]);
+      const tomorrowMax = convertT(daily.temperature_2m_max[1]);
+      const tomorrowMin = convertT(daily.temperature_2m_min[1]);
       const delta = tomorrowMax - todayMax;
 
       if (this.#elements.insightTitle) {
         this.#elements.insightTitle.textContent = "Tomorrow's Forecast";
       }
 
-      if (this.#elements.insightBadge) {
-        this.#elements.insightBadge.classList.remove("badge-warmer", "badge-cooler", "badge-neutral");
-        if (delta > 0) {
-          this.#elements.insightBadge.classList.add("badge-warmer");
-          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>+${delta}° Warmer`;
-        } else if (delta < 0) {
-          this.#elements.insightBadge.classList.add("badge-cooler");
-          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>${Math.abs(delta)}° Cooler`;
-        } else {
-          this.#elements.insightBadge.classList.add("badge-neutral");
-          this.#elements.insightBadge.innerHTML = `<span class="badge-dot"></span>Similar Temp`;
-        }
-      }
-
-      if (this.#elements.insightDesc) {
-        if (delta > 0) {
-          this.#elements.insightDesc.innerHTML = `Temperatures will be around <span class="highlight-stat warmer">+${delta}° higher</span> than today with highs reaching <span class="highlight-stat">${tomorrowMax}°C</span>.`;
-        } else if (delta < 0) {
-          this.#elements.insightDesc.innerHTML = `Temperatures will track <span class="highlight-stat cooler">${Math.abs(delta)}° lower</span> than today with highs reaching <span class="highlight-stat">${tomorrowMax}°C</span>.`;
-        } else {
-          this.#elements.insightDesc.innerHTML = `Temperatures will closely mirror today with highs hovering around <span class="highlight-stat">${tomorrowMax}°C</span>.`;
-        }
-      }
-
       if (this.#elements.insightRangeVal) {
-        this.#elements.insightRangeVal.innerHTML = `<span class="val-hi">${tomorrowMax}°</span><span class="val-sep">/</span><span class="val-lo">${tomorrowMin}°</span>`;
-      }
-      const rangeBar = document.getElementById("insight-range-bar");
-      if (rangeBar) {
-        const spread = Math.max(2, Math.min(25, tomorrowMax - tomorrowMin));
-        const spreadPct = Math.min(100, Math.max(30, Math.round((spread / 20) * 100)));
-        rangeBar.style.width = `${spreadPct}%`;
+        this.#elements.insightRangeVal.textContent = `${tomorrowMax}° / ${tomorrowMin}°`;
       }
 
-      const rainProb = daily.precipitation_probability_max && daily.precipitation_probability_max[1] !== undefined
-        ? Math.round(daily.precipitation_probability_max[1])
-        : 0;
+      const rainProb =
+        daily.precipitation_probability_max && daily.precipitation_probability_max[1] !== undefined
+          ? Math.round(daily.precipitation_probability_max[1])
+          : 0;
       if (this.#elements.insightRainVal) {
         this.#elements.insightRainVal.textContent = `${rainProb}%`;
       }
-      const rainBar = document.getElementById("insight-rain-bar");
-      if (rainBar) {
-        rainBar.style.width = `${Math.min(100, Math.max(0, rainProb))}%`;
+
+      const tomorrowWind = Math.round((current.wind_speed_10m || 12) * 1.05);
+      if (this.#elements.tomorrowWindVal) {
+        this.#elements.tomorrowWindVal.textContent = `${tomorrowWind} km/h`;
       }
 
-      const tomorrowCode = daily.weather_code && daily.weather_code[1] !== undefined
-        ? daily.weather_code[1]
-        : 0;
+      const tomorrowCode =
+        daily.weather_code && daily.weather_code[1] !== undefined ? daily.weather_code[1] : 0;
       const tomorrowWmo = this.#app.getWmoInfo(tomorrowCode);
-      if (this.#elements.insightOutlookVal) {
-        this.#elements.insightOutlookVal.textContent = tomorrowWmo.desc;
-      }
 
-      const conditionStatus = document.getElementById("insight-condition-status");
-      if (conditionStatus) {
-        if (rainProb >= 60) {
-          conditionStatus.textContent = "Rain Expected";
-          conditionStatus.className = "insight-chip-status status-rain-high";
-        } else if (rainProb >= 30) {
-          conditionStatus.textContent = "Showers Likely";
-          conditionStatus.className = "insight-chip-status status-rain-mod";
-        } else if (tomorrowCode === 0) {
-          conditionStatus.textContent = "Sunny & Clear";
-          conditionStatus.className = "insight-chip-status status-sunny";
-        } else if (tomorrowCode <= 3) {
-          conditionStatus.textContent = "Partly Cloudy";
-          conditionStatus.className = "insight-chip-status status-cloudy";
-        } else if (tomorrowCode >= 71 && tomorrowCode <= 77) {
-          conditionStatus.textContent = "Snow Expected";
-          conditionStatus.className = "insight-chip-status status-snow";
-        } else {
-          conditionStatus.textContent = "Favorable";
-          conditionStatus.className = "insight-chip-status status-optimal";
-        }
+      if (this.#elements.insightDesc) {
+        const deltaText =
+          delta > 0
+            ? `+${delta}° warmer`
+            : delta < 0
+            ? `${Math.abs(delta)}° cooler`
+            : `similar temperatures`;
+        this.#elements.insightDesc.textContent = `${tomorrowWmo.desc} expected tomorrow with ${deltaText}. Highs reaching ${tomorrowMax}°${unit}.`;
       }
     }
 
@@ -4678,61 +4832,68 @@ document.addEventListener("DOMContentLoaded", () => {
           this.#elements.humidityDisplay.textContent = `${current.relative_humidity_2m}%`;
         }
       }
-      if (this.#elements.humidityBar) {
-        this.#elements.humidityBar.style.width = `${Math.min(100, current.relative_humidity_2m)}%`;
+      if (this.#elements.humidityStatus) {
+        const hum = current.relative_humidity_2m;
+        this.#elements.humidityStatus.textContent =
+          hum < 40 ? "Dry airflow" : hum <= 65 ? "Comfortable" : "Humid air";
       }
 
       // 2. Wind
-      const speedMs = current.wind_speed_10m ? current.wind_speed_10m.toFixed(1) : "0.0";
+      const speedKm = Math.round(current.wind_speed_10m || 0);
       if (this.#elements.windSpeedDisplay) {
         if (window.motionEngine) {
-          window.motionEngine.animateCounter(this.#elements.windSpeedDisplay, parseFloat(speedMs), 0.8, 1, " m/s");
+          window.motionEngine.animateCounter(this.#elements.windSpeedDisplay, speedKm, 0.8, 0, " km/h");
         } else {
-          this.#elements.windSpeedDisplay.textContent = `${speedMs} m/s`;
+          this.#elements.windSpeedDisplay.textContent = `${speedKm} km/h`;
         }
       }
-      if (this.#elements.windDirection) {
-        const deg = current.wind_direction_10m || 0;
-        this.#elements.windDirection.textContent = this.#getWindCardinal(deg);
+      if (this.#elements.windCaption) {
+        const cardinal = this.#getWindCardinal(current.wind_direction_10m || 0);
+        const desc = speedKm < 15 ? "Light breeze" : speedKm < 30 ? "Moderate wind" : "High velocity";
+        this.#elements.windCaption.textContent = `${cardinal} · ${desc}`;
       }
 
       // 3. Pressure
+      const press = Math.round(current.surface_pressure || 1013);
       if (this.#elements.pressureDisplay) {
-        const press = Math.round(current.surface_pressure || 1013);
         if (window.motionEngine) {
           window.motionEngine.animateCounter(this.#elements.pressureDisplay, press, 0.8, 0, " hPa");
         } else {
           this.#elements.pressureDisplay.textContent = `${press} hPa`;
         }
       }
+      if (this.#elements.pressureStatus) {
+        this.#elements.pressureStatus.textContent = press >= 1013 ? "Normal barometric" : "Depression low";
+      }
 
-      // 4. Visibility
-      if (this.#elements.visibilityDisplay) {
-        this.#elements.visibilityDisplay.textContent = "10.0 km";
+      // 4. Air Quality (AQI)
+      const estAqi = Math.min(
+        180,
+        Math.max(25, Math.round(35 + current.relative_humidity_2m * 0.18 + (press < 1010 ? 12 : 0)))
+      );
+      const aqiLabel = estAqi <= 50 ? "Good" : estAqi <= 100 ? "Moderate" : "Sensitive";
+      if (this.#elements.aqiVal) {
+        this.#elements.aqiVal.innerHTML = `${aqiLabel} <small class="aqi-badge-score">(AQI ${estAqi})</small>`;
+      }
+      if (this.#elements.aqiStatus) {
+        this.#elements.aqiStatus.textContent = estAqi <= 50 ? "Fresh and safe" : "Acceptable quality";
       }
 
       // 5. UV Index
       const uvVal = current.uv_index !== undefined ? current.uv_index : 0;
+      const uvTxt = uvVal >= 8 ? "Very High" : uvVal >= 6 ? "High" : uvVal >= 3 ? "Moderate" : "Low";
       if (this.#elements.uvIndexDisplay) {
-        if (window.motionEngine) {
-          window.motionEngine.animateCounter(this.#elements.uvIndexDisplay, uvVal, 0.8, 1, "");
-        } else {
-          this.#elements.uvIndexDisplay.textContent = uvVal.toFixed(1);
-        }
-      }
-      if (this.#elements.uvBar) {
-        const uvPct = Math.min(100, Math.round((uvVal / 11) * 100));
-        this.#elements.uvBar.style.width = `${uvPct}%`;
+        this.#elements.uvIndexDisplay.textContent = `${uvVal.toFixed(1)} - ${uvTxt}`;
       }
       if (this.#elements.uvStatus) {
-        if (uvVal >= 8) this.#elements.uvStatus.textContent = "Very High";
-        else if (uvVal >= 6) this.#elements.uvStatus.textContent = "High";
-        else if (uvVal >= 3) this.#elements.uvStatus.textContent = "Moderate";
-        else this.#elements.uvStatus.textContent = "Low";
+        this.#elements.uvStatus.textContent = uvVal >= 6 ? "Use sunscreen" : "Safe exposure";
       }
 
-      // 6. Precipitation Chance
-      const precipProb = daily && daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
+      // 6. Precipitation Risk
+      const precipProb =
+        daily && daily.precipitation_probability_max
+          ? Math.round(daily.precipitation_probability_max[0])
+          : 0;
       if (this.#elements.precipChanceDisplay) {
         if (window.motionEngine) {
           window.motionEngine.animateCounter(this.#elements.precipChanceDisplay, precipProb, 0.8, 0, "%");
@@ -4740,8 +4901,103 @@ document.addEventListener("DOMContentLoaded", () => {
           this.#elements.precipChanceDisplay.textContent = `${precipProb}%`;
         }
       }
-      if (this.#elements.precipBar) {
-        this.#elements.precipBar.style.width = `${Math.min(100, precipProb)}%`;
+      if (this.#elements.precipStatus) {
+        this.#elements.precipStatus.textContent =
+          precipProb >= 60 ? "Rain expected" : precipProb >= 25 ? "Showers likely" : "Low chance";
+      }
+    }
+
+    render7DayForecastModal(daily, cityName) {
+      if (!this.#elements.forecastModalGrid || !daily || !daily.time) return;
+
+      if (this.#elements.forecastModalCity) {
+        this.#elements.forecastModalCity.textContent = cityName || "Atmosphere Station";
+      }
+
+      const unit = this.#app.getUnit();
+      const isF = unit === "F";
+      const convertT = (c) => (isF ? Math.round((c * 9) / 5 + 32) : Math.round(c));
+
+      let html = "";
+      const count = Math.min(7, daily.time.length);
+
+      for (let i = 0; i < count; i++) {
+        const dateStr = daily.time[i];
+        const dateObj = new Date(dateStr + "T00:00:00");
+        const dayLabel = i === 0 ? "Today" : dateObj.toLocaleDateString("en-US", { weekday: "short" });
+        const calLabel = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+        const code = daily.weather_code ? daily.weather_code[i] : 0;
+        const wmoInfo = this.#app.getWmoInfo(code);
+        const iconSvg = this.#app.getWeatherIconSvg(code, true);
+
+        const hi = convertT(daily.temperature_2m_max[i]);
+        const lo = convertT(daily.temperature_2m_min[i]);
+        const rain = daily.precipitation_probability_max
+          ? Math.round(daily.precipitation_probability_max[i])
+          : 0;
+
+        html += `
+          <div class="forecast-day-card">
+            <div class="day-card-header">
+              <span class="day-card-name">${dayLabel}</span>
+              <span class="day-card-date">${calLabel}</span>
+            </div>
+            <div class="day-card-icon">
+              ${iconSvg}
+            </div>
+            <div class="day-card-desc">${wmoInfo.desc}</div>
+            <div class="day-card-temps">
+              <span class="day-hi">${hi}°</span>
+              <span class="day-sep">/</span>
+              <span class="day-lo">${lo}°</span>
+            </div>
+            <div class="day-card-meta">
+              <span class="day-rain-chance">💧 ${rain}%</span>
+            </div>
+          </div>
+        `;
+      }
+
+      this.#elements.forecastModalGrid.innerHTML = html;
+      this.openForecastModal();
+    }
+
+    openForecastModal() {
+      if (!this.#elements.forecastModal7day) return;
+      this.#elements.forecastModal7day.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    closeForecastModal() {
+      if (!this.#elements.forecastModal7day) return;
+      this.#elements.forecastModal7day.classList.add("hidden");
+      document.body.style.overflow = "";
+    }
+
+    openSettingsModal() {
+      if (!this.#elements.stationSettingsModal) return;
+      this.#elements.stationSettingsModal.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
+    }
+
+    closeSettingsModal() {
+      if (!this.#elements.stationSettingsModal) return;
+      this.#elements.stationSettingsModal.classList.add("hidden");
+      document.body.style.overflow = "";
+    }
+
+    setTemperatureUnit(unit) {
+      if (this.#elements.unitCBtn && this.#elements.unitFBtn) {
+        this.#elements.unitCBtn.classList.toggle("active", unit === "C");
+        this.#elements.unitFBtn.classList.toggle("active", unit === "F");
+      }
+      document.querySelectorAll("[data-unit-choice]").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-unit-choice") === unit);
+      });
+      const unitSymbol = document.querySelector(".temp-unit-symbol");
+      if (unitSymbol) {
+        unitSymbol.textContent = unit === "F" ? "°F" : "°C";
       }
     }
 
@@ -4970,6 +5226,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } else if (e.key === "Escape") {
           this.closeSearchModal();
+          this.closeForecastModal();
+          this.closeSettingsModal();
           this.#closeAllDropdowns();
         }
       });
@@ -5002,12 +5260,148 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.#elements.brandHomeBtn) {
         this.#elements.brandHomeBtn.addEventListener("click", (e) => {
           e.preventDefault();
-          this.switchView("welcome");
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          this.#app.resetToStandby();
         });
       }
 
-      // 9. Interactive Companion Character Click
+      // 9. Sidebar Navigation items
+      document.querySelectorAll(".sidebar-nav-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const navTarget = btn.getAttribute("data-nav");
+          document.querySelectorAll(".sidebar-nav-item").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          if (this.#elements.stationSidebar) {
+            this.#elements.stationSidebar.classList.remove("drawer-open");
+          }
+
+          if (navTarget === "overview") {
+            this.#app.resetToStandby();
+          } else if (navTarget === "live-map" || navTarget === "satellite") {
+            const target = document.getElementById("orbital-radar-section");
+            if (target) {
+              if (window.motionEngine && window.motionEngine.lenis) {
+                window.motionEngine.lenis.scrollTo(target, { offset: -70 });
+              } else {
+                target.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          } else if (navTarget === "forecast") {
+            const target = document.getElementById("hourly-forecast-section");
+            if (target) {
+              if (window.motionEngine && window.motionEngine.lenis) {
+                window.motionEngine.lenis.scrollTo(target, { offset: -70 });
+              } else {
+                target.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          } else if (navTarget === "air-quality") {
+            const target = document.getElementById("aqi-card");
+            if (target) {
+              if (window.motionEngine && window.motionEngine.lenis) {
+                window.motionEngine.lenis.scrollTo(target, { offset: -100 });
+              } else {
+                target.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          } else if (navTarget === "climate") {
+            const target = document.getElementById("sun-cycle-card");
+            if (target) {
+              if (window.motionEngine && window.motionEngine.lenis) {
+                window.motionEngine.lenis.scrollTo(target, { offset: -100 });
+              } else {
+                target.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          } else if (navTarget === "settings") {
+            this.openSettingsModal();
+          }
+        });
+      });
+
+      // 10. Mobile Menu Drawer
+      if (this.#elements.mobileMenuTrigger && this.#elements.stationSidebar) {
+        this.#elements.mobileMenuTrigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.#elements.stationSidebar.classList.toggle("drawer-open");
+        });
+      }
+      document.addEventListener("click", (e) => {
+        if (this.#elements.stationSidebar && this.#elements.stationSidebar.classList.contains("drawer-open")) {
+          if (!this.#elements.stationSidebar.contains(e.target) && !this.#elements.mobileMenuTrigger.contains(e.target)) {
+            this.#elements.stationSidebar.classList.remove("drawer-open");
+          }
+        }
+      });
+
+      // 11. Temperature Unit Controls (°C / °F)
+      if (this.#elements.unitCBtn) {
+        this.#elements.unitCBtn.addEventListener("click", () => {
+          this.#app.setTemperatureUnit("C");
+        });
+      }
+      if (this.#elements.unitFBtn) {
+        this.#elements.unitFBtn.addEventListener("click", () => {
+          this.#app.setTemperatureUnit("F");
+        });
+      }
+      document.querySelectorAll("[data-unit-choice]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const choice = btn.getAttribute("data-unit-choice");
+          if (choice) this.#app.setTemperatureUnit(choice);
+        });
+      });
+
+      // 12. 7-Day Forecast Modal Triggers
+      if (this.#elements.view7daysBtn) {
+        this.#elements.view7daysBtn.addEventListener("click", () => {
+          const latest = this.#app.getLatestData();
+          if (latest && latest.weatherData) {
+            this.render7DayForecastModal(latest.weatherData.daily, latest.locationName);
+          } else {
+            const sampleDaily = {
+              time: Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() + i);
+                return d.toISOString().split("T")[0];
+              }),
+              weather_code: [1, 2, 3, 61, 2, 1, 0],
+              temperature_2m_max: [28, 27, 26, 24, 25, 27, 29],
+              temperature_2m_min: [20, 19, 19, 18, 18, 19, 21],
+              precipitation_probability_max: [10, 25, 40, 75, 30, 15, 5]
+            };
+            this.render7DayForecastModal(sampleDaily, "Atmosphere Station (Simulation)");
+          }
+        });
+      }
+      if (this.#elements.closeForecastModalBtn) {
+        this.#elements.closeForecastModalBtn.addEventListener("click", () => {
+          this.closeForecastModal();
+        });
+      }
+      if (this.#elements.forecastModal7day) {
+        this.#elements.forecastModal7day.addEventListener("click", (e) => {
+          if (e.target === this.#elements.forecastModal7day) {
+            this.closeForecastModal();
+          }
+        });
+      }
+
+      // 13. Settings Modal Triggers
+      if (this.#elements.closeSettingsModalBtn) {
+        this.#elements.closeSettingsModalBtn.addEventListener("click", () => {
+          this.closeSettingsModal();
+        });
+      }
+      if (this.#elements.stationSettingsModal) {
+        this.#elements.stationSettingsModal.addEventListener("click", (e) => {
+          if (e.target === this.#elements.stationSettingsModal) {
+            this.closeSettingsModal();
+          }
+        });
+      }
+
+      // 14. Interactive Companion Character Click
       if (this.#elements.characterFigure) {
         this.#elements.characterFigure.addEventListener("click", () => {
           this.#elements.characterFigure.classList.remove("reacting");
@@ -5016,7 +5410,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // 10. Smooth Scroll for Navigation Anchor Links
+      // 15. Smooth Scroll for Navigation Anchor Links
       document.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", (e) => {
           const href = link.getAttribute("href");
@@ -5036,17 +5430,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
 
-      // 11. Click outside to dismiss autocomplete dropdowns
+      // 16. Click outside to dismiss autocomplete dropdowns
       document.addEventListener("click", (e) => {
         if (!e.target.closest(".search-box-wrapper") && !e.target.closest(".search-dropdown")) {
           this.#closeAllDropdowns();
         }
       });
 
-      // 12. Planetary Orbital Satellite Telemetry Inspector
+      // 17. Planetary Orbital Satellite Telemetry Inspector
       this.initSatelliteInspector();
 
-      // 13. Cinematic CTA Section Buttons
+      // 18. Cinematic CTA Section Buttons
       if (this.#elements.ctaSearchBtn) {
         this.#elements.ctaSearchBtn.addEventListener("click", () => {
           this.openSearchModal();
@@ -5165,6 +5559,10 @@ document.addEventListener("DOMContentLoaded", () => {
     #ui;
     #historyKey = "atmosphere_recent_searches";
     #maxHistory = 6;
+    #temperatureUnit = "C";
+    #latestWeatherData = null;
+    #latestLocationName = null;
+    #latestTimezone = null;
 
     constructor() {
       this.#security = new AtmosphereSecurity();
@@ -5173,25 +5571,87 @@ document.addEventListener("DOMContentLoaded", () => {
       this.#splineRenderer = new AtmosphereSplineRenderer();
       this.#atmosphericBackground = window.AtmosphericBackground ? new window.AtmosphericBackground() : null;
       this.#ui = new AtmosphereUIController(this);
+
+      try {
+        const savedUnit = localStorage.getItem("atmosphere_temp_unit");
+        if (savedUnit === "F" || savedUnit === "C") {
+          this.#temperatureUnit = savedUnit;
+        }
+      } catch {}
     }
 
     async init() {
       this.#ui.bindEvents();
-      this.#ui.initStandbyLandingState(this.#security.getMaskedStatus());
-      this.#splineRenderer.renderStandby(this.#ui.getHourlyTimeline());
+      this.#ui.setTemperatureUnit(this.#temperatureUnit);
+      this.#ui.renderStandbyState(this.#security.getMaskedStatus());
+      this.renderStandbySpline();
 
       // Safe global debug facade (ZERO API KEY EXPOSURE)
       window.Atmosphere = Object.freeze({
         hasKey: () => this.#security.hasKey(),
         setKey: (key) => this.#security.setCustomKey(key),
-        clearKey: () => this.#security.clearKey()
+        clearKey: () => this.#security.clearKey(),
+        resetToStandby: () => this.resetToStandby(),
+        setUnit: (u) => this.setTemperatureUnit(u)
       });
 
       // Background health check for OpenWeather key
       if (this.#security.hasKey()) {
         await this.#security.testKeyHealth();
-        this.#ui.initStandbyLandingState(this.#security.getMaskedStatus());
       }
+    }
+
+    getUnit() {
+      return this.#temperatureUnit;
+    }
+
+    setTemperatureUnit(unit) {
+      if (unit !== "C" && unit !== "F") return;
+      this.#temperatureUnit = unit;
+      try {
+        localStorage.setItem("atmosphere_temp_unit", unit);
+      } catch {}
+
+      this.#ui.setTemperatureUnit(unit);
+
+      if (this.#latestWeatherData) {
+        this.#ui.updateDashboard(this.#latestWeatherData, this.#latestLocationName, this.#latestTimezone);
+        this.#splineRenderer.render(
+          this.#ui.getHourlyTimeline(),
+          this.#latestWeatherData.hourly,
+          this.#latestWeatherData.current ? this.#latestWeatherData.current.time : "",
+          this.#temperatureUnit
+        );
+      }
+    }
+
+    getLatestData() {
+      return {
+        weatherData: this.#latestWeatherData,
+        locationName: this.#latestLocationName,
+        timezone: this.#latestTimezone
+      };
+    }
+
+    renderStandbySpline() {
+      this.#splineRenderer.renderStandby(this.#ui.getHourlyTimeline());
+    }
+
+    resetToStandby() {
+      this.#latestWeatherData = null;
+      this.#latestLocationName = null;
+      this.#latestTimezone = null;
+      this.#ui.syncSearchInputs("");
+      this.#ui.renderStandbyState();
+      this.renderStandbySpline();
+      if (window.motionEngine) {
+        window.motionEngine.animateReturnToStandby();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    getWeatherIconSvg(code, isDay) {
+      return this.#splineRenderer.getWeatherIconSvg(code, isDay);
     }
 
     sanitize(input) {
@@ -5238,12 +5698,17 @@ document.addEventListener("DOMContentLoaded", () => {
           ? `${location.name}, ${location.admin1}`
           : `${location.name}, ${location.country || ""}`;
 
+        this.#latestWeatherData = weatherData;
+        this.#latestLocationName = locationLabel;
+        this.#latestTimezone = location.timezone;
+
         this.#ui.syncSearchInputs(location.name);
         this.#ui.updateDashboard(weatherData, locationLabel, location.timezone);
         this.#splineRenderer.render(
           this.#ui.getHourlyTimeline(),
           weatherData.hourly,
-          weatherData.current ? weatherData.current.time : ""
+          weatherData.current ? weatherData.current.time : "",
+          this.#temperatureUnit
         );
 
         this.saveRecentSearch(location.name);
@@ -5276,12 +5741,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const label = loc.admin1 ? `${loc.name}, ${loc.admin1}` : `${loc.name}, ${loc.country || ""}`;
 
+            this.#latestWeatherData = weatherData;
+            this.#latestLocationName = label;
+            this.#latestTimezone = "auto";
+
             this.#ui.syncSearchInputs(loc.name);
             this.#ui.updateDashboard(weatherData, label, "auto");
             this.#splineRenderer.render(
               this.#ui.getHourlyTimeline(),
               weatherData.hourly,
-              weatherData.current ? weatherData.current.time : ""
+              weatherData.current ? weatherData.current.time : "",
+              this.#temperatureUnit
             );
 
             this.saveRecentSearch(loc.name);

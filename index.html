@@ -83,730 +83,712 @@
       <div class="atmos-vignette-overlay"></div>
     </div>
 
-    <!-- 1. FIXED TOP CINEMATIC NAVIGATION -->
-    <header class="cinematic-top-nav" id="cinematic-nav">
-      <div class="nav-inner-container">
-        <!-- Brand on Left -->
-        <div class="nav-brand-group">
-          <a href="#" class="brand-link" id="brand-home-btn" title="Atmosphere Live">
-            <svg class="brand-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+    <div class="app-shell" id="app-shell">
+      <!-- =========================================================
+           LEFT STATION SIDEBAR (Reference Visual Design)
+           ========================================================= -->
+      <aside class="station-sidebar" id="station-sidebar">
+        <!-- Brand Header -->
+        <div class="sidebar-brand-wrapper">
+          <div class="brand-logo-badge">
+            <svg class="brand-cloud-icon" viewBox="0 0 32 32" fill="none">
+              <defs>
+                <linearGradient id="sideCloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#2563eb"/>
+                </linearGradient>
+                <filter id="sideCloudGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#38bdf8" flood-opacity="0.45"/>
+                </filter>
+              </defs>
+              <path d="M10 22h14a6 6 0 0 0 1.2-11.9A8 8 0 0 0 9.8 8.5 6 6 0 0 0 10 22z" fill="url(#sideCloudGrad)" filter="url(#sideCloudGlow)"/>
+              <line x1="12" y1="24" x2="10" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+              <line x1="18" y1="24" x2="16" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+              <line x1="24" y1="24" x2="22" y2="28" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <span class="brand-name">Atmosphere<span class="brand-accent">Live</span></span>
-          </a>
-          <!-- Live Telemetry Pill Badge (Template Signature) -->
-          <div class="telemetry-pill-badge" id="telemetry-pill-status">
-            <span class="pulse-beacon-sm"></span>
-            <span class="telemetry-count">75k</span>
-            <span class="telemetry-label">sensors online</span>
+          </div>
+          <div class="brand-text-col">
+            <span class="brand-title">Atmosphere</span>
+            <span class="brand-sub">Weather Station</span>
           </div>
         </div>
 
-        <!-- Center Links -->
-        <nav class="nav-center-links">
-          <a href="#dashboard-section" class="nav-link active">Live Telemetry</a>
-          <a href="#orbital-radar-section" class="nav-link">Satellite Mesh</a>
-          <button class="nav-search-trigger" id="nav-search-trigger-btn" title="Search global cities (⌘K)">
-            <svg class="search-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.3-4.3"/>
+        <!-- Sidebar Navigation Menu -->
+        <nav class="sidebar-nav" id="sidebar-nav">
+          <button class="sidebar-nav-item active" data-nav="overview" title="Atmospheric Overview & Station Standby">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
-            <span>Search</span>
-            <kbd>⌘K</kbd>
+            <span>Overview</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="live-map" title="Global Satellite & Radar Mesh">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+              <line x1="8" y1="2" x2="8" y2="18"/>
+              <line x1="16" y1="6" x2="16" y2="22"/>
+            </svg>
+            <span>Live Map</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="forecast" title="24-Hour Predictive Spline Forecast">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+            </svg>
+            <span>Forecast</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="satellite" title="Constellation Telemetry Inspector">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span>Satellite</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="air-quality" title="Air Quality Index & Particulate Mesh">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+            <span>Air Quality</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="climate" title="Solar Horizon & Daylight Progression">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span>Climate</span>
+          </button>
+          <button class="sidebar-nav-item" data-nav="settings" title="Atmosphere Preferences & Units">
+            <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Settings</span>
           </button>
         </nav>
 
-        <!-- Right Quick Actions -->
-        <div class="nav-actions-group">
-          <button class="nav-geo-btn" id="nav-geo-btn" title="Detect Current GPS Location">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+        <!-- Dynamic Bottom Greeting Card (Reference Design) -->
+        <div class="sidebar-greeting-card" id="sidebar-greeting-card">
+          <div class="greeting-art-thumb">
+            <svg class="greeting-night-svg" viewBox="0 0 180 90" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="greetSkyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0c1838"/>
+                  <stop offset="100%" stop-color="#030816"/>
+                </linearGradient>
+                <linearGradient id="greetHill1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#0f172a"/>
+                </linearGradient>
+                <linearGradient id="greetHill2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#047857"/>
+                  <stop offset="100%" stop-color="#064e3b"/>
+                </linearGradient>
+              </defs>
+              <rect width="180" height="90" rx="10" fill="url(#greetSkyGrad)"/>
+              <!-- Crescent Moon -->
+              <path d="M40 22 A8 8 0 1 0 34 34 A7 7 0 0 1 40 22 Z" fill="#e2e8f0" filter="drop-shadow(0 0 6px rgba(226,232,240,0.6))"/>
+              <circle cx="120" cy="18" r="1" fill="#fff" opacity="0.8"/>
+              <circle cx="95" cy="28" r="1.2" fill="#fff" opacity="0.6"/>
+              <circle cx="145" cy="30" r="0.8" fill="#fff" opacity="0.9"/>
+              <!-- Atmospheric clouds -->
+              <path d="M70 38 Q85 32 100 38 Q115 34 130 38 L130 50 L70 50 Z" fill="rgba(255,255,255,0.08)"/>
+              <!-- Hills -->
+              <path d="M0 60 Q50 42 100 55 T180 50 L180 90 L0 90 Z" fill="url(#greetHill1)"/>
+              <path d="M0 72 Q60 58 120 70 T180 65 L180 90 L0 90 Z" fill="url(#greetHill2)" opacity="0.7"/>
+              <!-- Pine silhouette -->
+              <polygon points="140,55 144,65 136,65" fill="#022c22"/>
+              <polygon points="140,50 143,58 137,58" fill="#022c22"/>
+              <polygon points="152,58 155,67 149,67" fill="#022c22"/>
             </svg>
-            <span>My Location</span>
-          </button>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="nav-github-btn">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </div>
+          <div class="greeting-content">
+            <h4 class="greeting-title" id="greeting-title">Good morning 👋</h4>
+            <p class="greeting-desc" id="greeting-desc">Check today's weather and plan your day better.</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- =========================================================
+           MAIN STATION WORKSPACE
+           ========================================================= -->
+      <div class="station-main" id="station-main">
+        <!-- TOP CONTROL BAR (Reference Design Search & Unit Switcher) -->
+        <header class="station-topbar" id="station-topbar">
+          <div class="station-search-capsule" id="station-search-capsule">
+            <svg class="search-capsule-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
             </svg>
-            <span>Source</span>
-          </a>
-        </div>
-      </div>
-    </header>
-
-    <div class="app-layout" id="app-layout">
-      <!-- 2. CINEMATIC HERO SECTION (Template Styled) -->
-      <section class="cinematic-hero-section" id="hero-section">
-        <!-- Eyebrow Pearl Pill Badge -->
-        <div class="pearl-badge" id="hero-eyebrow-badge">
-          <span class="pulse-beacon"></span>
-          <span id="hero-eyebrow-text">OPENWEATHER API ACTIVE · HIGH-PRECISION CITY SEARCH</span>
-        </div>
-
-        <!-- Headline Typography -->
-        <h1 class="cinematic-hero-title">
-          Atmospheric Intelligence.
-          <span class="zinc-gradient-text">Predictive Precision.</span>
-        </h1>
-
-        <p class="cinematic-hero-subtitle" id="hero-subtitle">
-          Hyper-accurate 1-hour Catmull-Rom spline curves, live orbital telemetry, and real-time celestial simulations powered by OpenWeather API geocoding and global satellite models.
-        </p>
-
-        <!-- Prominent Dark Glass Search Capsule with Shortcut -->
-        <div class="cinematic-search-capsule-wrapper">
-          <div class="search-box-wrapper">
-            <div class="search-input-group">
-              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.3-4.3"/>
-              </svg>
-              <input
-                type="text"
-                id="city-input"
-                placeholder="Search any global city, coordinates or airport..."
-                autocomplete="off"
-                autocorrect="off"
-                autocapitalize="off"
-                spellcheck="false"
-              />
-              <span class="search-shortcut-kbd" id="search-shortcut-kbd" title="Press Ctrl+K or / to search"><kbd>⌘K</kbd></span>
-              <button id="clear-input-btn" class="clear-btn hidden" aria-label="Clear input">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 6 6 18M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-            
-            <button id="hero-geo-btn" class="geo-action-btn" title="Use current GPS location">
+            <input
+              type="text"
+              id="city-input"
+              class="station-search-input"
+              placeholder="Search for a city..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <span class="search-kbd-badge" id="search-shortcut-kbd" title="Press Ctrl+K or / to search"><kbd>⌘K</kbd></span>
+            <button id="clear-input-btn" class="capsule-clear-btn hidden" aria-label="Clear input">✕</button>
+            <button id="hero-geo-btn" class="capsule-geo-btn" title="Detect Current GPS Location">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="3 11 22 2 13 21 11 13 3 11"/>
               </svg>
             </button>
-
-            <button id="get-weather-btn" class="search-btn">
-              <span>Search</span>
-              <div class="btn-arrow-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </div>
-            </button>
+            <button id="get-weather-btn" class="capsule-search-btn">Search</button>
 
             <!-- Dynamic Autocomplete & Search History Dropdown -->
             <div id="search-dropdown" class="search-dropdown hidden"></div>
           </div>
 
-          <!-- Atmospheric Geocoding Status Indicator -->
-          <div class="api-key-status-indicator" id="api-key-status-indicator">
-            <span class="api-status-dot"></span>
-            <span class="api-status-label" id="api-status-label">OpenWeather Geocoding Engine · Satellite Telemetry</span>
-            <span class="api-status-badge" id="api-status-badge">CONNECTED</span>
-          </div>
+          <!-- Topbar Actions: Unit Toggle & Station Status -->
+          <div class="station-topbar-actions">
+            <!-- Temperature Unit Switcher (°C / °F) -->
+            <div class="unit-toggle-control" id="unit-toggle-wrapper" title="Switch Temperature Units">
+              <button class="unit-btn active" id="unit-c-btn" data-unit="C">°C</button>
+              <span class="unit-sep">/</span>
+              <button class="unit-btn" id="unit-f-btn" data-unit="F">°F</button>
+            </div>
 
-          <!-- Quick Telemetry City Chips -->
-          <div class="quick-cities-row">
-            <span class="quick-label">Telemetry:</span>
-            <button class="city-pill" data-city="New York">New York</button>
-            <button class="city-pill" data-city="London">London</button>
-            <button class="city-pill" data-city="Tokyo">Tokyo</button>
-            <button class="city-pill" data-city="Paris">Paris</button>
-            <button class="city-pill" data-city="Dubai">Dubai</button>
-            <button class="city-pill" data-city="Reykjavik">Reykjavik</button>
+            <!-- Station Readiness Beacon -->
+            <div class="station-beacon-pill" id="station-beacon-pill">
+              <span class="pulse-beacon-sm"></span>
+              <span class="beacon-text" id="station-beacon-text">SYSTEM READY</span>
+            </div>
+
+            <!-- Mobile Drawer Menu Button -->
+            <button class="mobile-menu-trigger" id="mobile-menu-trigger" aria-label="Toggle navigation drawer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
           </div>
+        </header>
+
+        <!-- Dynamic Error Banner -->
+        <div id="error-message" class="error-banner hidden" role="alert">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12.01" y1="16" x2="16" y2="16"/>
+          </svg>
+          <span id="error-text"></span>
         </div>
-      </section>
 
-      <!-- 3. LIVE GLOBAL OBSERVATIONS MARQUEE TICKER (Template Feature) -->
-      <section class="marquee-ticker-section">
-        <p class="marquee-section-heading">REAL-TIME GLOBAL ATMOSPHERIC SENSORS</p>
-        <div class="mask-marquee">
-          <div class="animate-marquee">
-            <!-- Set 1 -->
-            <div class="marquee-weather-card city-pill" data-city="Tokyo">
-              <span class="marquee-icon">☀️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Tokyo, JP</span>
-                <span class="marquee-temp">19°C · Clear Sky</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="London">
-              <span class="marquee-icon">🌧️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">London, UK</span>
-                <span class="marquee-temp">14°C · Light Drizzle</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="New York">
-              <span class="marquee-icon">⛅</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">New York, US</span>
-                <span class="marquee-temp">22°C · Partly Cloudy</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Dubai">
-              <span class="marquee-icon">☀️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Dubai, AE</span>
-                <span class="marquee-temp">34°C · Sunny & Dry</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Paris">
-              <span class="marquee-icon">🌤️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Paris, FR</span>
-                <span class="marquee-temp">17°C · Gentle Breeze</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Reykjavik">
-              <span class="marquee-icon">✨</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Reykjavik, IS</span>
-                <span class="marquee-temp">4°C · Crystal Clear</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-
-            <!-- Set 2 (Seamless loop duplicate) -->
-            <div class="marquee-weather-card city-pill" data-city="Tokyo">
-              <span class="marquee-icon">☀️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Tokyo, JP</span>
-                <span class="marquee-temp">19°C · Clear Sky</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="London">
-              <span class="marquee-icon">🌧️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">London, UK</span>
-                <span class="marquee-temp">14°C · Light Drizzle</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="New York">
-              <span class="marquee-icon">⛅</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">New York, US</span>
-                <span class="marquee-temp">22°C · Partly Cloudy</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Dubai">
-              <span class="marquee-icon">☀️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Dubai, AE</span>
-                <span class="marquee-temp">34°C · Sunny & Dry</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Paris">
-              <span class="marquee-icon">🌤️</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Paris, FR</span>
-                <span class="marquee-temp">17°C · Gentle Breeze</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-            <div class="marquee-weather-card city-pill" data-city="Reykjavik">
-              <span class="marquee-icon">✨</span>
-              <div class="marquee-meta">
-                <span class="marquee-city">Reykjavik, IS</span>
-                <span class="marquee-temp">4°C · Crystal Clear</span>
-              </div>
-              <span class="marquee-arrow">↗</span>
-            </div>
-          </div>
+        <!-- Dynamic Loading Indicator -->
+        <div id="loading-spinner" class="spinner-container hidden">
+          <div class="pulse-loader"></div>
+          <p class="loading-text">Synchronizing atmospheric sensors & Catmull-Rom spline curves...</p>
         </div>
-      </section>
 
-      <!-- 4. CINEMATIC SHOWCASE FRAME: THE CORE WEATHER DASHBOARD -->
-      <div class="cinematic-frame-outer" id="dashboard-section">
-        <div class="cinematic-frame-inner">
-          <!-- Frame Top Header Bar (macOS / SaaS Style) -->
-          <div class="frame-status-bar">
-            <div class="frame-dots">
-              <span class="dot red"></span>
-              <span class="dot yellow"></span>
-              <span class="dot green"></span>
-            </div>
+        <!-- =========================================================
+             THE CORE WEATHER DASHBOARD (First-Class Standby & Active City State)
+             ========================================================= -->
+        <main id="weather-dashboard" class="weather-dashboard state-standby">
+          <!-- 1. HERO ATMOSPHERIC SCENERY CARD (Reference Design Layout) -->
+          <section class="hero-scenery-card" id="hero-scenery-card">
+            <!-- Dynamic Specular Gloss Sheen & Glass Bevel Glare -->
+            <div class="card-specular-glare" id="card-specular-glare"></div>
+            <div class="card-glass-rim"></div>
 
-            <!-- Integrated Dashboard Search Bar (Instant search from dashboard!) -->
-            <div class="frame-search-wrapper" id="frame-search-wrapper">
-              <div class="frame-search-input-group">
-                <svg class="frame-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.3-4.3"/>
+            <!-- Dynamic Animated Artwork Backdrop with Layered 3D Depth -->
+            <div class="scenery-canvas" id="scenery-canvas">
+              <div class="sky-elements" id="sky-elements" data-depth="0.35"></div>
+              <div class="mist-layer" data-depth="0.45"></div>
+              <div class="landscape-ground" data-depth="0.22">
+                <div class="scenery-fx-particles" id="scenery-fx-particles"></div>
+
+                <!-- High-Fidelity Scenic Hill & Distant City Silhouette SVG -->
+                <svg class="landscape-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="distantMountainGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--mountain-top, rgba(30, 41, 59, 0.4))" />
+                      <stop offset="100%" stop-color="var(--mountain-base, rgba(15, 23, 42, 0.7))" />
+                    </linearGradient>
+                    <linearGradient id="middleHillsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--hills-top, rgba(34, 197, 94, 0.45))" />
+                      <stop offset="100%" stop-color="var(--hills-base, rgba(20, 83, 45, 0.8))" />
+                    </linearGradient>
+                    <linearGradient id="foregroundGrassGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="var(--grass-crest, rgba(74, 222, 128, 0.85))" />
+                      <stop offset="15%" stop-color="var(--grass-mid, rgba(22, 163, 74, 0.95))" />
+                      <stop offset="100%" stop-color="var(--grass-base, rgba(5, 46, 22, 1))" />
+                    </linearGradient>
+                    <linearGradient id="crestGlowGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="rgba(255, 255, 255, 0)" />
+                      <stop offset="50%" stop-color="var(--crest-highlight, rgba(255, 255, 255, 0.35))" />
+                      <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                    </linearGradient>
+                  </defs>
+
+                  <path class="distant-mountain-ridge" d="M0,130 Q180,75 360,115 T740,85 Q880,110 1000,95 L1000,320 L0,320 Z" fill="url(#distantMountainGrad)"/>
+                  <path class="middle-hills-layer" d="M0,175 Q240,115 500,165 T1000,140 L1000,320 L0,320 Z" fill="url(#middleHillsGrad)"/>
+                  <path class="foreground-knoll" d="M0,215 Q260,165 520,205 T1000,185 L1000,320 L0,320 Z" fill="url(#foregroundGrassGrad)"/>
+                  <path class="hill-crest-glow" d="M0,215 Q260,165 520,205 T1000,185" fill="none" stroke="url(#crestGlowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+
+                  <g class="wind-grass-cluster">
+                    <path class="grass-blade g1" d="M280,185 Q282,170 279,162" stroke="rgba(187, 247, 208, 0.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g2" d="M284,186 Q288,172 287,160" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g3" d="M290,187 Q295,175 298,165" stroke="rgba(187, 247, 208, 0.65)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g4" d="M420,195 Q422,178 418,168" stroke="rgba(187, 247, 208, 0.75)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                    <path class="grass-blade g5" d="M426,196 Q431,180 433,170" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
+                  </g>
                 </svg>
-                <input
-                  type="text"
-                  id="dashboard-city-input"
-                  placeholder="Search another city (e.g. Kashipur, Almora, Tokyo)..."
-                  autocomplete="off"
-                  spellcheck="false"
-                />
-                <button id="dashboard-search-btn" class="dash-search-submit-btn" type="button" title="Search City">Search</button>
               </div>
-              <div id="dashboard-search-dropdown" class="search-dropdown hidden"></div>
-            </div>
 
-            <div class="frame-meta-actions">
-              <div class="frame-location-pill" id="frame-location-pill">
-                <span class="pulse-beacon-sm"></span>
-                <span id="frame-city-label">LIVE ATMOSPHERIC TELEMETRY</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Error Message Banner -->
-          <div id="error-message" class="error-banner hidden" role="alert">
-            <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" y2="12"/>
-              <line x1="12.01" y1="16" y2="16"/>
-            </svg>
-            <span id="error-text"></span>
-          </div>
-
-          <!-- Loading Spinner -->
-          <div id="loading-spinner" class="spinner-container hidden">
-            <div class="pulse-loader"></div>
-            <p class="loading-text">Synchronizing orbital sensors & spline curves...</p>
-          </div>
-
-          <!-- The Weather Dashboard -->
-          <main id="weather-dashboard" class="weather-dashboard">
-            <!-- Interactive View Mode Tabs -->
-            <div class="dashboard-tabs-bar" id="dashboard-tabs-bar">
-              <div class="tab-slider-pill"></div>
-              <button class="view-tab-btn active" data-view="all">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
-                <span>Overview</span>
-              </button>
-              <button class="view-tab-btn" data-view="spline">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-                <span>24h Spline</span>
-              </button>
-              <button class="view-tab-btn" data-view="solar">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg>
-                <span>Sun & Horizon</span>
-              </button>
-              <button class="view-tab-btn" data-view="telemetry">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                <span>Atmosphere Grid</span>
-              </button>
-            </div>
-
-            <!-- 1. Hero Atmospheric Scenery Section (Option A & MotionSites 3D Depth Model) -->
-            <section class="hero-scenery-card" id="hero-scenery-card">
-              <!-- Dynamic Specular Gloss Sheen & Glass Bevel Glare -->
-              <div class="card-specular-glare" id="card-specular-glare"></div>
-              <div class="card-glass-rim"></div>
-
-              <!-- Dynamic Animated Artwork Backdrop with Layered 3D Depth -->
-              <div class="scenery-canvas" id="scenery-canvas">
-                <div class="sky-elements" id="sky-elements" data-depth="0.35"></div>
-                <div class="mist-layer" data-depth="0.45"></div>
-                <div class="landscape-ground" data-depth="0.22">
-                  <!-- Dynamic Weather Ambient FX Particles -->
-                  <div class="scenery-fx-particles" id="scenery-fx-particles"></div>
-
-                  <!-- High-Fidelity Scenic Hill Silhouette -->
-                  <svg class="landscape-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="distantMountainGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--mountain-top, rgba(30, 41, 59, 0.4))" />
-                        <stop offset="100%" stop-color="var(--mountain-base, rgba(15, 23, 42, 0.7))" />
-                      </linearGradient>
-                      <linearGradient id="middleHillsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--hills-top, rgba(34, 197, 94, 0.45))" />
-                        <stop offset="100%" stop-color="var(--hills-base, rgba(20, 83, 45, 0.8))" />
-                      </linearGradient>
-                      <linearGradient id="foregroundGrassGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--grass-crest, rgba(74, 222, 128, 0.85))" />
-                        <stop offset="15%" stop-color="var(--grass-mid, rgba(22, 163, 74, 0.95))" />
-                        <stop offset="100%" stop-color="var(--grass-base, rgba(5, 46, 22, 1))" />
-                      </linearGradient>
-                      <linearGradient id="crestGlowGrad" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="rgba(255, 255, 255, 0)" />
-                        <stop offset="50%" stop-color="var(--crest-highlight, rgba(255, 255, 255, 0.35))" />
-                        <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
-                      </linearGradient>
-                    </defs>
-
-                    <path class="distant-mountain-ridge" d="M0,130 Q180,75 360,115 T740,85 Q880,110 1000,95 L1000,320 L0,320 Z" fill="url(#distantMountainGrad)"/>
-                    <path class="middle-hills-layer" d="M0,175 Q240,115 500,165 T1000,140 L1000,320 L0,320 Z" fill="url(#middleHillsGrad)"/>
-                    <path class="foreground-knoll" d="M0,215 Q260,165 520,205 T1000,185 L1000,320 L0,320 Z" fill="url(#foregroundGrassGrad)"/>
-                    <path class="hill-crest-glow" d="M0,215 Q260,165 520,205 T1000,185" fill="none" stroke="url(#crestGlowGrad)" stroke-width="2.5" stroke-linecap="round"/>
-
-                    <g class="wind-grass-cluster">
-                      <path class="grass-blade g1" d="M280,185 Q282,170 279,162" stroke="rgba(187, 247, 208, 0.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g2" d="M284,186 Q288,172 287,160" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g3" d="M290,187 Q295,175 298,165" stroke="rgba(187, 247, 208, 0.65)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g4" d="M420,195 Q422,178 418,168" stroke="rgba(187, 247, 208, 0.75)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g5" d="M426,196 Q431,180 433,170" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g6" d="M680,190 Q684,175 683,165" stroke="rgba(187, 247, 208, 0.7)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g7" d="M686,191 Q691,177 694,167" stroke="rgba(187, 247, 208, 0.85)" stroke-width="2" stroke-linecap="round" fill="none"/>
-                      <path class="grass-blade g8" d="M692,192 Q698,181 701,172" stroke="rgba(187, 247, 208, 0.6)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-                    </g>
-                  </svg>
+              <!-- Weather Companion Character Observer (Depth Tier 3) -->
+              <div class="character-silhouette" id="character-figure" data-depth="0.38" title="Atmospheric observer · Watching the horizon">
+                <div class="character-reaction-bubble" id="char-reaction-bubble">
+                  <span class="bubble-text">☀️ Ready for observation</span>
+                  <span class="bubble-tail"></span>
                 </div>
 
-                <!-- Weather Companion Character Observer (Depth Tier 3) -->
-                <div class="character-silhouette" id="character-figure" data-depth="0.38" title="Atmospheric companion · Click to interact!">
-                  <div class="character-reaction-bubble" id="char-reaction-bubble">
-                    <span class="bubble-text">☀️ Beautiful day out!</span>
-                    <span class="bubble-tail"></span>
-                  </div>
+                <svg class="char-vector-svg" viewBox="0 0 120 180" fill="none">
+                  <defs>
+                    <linearGradient id="charSkinGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#FCD34D" />
+                      <stop offset="100%" stop-color="#F59E0B" />
+                    </linearGradient>
+                    <linearGradient id="umbrellaCanopyGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#38BDF8" />
+                      <stop offset="60%" stop-color="#0284C7" />
+                      <stop offset="100%" stop-color="#0369A1" />
+                    </linearGradient>
+                  </defs>
 
-                  <svg class="char-vector-svg" viewBox="0 0 120 180" fill="none">
-                    <defs>
-                      <linearGradient id="charSkinGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#FCD34D" />
-                        <stop offset="100%" stop-color="#F59E0B" />
-                      </linearGradient>
-                      <linearGradient id="umbrellaCanopyGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#38BDF8" />
-                        <stop offset="60%" stop-color="#0284C7" />
-                        <stop offset="100%" stop-color="#0369A1" />
-                      </linearGradient>
-                    </defs>
+                  <ellipse class="char-cast-shadow" cx="60" cy="174" rx="26" ry="5.5" fill="rgba(0, 0, 0, 0.45)" />
 
-                    <ellipse class="char-cast-shadow" cx="60" cy="174" rx="26" ry="5.5" fill="rgba(0, 0, 0, 0.45)" />
-
-                    <g class="char-body-rig">
-                      <g class="char-rain-umbrella hidden-when-dry">
-                        <path class="umbrella-canopy" d="M22,50 C22,18 98,18 98,50 C86,47 74,47 60,47 C46,47 34,47 22,50 Z" fill="url(#umbrellaCanopyGrad)"/>
-                        <path class="umbrella-ribs" d="M60,20 L60,47 M41,24 Q44,38 41,48 M79,24 Q76,38 79,48" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.2" fill="none"/>
-                        <path class="umbrella-shaft" d="M60,47 L60,110 Q60,118 67,118 Q73,118 73,112" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        <circle class="canopy-drop d1" cx="35" cy="44" r="1.8" fill="#BAE6FD" />
-                        <circle class="canopy-drop d2" cx="82" cy="46" r="1.5" fill="#BAE6FD" />
-                      </g>
-
-                      <g class="char-legs">
-                        <path class="char-leg-l" d="M49,122 L45,158" stroke="var(--char-trousers, #1E293B)" stroke-width="9" stroke-linecap="round"/>
-                        <path class="char-leg-r" d="M71,122 L75,158" stroke="var(--char-trousers, #1E293B)" stroke-width="9" stroke-linecap="round"/>
-                        <path class="char-shoe-l" d="M40,160 Q45,158 52,160 Q52,165 41,165 Z" fill="var(--char-shoes, #F8FAFC)"/>
-                        <path class="char-shoe-r" d="M70,160 Q75,158 82,160 Q82,165 71,165 Z" fill="var(--char-shoes, #F8FAFC)"/>
-                      </g>
-
-                      <g class="char-torso-group">
-                        <path class="char-torso" d="M46,82 C44,95 45,116 47,125 L73,125 C75,116 76,95 74,82 Z" fill="var(--char-jacket, #F59E0B)"/>
-                        <path class="char-zipper" d="M60,82 L60,125" stroke="rgba(0, 0, 0, 0.22)" stroke-width="1.5" stroke-linecap="round"/>
-                        <path class="char-messenger-strap" d="M48,84 L72,118" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
-                        <rect class="char-messenger-pouch" x="66" y="112" width="10" height="9" rx="2" fill="#1E293B" transform="rotate(-15 66 112)"/>
-                      </g>
-
-                      <g class="char-arm-l">
-                        <path class="char-arm-sleeve" d="M46,85 Q38,102 44,115" stroke="var(--char-jacket, #F59E0B)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-                        <circle class="char-hand" cx="45" cy="117" r="4.2" fill="url(#charSkinGrad)"/>
-                        <rect class="char-phone-device" x="42" y="113" width="9" height="15" rx="1.8" fill="#0F172A" stroke="#38BDF8" stroke-width="0.8" transform="rotate(-20 42 113)"/>
-                      </g>
-
-                      <g class="char-arm-r">
-                        <path class="char-arm-sleeve-r" d="M74,85 Q82,100 76,112" stroke="var(--char-jacket, #F59E0B)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-                        <circle class="char-hand-r" cx="75" cy="114" r="4.2" fill="url(#charSkinGrad)"/>
-                      </g>
-
-                      <g class="char-head-group">
-                        <circle class="char-head" cx="60" cy="62" r="14" fill="url(#charSkinGrad)" />
-                        <path class="char-hair-modern" d="M47,60 C46,47 72,45 74,58 C72,53 65,51 58,54 C53,56 50,57 47,60 Z" fill="var(--char-hair, #334155)"/>
-                        <path class="char-cap-visor" d="M50,56 Q68,54 75,59" stroke="var(--char-cap, #0F172A)" stroke-width="3" stroke-linecap="round" fill="none"/>
-                        <g class="char-sunglasses">
-                          <rect class="char-glasses-frame" x="52" y="60" width="17" height="6.5" rx="3" fill="#0F172A" />
-                          <line class="char-glasses-glint" x1="54" y1="62" x2="58" y2="65" stroke="rgba(255, 255, 255, 0.65)" stroke-width="1" stroke-linecap="round"/>
-                        </g>
-                        <circle class="char-blush" cx="53" cy="68" r="2" fill="rgba(239, 68, 68, 0.28)"/>
-                        <circle class="char-blush" cx="67" cy="68" r="2" fill="rgba(239, 68, 68, 0.28)"/>
-                      </g>
+                  <g class="char-body-rig">
+                    <g class="char-rain-umbrella hidden-when-dry">
+                      <path class="umbrella-canopy" d="M22,50 C22,18 98,18 98,50 C86,47 74,47 60,47 C46,47 34,47 22,50 Z" fill="url(#umbrellaCanopyGrad)"/>
+                      <path class="umbrella-ribs" d="M60,20 L60,47 M41,24 Q44,38 41,48 M79,24 Q76,38 79,48" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1.2" fill="none"/>
+                      <path class="umbrella-shaft" d="M60,47 L60,110 Q60,118 67,118 Q73,118 73,112" stroke="#475569" stroke-width="3" stroke-linecap="round" fill="none"/>
+                      <circle class="canopy-drop d1" cx="35" cy="44" r="1.8" fill="#BAE6FD" />
+                      <circle class="canopy-drop d2" cx="82" cy="46" r="1.5" fill="#BAE6FD" />
                     </g>
-                  </svg>
-                </div>
-              </div>
 
-              <!-- Top Floating Meta Details (Option A Frosted Glass Tier) -->
-              <div class="hero-top-details" data-depth="-0.15">
-                <div class="city-location-badge">
-                  <span class="live-telemetry-beacon"></span>
+                    <g class="char-legs">
+                      <path class="char-leg-l" d="M49,122 L45,158" stroke="var(--char-trousers, #1E293B)" stroke-width="9" stroke-linecap="round"/>
+                      <path class="char-leg-r" d="M71,122 L75,158" stroke="var(--char-trousers, #1E293B)" stroke-width="9" stroke-linecap="round"/>
+                      <path class="char-shoe-l" d="M40,160 Q45,158 52,160 Q52,165 41,165 Z" fill="var(--char-shoes, #F8FAFC)"/>
+                      <path class="char-shoe-r" d="M70,160 Q75,158 82,160 Q82,165 71,165 Z" fill="var(--char-shoes, #F8FAFC)"/>
+                    </g>
+
+                    <g class="char-torso-group">
+                      <path class="char-torso" d="M46,82 C44,95 45,116 47,125 L73,125 C75,116 76,95 74,82 Z" fill="var(--char-jacket, #F59E0B)"/>
+                      <path class="char-zipper" d="M60,82 L60,125" stroke="rgba(0, 0, 0, 0.22)" stroke-width="1.5" stroke-linecap="round"/>
+                      <path class="char-messenger-strap" d="M48,84 L72,118" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+                      <rect class="char-messenger-pouch" x="66" y="112" width="10" height="9" rx="2" fill="#1E293B" transform="rotate(-15 66 112)"/>
+                    </g>
+
+                    <g class="char-arm-l">
+                      <path class="char-arm-sleeve" d="M46,85 Q38,102 44,115" stroke="var(--char-jacket, #F59E0B)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                      <circle class="char-hand" cx="45" cy="117" r="4.2" fill="url(#charSkinGrad)"/>
+                      <rect class="char-phone-device" x="42" y="113" width="9" height="15" rx="1.8" fill="#0F172A" stroke="#38BDF8" stroke-width="0.8" transform="rotate(-20 42 113)"/>
+                    </g>
+
+                    <g class="char-arm-r">
+                      <path class="char-arm-sleeve-r" d="M74,85 Q82,100 76,112" stroke="var(--char-jacket, #F59E0B)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+                      <circle class="char-hand-r" cx="75" cy="114" r="4.2" fill="url(#charSkinGrad)"/>
+                    </g>
+
+                    <g class="char-head-group">
+                      <circle class="char-head" cx="60" cy="62" r="14" fill="url(#charSkinGrad)" />
+                      <path class="char-hair-modern" d="M47,60 C46,47 72,45 74,58 C72,53 65,51 58,54 C53,56 50,57 47,60 Z" fill="var(--char-hair, #334155)"/>
+                      <path class="char-cap-visor" d="M50,56 Q68,54 75,59" stroke="var(--char-cap, #0F172A)" stroke-width="3" stroke-linecap="round" fill="none"/>
+                      <circle class="char-blush" cx="53" cy="68" r="2" fill="rgba(239, 68, 68, 0.28)"/>
+                      <circle class="char-blush" cx="67" cy="68" r="2" fill="rgba(239, 68, 68, 0.28)"/>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Top Row: Location Header on Left, Calendar & Clock on Right -->
+            <div class="hero-top-row">
+              <div class="hero-location-block">
+                <span class="location-pin-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
                     <circle cx="12" cy="10" r="3"/>
                   </svg>
-                  <h1 id="city-name">Atmosphere Station</h1>
-                  <span class="country-tag" id="country-tag">--</span>
-                </div>
-                <div class="hero-local-time-box">
-                  <svg class="clock-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                  <span class="hero-local-time" id="local-time-clock">--:-- --</span>
+                </span>
+                <div class="location-names-col">
+                  <h1 class="hero-city-title" id="city-name">Atmosphere Station</h1>
+                  <span class="hero-country-tag" id="country-tag">Global Atmospheric Network · Standby</span>
                 </div>
               </div>
 
-              <!-- Bottom Weather Reading Metrics (Option A Floating Glass Tier) -->
-              <div class="hero-bottom-reading" data-depth="-0.22">
-                <div class="temp-condition-block">
-                  <div class="temperature-row">
-                    <span class="main-temperature" id="temperature">--</span>
-                    <span class="deg-symbol">°</span>
-                  </div>
-                  <div class="hero-condition-title" id="weather-description">Connecting Telemetry...</div>
-                </div>
-
-                <div class="hero-submetrics">
-                  <div class="submetric-pill" title="Feels like temperature">
-                    <span class="pill-dot thermal-dot"></span>
-                    <span class="pill-label">Feels like</span>
-                    <span class="pill-val" id="apparent-temp">--°</span>
-                  </div>
-                  <div class="submetric-pill" title="Day's High / Low Range">
-                    <span class="pill-label">Range</span>
-                    <span class="pill-val" id="day-high-low">--° / --°</span>
-                  </div>
-                  <div class="submetric-pill" title="Atmospheric Humidity">
-                    <svg class="pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                    <span class="pill-label">Humidity</span>
-                    <span class="pill-val" id="hero-humidity">--%</span>
-                  </div>
-                  <div class="submetric-pill" title="Wind Velocity">
-                    <svg class="pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
-                    <span class="pill-label">Wind</span>
-                    <span class="pill-val" id="hero-wind-val">-- km/h</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- 2. AI Atmospheric Natural Language Advisory Banner -->
-            <div class="summary-card" id="summary-card">
-              <svg class="summary-sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
-              </svg>
-              <div class="summary-text" id="ai-summary-text">
-                Analyzing atmospheric spline and telemetry models...
+              <!-- Live Date & Clock Display -->
+              <div class="hero-datetime-widget">
+                <svg class="calendar-clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span class="hero-date-text" id="hero-date">Mon, 15 Sep 2026</span>
+                <span class="hero-clock-time" id="local-time-clock">10:24 AM</span>
               </div>
             </div>
 
-            <!-- 3. High-Resolution Hourly Forecast Spline Curve Chart -->
-            <section class="forecast-card" id="hourly-forecast-section">
+            <!-- Middle/Bottom Reading Row: Metrics on Left, Floating Stat Stack on Right -->
+            <div class="hero-main-reading-row">
+              <!-- Left: Giant Temperature & Condition -->
+              <div class="hero-temperature-col">
+                <div class="hero-temp-and-icon">
+                  <div class="hero-giant-temp">
+                    <span class="temp-digits" id="temperature">28</span>
+                    <span class="temp-unit-symbol">°</span>
+                  </div>
+                  <div class="hero-condition-icon-badge" id="hero-condition-icon-badge">
+                    <!-- Dynamic Soft 3D Sun Behind Cloud -->
+                    <svg class="hero-condition-svg" viewBox="0 0 64 64" fill="none">
+                      <circle cx="28" cy="24" r="12" fill="#fbbf24" filter="drop-shadow(0 0 8px rgba(251, 191, 36, 0.7))"/>
+                      <path d="M22 48h26a10 10 0 0 0 1.5-19.8 13 13 0 0 0-25-2.2A8.5 8.5 0 0 0 22 48z" fill="#e2e8f0" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.35))"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="hero-feels-like-row">
+                  <span>Feels like <strong id="apparent-temp">30°</strong></span>
+                </div>
+
+                <div class="hero-condition-title" id="weather-description">Partly Cloudy</div>
+
+                <p class="hero-narrative-advisory" id="ai-summary-text">
+                  A pleasant day with scattered clouds. Perfect for outdoor activities.
+                </p>
+              </div>
+
+              <!-- Far Right: Vertical Frosted Glass Capsule Stack (Reference Design) -->
+              <div class="hero-floating-stack" id="hero-floating-stack">
+                <!-- Humidity -->
+                <div class="stack-capsule">
+                  <span class="stack-icon-drop">💧</span>
+                  <div class="stack-meta">
+                    <span class="stack-label">Humidity</span>
+                    <span class="stack-val" id="hero-humidity">62%</span>
+                  </div>
+                </div>
+                <!-- Wind -->
+                <div class="stack-capsule">
+                  <span class="stack-icon-wind">💨</span>
+                  <div class="stack-meta">
+                    <span class="stack-label">Wind</span>
+                    <span class="stack-val" id="hero-wind-val">12 km/h</span>
+                  </div>
+                </div>
+                <!-- Visibility -->
+                <div class="stack-capsule">
+                  <span class="stack-icon-eye">👁️</span>
+                  <div class="stack-meta">
+                    <span class="stack-label">Visibility</span>
+                    <span class="stack-val" id="hero-visibility">10 km</span>
+                  </div>
+                </div>
+                <!-- Pressure -->
+                <div class="stack-capsule">
+                  <span class="stack-icon-gauge">🧭</span>
+                  <div class="stack-meta">
+                    <span class="stack-label">Pressure</span>
+                    <span class="stack-val" id="hero-pressure">1012 hPa</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. 24-HOUR FORECAST & TIMELINE SPLINE (Reference Design Card 2) -->
+          <section class="forecast-card" id="hourly-forecast-section">
+            <div class="card-header-bar">
+              <div class="header-title-group">
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>24-Hour Forecast & Timeline</span>
+              </div>
+              <div class="forecast-interval-dropdown-pill">
+                <span>1-HOUR INTERVALS</span>
+                <span class="pill-caret">⌵</span>
+              </div>
+            </div>
+
+            <div class="hourly-forecast-scroll-wrapper">
+              <div class="spline-chart-container hourly-timeline-container" id="spline-chart-container">
+                <div class="chart-loading-placeholder">Computing Catmull-Rom spline curves...</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. SPLIT CARDS: SUN PATH & HORIZON + TOMORROW'S FORECAST (Reference Row 3) -->
+          <div class="split-cards-row" id="split-cards-row">
+            <!-- Left Card: Sun Path & Horizon -->
+            <div class="widget-card sun-cycle-widget" id="sun-cycle-card">
               <div class="card-header-bar">
                 <div class="header-title-group">
                   <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 3v18h18"/>
-                    <path d="m19 9-5 5-4-4-3 3"/>
-                  </svg>
-                  <span>24-Hour Forecast & Spline Trajectory</span>
-                </div>
-                <span class="forecast-resolution-badge">1-HOUR INTERVALS</span>
-              </div>
-              <div class="hourly-forecast-scroll-wrapper">
-                <div class="spline-chart-container hourly-timeline-container" id="spline-chart-container">
-                  <div class="chart-loading-placeholder">Computing Catmull-Rom spline curves...</div>
-                </div>
-              </div>
-            </section>
-
-            <!-- 4. Modular Widgets Grid (4-Column Bento Architecture) -->
-            <section class="widgets-dashboard-grid" id="widgets-dashboard-grid">
-              <!-- Sun Cycle Arc Widget (2 Columns) -->
-              <div class="widget-card sun-cycle-widget" id="sun-cycle-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="4"/>
                     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
                   </svg>
-                  <span id="sun-status-title">Sun Position & Horizon</span>
+                  <span id="sun-status-title">Sun Path & Horizon</span>
                 </div>
-                <div class="sun-arc-visual">
-                  <svg class="sun-arc-svg" viewBox="0 0 240 120">
-                    <defs>
-                      <linearGradient id="arcGlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"/>
-                        <stop offset="50%" stop-color="#ffd700" stop-opacity="0.9"/>
-                        <stop offset="100%" stop-color="#f97316" stop-opacity="0.4"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M 20 105 A 100 85 0 0 1 220 105" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-dasharray="4 4" />
-                    <path id="sun-arc-progress" d="M 20 105 A 100 85 0 0 1 220 105" fill="none" stroke="url(#arcGlowGrad)" stroke-width="3.5" stroke-linecap="round"/>
-                    <circle id="sun-arc-orb" cx="20" cy="105" r="7" fill="#ffd700" filter="drop-shadow(0 0 8px rgba(255,215,0,0.8))"/>
-                    <line x1="10" y1="105" x2="230" y2="105" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-                    <text x="20" y="117" fill="var(--text-dim)" font-size="10" id="arc-sunrise-text">--:--</text>
-                    <text x="220" y="117" text-anchor="end" fill="var(--text-dim)" font-size="10" id="arc-sunset-text">--:--</text>
-                  </svg>
+                <div class="daylight-badge-pill" id="daylight-badge-pill">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Daylight: <strong id="daylight-duration-val">12h 43m</strong></span>
                 </div>
-                <div class="sun-footer-text" id="sun-footer-text">Daylight progression tracking</div>
               </div>
 
-              <!-- Atmospheric Insight Card (3 Columns in Bento Grid) -->
-              <div class="widget-card insight-widget" id="insight-card">
-                <!-- Ambient Card Glow Mesh -->
-                <div class="insight-glow-mesh" aria-hidden="true"></div>
+              <div class="sun-arc-visual">
+                <svg class="sun-arc-svg" viewBox="0 0 460 160" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="sunArcBeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.4"/>
+                      <stop offset="50%" stop-color="#fbbf24" stop-opacity="1"/>
+                      <stop offset="100%" stop-color="#ea580c" stop-opacity="0.5"/>
+                    </linearGradient>
+                    <linearGradient id="horizonRidgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="rgba(15, 23, 42, 0.75)"/>
+                      <stop offset="100%" stop-color="rgba(2, 6, 23, 0.95)"/>
+                    </linearGradient>
+                    <filter id="sunOrbGlow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.9"/>
+                    </filter>
+                  </defs>
 
-                <!-- 1. Header with Icon Halo, Title, and Dynamic Status Pill -->
-                <div class="insight-header-row">
-                  <div class="insight-header-left">
-                    <div class="insight-icon-halo">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                      </svg>
-                    </div>
-                    <span class="insight-header-title" id="insight-title">Tomorrow's Forecast</span>
+                  <!-- Mountain Horizon Silhouette -->
+                  <path class="sun-horizon-ridge" d="M 0 135 Q 110 115 220 128 T 460 120 L 460 160 L 0 160 Z" fill="url(#horizonRidgeGrad)"/>
+
+                  <!-- Parabolic Solar Path Arc -->
+                  <path d="M 40 130 Q 230 18 420 130" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2.5" stroke-dasharray="5 5"/>
+                  <path id="sun-arc-progress" d="M 40 130 Q 230 18 420 130" fill="none" stroke="url(#sunArcBeamGrad)" stroke-width="3" stroke-linecap="round"/>
+
+                  <!-- Horizon Baseline -->
+                  <line x1="20" y1="130" x2="440" y2="130" stroke="rgba(255,255,255,0.14)" stroke-width="1.2"/>
+
+                  <!-- Sunrise / Sunset Horizon Dots -->
+                  <circle cx="40" cy="130" r="4.5" fill="#f59e0b"/>
+                  <circle cx="420" cy="130" r="4.5" fill="#ea580c"/>
+
+                  <!-- Live Positioned Sun Orb (Calculated by celestial physics) -->
+                  <circle id="sun-arc-orb" cx="230" cy="24" r="9" fill="#fef08a" filter="url(#sunOrbGlow)"/>
+                </svg>
+
+                <div class="sun-times-row">
+                  <div class="sun-time-block">
+                    <span class="sun-time-val" id="arc-sunrise-text">6:12 AM</span>
+                    <span class="sun-time-label">Sunrise</span>
                   </div>
-                  <span class="insight-badge" id="insight-badge">Next 24h</span>
-                </div>
-
-                <!-- 2. Hero Editorial Narrative -->
-                <div class="insight-narrative-box">
-                  <p class="insight-narrative-lead" id="insight-desc">
-                    Atmospheric model running 24-hour predictive simulations...
-                  </p>
-                </div>
-
-                <!-- 3. Glassmorphic Telemetry Chips Grid -->
-                <div class="insight-chips-container">
-                  <!-- Chip 1: Diurnal Temperature Range -->
-                  <div class="insight-chip insight-chip-range">
-                    <div class="insight-chip-header">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
-                      </svg>
-                      <span class="insight-chip-label">TEMP RANGE</span>
-                    </div>
-                    <div class="insight-chip-value" id="insight-range-val">--° / --°</div>
-                    <div class="insight-chip-bar">
-                      <div class="insight-chip-bar-fill range-bar-fill" id="insight-range-bar"></div>
-                    </div>
-                  </div>
-
-                  <!-- Chip 2: Precipitation Risk -->
-                  <div class="insight-chip insight-chip-rain">
-                    <div class="insight-chip-header">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
-                        <path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/>
-                      </svg>
-                      <span class="insight-chip-label">RAIN RISK</span>
-                    </div>
-                    <div class="insight-chip-value" id="insight-rain-val">--%</div>
-                    <div class="insight-chip-bar">
-                      <div class="insight-chip-bar-fill rain-bar-fill" id="insight-rain-bar" style="width: 0%;"></div>
-                    </div>
-                  </div>
-
-                  <!-- Chip 3: Sky Condition & Outlook -->
-                  <div class="insight-chip insight-chip-outlook">
-                    <div class="insight-chip-header">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="4"/>
-                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                      </svg>
-                      <span class="insight-chip-label">SKY OUTLOOK</span>
-                    </div>
-                    <div class="insight-chip-value" id="insight-outlook-val">Clear Sky</div>
-                    <div class="insight-chip-status" id="insight-condition-status">Optimal</div>
+                  <div class="sun-time-block text-right">
+                    <span class="sun-time-val" id="arc-sunset-text">6:55 PM</span>
+                    <span class="sun-time-label">Sunset</span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Humidity Metric Box -->
-              <div class="widget-card metric-box" id="humidity-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            <!-- Right Card: Tomorrow's Forecast -->
+            <div class="widget-card insight-widget" id="insight-card">
+              <div class="card-header-bar">
+                <div class="header-title-group">
+                  <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
                   </svg>
-                  <span>Relative Humidity</span>
+                  <span id="insight-title">Tomorrow's Forecast</span>
                 </div>
-                <div class="metric-main-value" id="humidity">--%</div>
-                <div class="metric-sub-bar">
-                  <div class="progress-fill" id="humidity-bar" style="width: 0%;"></div>
-                </div>
-                <span class="metric-caption" id="humidity-status">Optimal comfort</span>
+                <button class="view-7days-btn" id="view-7days-btn" title="Inspect full 7-day multi-model forecast">
+                  <span>View 7 Days</span>
+                  <span class="btn-arrow">→</span>
+                </button>
               </div>
 
-              <!-- Wind Velocity Metric Box -->
-              <div class="widget-card metric-box" id="wind-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
-                  </svg>
-                  <span>Wind Velocity</span>
-                </div>
-                <div class="metric-main-value" id="wind-speed">-- m/s</div>
-                <span class="metric-direction" id="wind-direction">Calm</span>
-                <span class="metric-caption" id="wind-caption">Gentle airflow</span>
-              </div>
+              <!-- Narrative Advisory Summary -->
+              <p class="tomorrow-editorial-lead" id="insight-desc">
+                Slight chance of rain tomorrow. Similar temperatures with partly cloudy skies.
+              </p>
 
-              <!-- Atmospheric Pressure Box -->
-              <div class="widget-card metric-box" id="pressure-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M16 12l-4-4-4 4M12 16V9"/>
-                  </svg>
-                  <span>Surface Pressure</span>
+              <!-- 3 Submetric Bento Capsules -->
+              <div class="tomorrow-capsules-grid">
+                <!-- Capsule 1: Min / Max Temp -->
+                <div class="tomorrow-stat-box">
+                  <div class="stat-icon-wrapper rain-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m11 20-1 2M15 20l-1 2"/></svg>
+                  </div>
+                  <div class="stat-text-col">
+                    <span class="stat-main-number" id="insight-range-val">22° / 31°</span>
+                    <span class="stat-label">Min / Max</span>
+                  </div>
                 </div>
-                <div class="metric-main-value" id="pressure">-- hPa</div>
-                <span class="metric-caption" id="pressure-status">Standard sea level</span>
-              </div>
 
-              <!-- Optical Visibility Box -->
-              <div class="widget-card metric-box" id="visibility-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                  </svg>
-                  <span>Optical Visibility</span>
+                <!-- Capsule 2: Wind -->
+                <div class="tomorrow-stat-box">
+                  <div class="stat-icon-wrapper wind-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                  </div>
+                  <div class="stat-text-col">
+                    <span class="stat-main-number" id="tomorrow-wind-val">14 km/h</span>
+                    <span class="stat-label">Wind</span>
+                  </div>
                 </div>
-                <div class="metric-main-value" id="visibility">-- km</div>
-                <span class="metric-caption" id="visibility-status">Clear view</span>
-              </div>
 
-              <!-- UV Radiation Index Card (2 Columns) -->
-              <div class="widget-card metric-box" id="uv-index-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5"/>
-                    <line x1="12" y1="1" x2="12" y2="3"/>
-                    <line x1="12" y1="21" x2="12" y2="23"/>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                    <line x1="1" y1="12" x2="3" y2="12"/>
-                    <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                  </svg>
-                  <span>UV Radiation Index</span>
+                <!-- Capsule 3: Chance of Rain -->
+                <div class="tomorrow-stat-box">
+                  <div class="stat-icon-wrapper precip-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/></svg>
+                  </div>
+                  <div class="stat-text-col">
+                    <span class="stat-main-number" id="insight-rain-val">40%</span>
+                    <span class="stat-label">Chance of Rain</span>
+                  </div>
                 </div>
-                <div class="metric-main-value" id="uv-index">--</div>
-                <div class="metric-sub-bar">
-                  <div class="progress-fill uv-bar-fill" id="uv-bar" style="width: 20%;"></div>
-                </div>
-                <span class="metric-caption" id="uv-status">Low exposure risk</span>
               </div>
+            </div>
+          </div>
 
-              <!-- Precipitation Probability Card (2 Columns) -->
-              <div class="widget-card metric-box" id="precip-card">
-                <div class="widget-header">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                  </svg>
-                  <span>Precipitation Risk</span>
-                </div>
-                <div class="metric-main-value" id="precip-chance">--%</div>
-                <div class="metric-sub-bar">
-                  <div class="progress-fill" id="precip-bar" style="width: 0%;"></div>
-                </div>
-                <span class="metric-caption" id="precip-status">Dry conditions</span>
+          <!-- 4. 6 BENTO ENVIRONMENTAL METRIC CARDS (Reference Row 4) -->
+          <section class="widgets-dashboard-grid" id="widgets-dashboard-grid">
+            <!-- 1. Relative Humidity (Cyan Wave) -->
+            <div class="widget-card metric-box bento-humidity" id="humidity-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                <span>Relative Humidity</span>
               </div>
-            </section>
-          </main>
-        </div>
-      </div>
+              <div class="bento-body">
+                <span class="bento-value" id="humidity">62%</span>
+                <span class="bento-status" id="humidity-status">Comfortable</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,28 Q40,8 80,24 T160,18" fill="none" stroke="#38bdf8" stroke-width="2.5" class="wave-glow wave-blue"/>
+                  <path d="M0,28 Q40,8 80,24 T160,18 L160,40 L0,40 Z" fill="url(#waveGradBlue)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 2. Wind Velocity (Emerald Wave) -->
+            <div class="widget-card metric-box bento-wind" id="wind-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                <span>Wind Velocity</span>
+              </div>
+              <div class="bento-body">
+                <span class="bento-value" id="wind-speed">12 km/h</span>
+                <span class="bento-status" id="wind-caption">Light breeze</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,24 Q40,32 80,16 T160,26" fill="none" stroke="#10b981" stroke-width="2.5" class="wave-glow wave-green"/>
+                  <path d="M0,24 Q40,32 80,16 T160,26 L160,40 L0,40 Z" fill="url(#waveGradGreen)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 3. Surface Pressure (Amber Wave) -->
+            <div class="widget-card metric-box bento-pressure" id="pressure-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4-4 4M12 16V9"/></svg>
+                <span>Surface Pressure</span>
+              </div>
+              <div class="bento-body">
+                <span class="bento-value" id="pressure">1012 hPa</span>
+                <span class="bento-status" id="pressure-status">Stable</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,20 Q40,10 80,30 T160,18" fill="none" stroke="#f59e0b" stroke-width="2.5" class="wave-glow wave-amber"/>
+                  <path d="M0,20 Q40,10 80,30 T160,18 L160,40 L0,40 Z" fill="url(#waveGradAmber)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 4. Air Quality (Cyan/Green Wave) -->
+            <div class="widget-card metric-box bento-aqi" id="aqi-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                <span>Air Quality</span>
+              </div>
+              <div class="bento-body">
+                <span class="bento-value" id="aqi-val">Good <small class="aqi-badge-score">(AQI 42)</small></span>
+                <span class="bento-status" id="aqi-status">Fresh and safe</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,26 Q40,12 80,24 T160,16" fill="none" stroke="#06b6d4" stroke-width="2.5" class="wave-glow wave-cyan"/>
+                  <path d="M0,26 Q40,12 80,24 T160,16 L160,40 L0,40 Z" fill="url(#waveGradCyan)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 5. UV Index (Golden Wave) -->
+            <div class="widget-card metric-box bento-uv" id="uv-index-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <span>UV Index</span>
+              </div>
+              <div class="bento-body">
+                <span class="bento-value" id="uv-index">6 - High</span>
+                <span class="bento-status" id="uv-status">Use sunscreen</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,28 Q40,14 80,26 T160,20" fill="none" stroke="#eab308" stroke-width="2.5" class="wave-glow wave-gold"/>
+                  <path d="M0,28 Q40,14 80,26 T160,20 L160,40 L0,40 Z" fill="url(#waveGradGold)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 6. Precipitation Risk (Purple Wave) -->
+            <div class="widget-card metric-box bento-precip" id="precip-card">
+              <div class="bento-header">
+                <svg class="bento-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/></svg>
+                <span>Precipitation Risk</span>
+              </div>
+              <div class="bento-body">
+                <span class="bento-value" id="precip-chance">20%</span>
+                <span class="bento-status" id="precip-status">Low chance</span>
+              </div>
+              <div class="bento-wave-wrapper">
+                <svg class="bento-wave-svg" viewBox="0 0 160 40" preserveAspectRatio="none">
+                  <path d="M0,22 Q40,30 80,14 T160,24" fill="none" stroke="#a855f7" stroke-width="2.5" class="wave-glow wave-purple"/>
+                  <path d="M0,22 Q40,30 80,14 T160,24 L160,40 L0,40 Z" fill="url(#waveGradPurple)" opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <!-- SVG Gradient Definitions for Bento Waves -->
+          <svg width="0" height="0" class="sr-only" aria-hidden="true">
+            <defs>
+              <linearGradient id="waveGradBlue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="waveGradGreen" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="waveGradAmber" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="waveGradCyan" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="waveGradGold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#eab308" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="waveGradPurple" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </main>
 
       <!-- 5. PLANETARY ORBITAL SATELLITE RADAR SECTION (Interactive Telemetry Inspector) -->
       <section class="orbital-radar-section" id="orbital-radar-section">
@@ -1015,7 +997,8 @@
           </div>
         </div>
       </footer>
-    </div>
+      </div> <!-- end station-main -->
+    </div> <!-- end app-shell -->
 
     <!-- Global Command Palette Search Modal (⌘K / Search Trigger) -->
     <div id="search-modal" class="search-modal-backdrop hidden" aria-hidden="true" role="dialog" aria-modal="true">
@@ -1050,6 +1033,69 @@
             <button class="modal-city-pill" data-city="Mumbai">Mumbai</button>
             <button class="modal-city-pill" data-city="Delhi">Delhi</button>
             <button class="modal-city-pill" data-city="Reykjavik">Reykjavik</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7-Day Multi-Model Forecast Modal (Triggered by "View 7 Days →") -->
+    <div id="forecast-modal-7day" class="forecast-modal-backdrop hidden" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="forecast-modal-box">
+        <div class="forecast-modal-header">
+          <div class="forecast-modal-title-group">
+            <span class="pulse-beacon-sm"></span>
+            <h3>7-Day Multi-Model Atmospheric Forecast</h3>
+            <span class="forecast-modal-city-badge" id="forecast-modal-city">Atmosphere Station</span>
+          </div>
+          <button id="close-forecast-modal-btn" class="modal-close-btn" aria-label="Close 7-day forecast">✕</button>
+        </div>
+        <div class="forecast-modal-grid" id="forecast-modal-grid">
+          <!-- Dynamically populated 7 day forecast cards -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Station Settings Modal (Triggered by Settings sidebar icon) -->
+    <div id="station-settings-modal" class="settings-modal-backdrop hidden" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="settings-modal-box">
+        <div class="settings-modal-header">
+          <div class="settings-title-group">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <h3>Station Settings & Preferences</h3>
+          </div>
+          <button id="close-settings-modal-btn" class="modal-close-btn" aria-label="Close settings">✕</button>
+        </div>
+        <div class="settings-modal-body">
+          <div class="setting-row">
+            <div class="setting-meta">
+              <span class="setting-label">Temperature Scale</span>
+              <span class="setting-hint">Choose between Celsius and Fahrenheit</span>
+            </div>
+            <div class="setting-control">
+              <button class="setting-pill-opt active" data-unit-choice="C">Celsius (°C)</button>
+              <button class="setting-pill-opt" data-unit-choice="F">Fahrenheit (°F)</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-meta">
+              <span class="setting-label">Wind Velocity Units</span>
+              <span class="setting-hint">Metric kilometers per hour or knots / meters per second</span>
+            </div>
+            <div class="setting-control">
+              <span class="setting-static-badge">km/h (WMO Standard)</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-meta">
+              <span class="setting-label">Atmospheric Motion & Parallax</span>
+              <span class="setting-hint">Hardware-accelerated 60fps celestial particles and Lenis scroll</span>
+            </div>
+            <div class="setting-control">
+              <span class="setting-active-dot">● ACTIVE (GPU Composited)</span>
+            </div>
           </div>
         </div>
       </div>

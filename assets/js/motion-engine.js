@@ -731,6 +731,89 @@ class MotionEngine {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
+
+  // --- MOTIONSITES.AI STANDBY TO ACTIVE CITY TRANSITION ---
+  animateStandbyToActive() {
+    if (typeof gsap === 'undefined') return;
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    // 1. Hero Card: Smooth scale bloom and blur-to-focus
+    const heroCard = document.getElementById('hero-scenery-card');
+    if (heroCard) {
+      tl.fromTo(heroCard,
+        { scale: 0.975, filter: 'blur(8px)', opacity: 0.7 },
+        { scale: 1, filter: 'blur(0px)', opacity: 1, duration: 0.7, clearProps: 'filter' }
+      );
+    }
+
+    // 2. Character Observer micro-bounce
+    const character = document.getElementById('character-figure');
+    if (character) {
+      tl.fromTo(character,
+        { scale: 0.85, y: 12 },
+        { scale: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)' },
+        '-=0.5'
+      );
+    }
+
+    // 3. 24-Hour Forecast & Spline Card
+    const forecastCard = document.getElementById('hourly-forecast-section');
+    if (forecastCard) {
+      tl.fromTo(forecastCard,
+        { y: 20, opacity: 0, filter: 'blur(6px)' },
+        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.65, clearProps: 'filter' },
+        '-=0.45'
+      );
+    }
+
+    // 4. Split Cards (Sun Path + Tomorrow's Forecast)
+    const splitCards = document.querySelectorAll('#sun-cycle-card, #insight-card');
+    if (splitCards.length) {
+      tl.fromTo(splitCards,
+        { y: 18, opacity: 0, scale: 0.98 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.08, clearProps: 'transform,opacity' },
+        '-=0.4'
+      );
+    }
+
+    // 5. 6 Bento Metric Boxes staggered entrance
+    const bentoCards = document.querySelectorAll('.widgets-dashboard-grid .metric-box');
+    if (bentoCards.length) {
+      tl.fromTo(bentoCards,
+        { y: 16, opacity: 0, scale: 0.97 },
+        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.04, clearProps: 'transform,opacity' },
+        '-=0.35'
+      );
+    }
+  }
+
+  // --- MOTIONSITES.AI CITY SWITCH TRANSITION ---
+  animateCitySwitch() {
+    if (typeof gsap === 'undefined') return;
+
+    const targets = document.querySelectorAll(
+      '#city-name, #temperature, #weather-description, #apparent-temp, #hero-floating-stack, #spline-chart-container, #sun-cycle-card, #insight-card, .widgets-dashboard-grid'
+    );
+
+    gsap.fromTo(targets,
+      { opacity: 0.4, filter: 'blur(4px)' },
+      { opacity: 1, filter: 'blur(0px)', duration: 0.55, stagger: 0.03, ease: 'power2.out', clearProps: 'filter,opacity' }
+    );
+  }
+
+  // --- MOTIONSITES.AI RETURN TO STANDBY TRANSITION ---
+  animateReturnToStandby() {
+    if (typeof gsap === 'undefined') return;
+
+    const dashboard = document.getElementById('weather-dashboard');
+    if (dashboard) {
+      gsap.fromTo(dashboard,
+        { opacity: 0.6, filter: 'blur(6px)', scale: 0.99 },
+        { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 0.65, ease: 'power3.out', clearProps: 'filter,transform,opacity' }
+      );
+    }
+  }
 }
 
 // Global instance
